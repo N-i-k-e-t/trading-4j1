@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRuleSci } from '@/lib/context';
 import { X, TrendingUp, TrendingDown, MessageSquare } from 'lucide-react';
-import type { BaselineState, Trade } from '@/types/trading';
+import type { BaselineState, Trade, Rule } from '@/types/trading';
+import { parseRoughNote } from '@/lib/agents/magicJournal';
+import { Wand2, Mic, Camera } from 'lucide-react';
 
 const moods: { label: string; emoji: string; value: BaselineState }[] = [
     { label: "Very Bad", emoji: "😢", value: "very_bad" },
@@ -31,7 +33,35 @@ export default function TradeEntryModal({ isOpen, onClose }: TradeEntryModalProp
     const [rulesFollowed, setRulesFollowed] = useState<string[]>([]);
     const [rulesBroken, setRulesBroken] = useState<string[]>([]);
 
-    const activeRules = rules.filter(r => r.isActive);
+    const [activeTab, setActiveTab] = useState<'manual' | 'magic'>('manual');
+    const [roughNote, setRoughNote] = useState('');
+    const [isParsing, setIsParsing] = useState(false);
+
+    const activeRules = rules.filter((r: Rule) => r.isActive);
+
+    const handleMagicParse = async () => {
+        if (!roughNote.trim()) {
+            showToast('Please type your raw notes first', 'error');
+            return;
+        }
+        setIsParsing(true);
+        const { parsedTrade, detectedFollowed, detectedBroken } = await parseRoughNote(roughNote, activeRules);
+        setIsParsing(false);
+
+        // Populate fields
+        if (parsedTrade.pair && parsedTrade.pair !== "UNKNOWN") setPair(parsedTrade.pair);
+        if (parsedTrade.type) setDirection(parsedTrade.type);
+        if (parsedTrade.entry) setEntry(parsedTrade.entry);
+        if (parsedTrade.exit) setExit(parsedTrade.exit);
+        if (parsedTrade.emotion) setSelectedMood(parsedTrade.emotion);
+        if (parsedTrade.notes) setNotes(parsedTrade.notes);
+        
+        setRulesFollowed(detectedFollowed);
+        setRulesBroken(detectedBroken);
+
+        showToast('AI successfully extracted structured data! Please review.', 'success');
+        setActiveTab('manual'); // Switch to review mode
+    };
 
     const toggleFollowed = (id: string) => {
         if (rulesFollowed.includes(id)) {
@@ -118,36 +148,116 @@ export default function TradeEntryModal({ isOpen, onClose }: TradeEntryModalProp
                                 </button>
                             </div>
 
-                            {/* Pair + Direction */}
-                            <div className="flex gap-3 mb-5">
-                                <div className="flex-1">
-                                    <label className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-wider ml-1 mb-1.5 block">Pair</label>
-                                    <input
-                                        type="text"
-                                        value={pair}
-                                        onChange={(e) => setPair(e.target.value)}
-                                        placeholder="EUR/USD"
-                                        className="w-full h-[48px] bg-[#1a1a2e]/5 rounded-xl px-4 text-[15px] font-semibold text-[#1a1a2e] placeholder-[#9ca3af] focus:ring-2 focus:ring-[#2563eb] border-none outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-wider ml-1 mb-1.5 block">Direction</label>
-                                    <div className="flex h-[48px] bg-[#1a1a2e]/5 rounded-xl overflow-hidden">
-                                        <button
-                                            onClick={() => setDirection('Long')}
-                                            className={`px-5 text-[13px] font-bold transition-all ${direction === 'Long' ? 'bg-[#22c55e] text-white' : 'text-[#6b7280]'}`}
-                                        >
-                                            Long
-                                        </button>
-                                        <button
-                                            onClick={() => setDirection('Short')}
-                                            className={`px-5 text-[13px] font-bold transition-all ${direction === 'Short' ? 'bg-[#ef4444] text-white' : 'text-[#6b7280]'}`}
-                                        >
-                                            Short
-                                        </button>
-                                    </div>
-                                </div>
+                            {/* Tabs */}
+                            <div className="flex bg-[#1a1a2e]/5 rounded-xl p-1 mb-6">
+                                <button
+                                    onClick={() => setActiveTab('manual')}
+                                    className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-lg text-sm font-bold transition-all ${activeTab === 'manual' ? 'bg-white text-[#1a1a2e] shadow-sm' : 'text-[#6b7280]'}`}
+                                >
+                                    Detailed Log
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('magic')}
+                                    className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-lg text-sm font-bold transition-all ${activeTab === 'magic' ? 'bg-white text-[#1a1a2e] shadow-sm' : 'text-[#6b7280]'}`}
+                                >
+                                    <Wand2 size={16} className={activeTab === 'magic' ? 'text-[#2563eb]' : ''} />
+                                    AI Magic Scan
+                                </button>
                             </div>
+
+                            <AnimatePresence mode="wait">
+                                {activeTab === 'magic' ? (
+                                    <motion.div
+                                        key="magic"
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -20 }}
+                                        className="flex flex-col gap-5"
+                                    >
+                                        <div className="bg-[#2563eb]/10 border border-[#2563eb]/20 rounded-xl p-4 text-[#1a1a2e] text-sm leading-relaxed">
+                                            <p className="font-bold flex items-center gap-2 mb-1">
+                                                <Wand2 size={16} className="text-[#2563eb]" />
+                                                Rough Note Parser
+                                            </p>
+                                            <p className="text-[#6b7280]">
+                                                Just brain-dump your trade details. Our AI (GPT-4o simulated) will extract the pair, entry/exit, emotion, and auto-score your active rules.
+                                            </p>
+                                            <p className="text-[#9ca3af] text-[11px] font-bold mt-2 uppercase tracking-wide">
+                                                Example: "took a long NIFTY at 24100, SL was 24050, but i moved it..."
+                                            </p>
+                                        </div>
+
+                                        <div className="relative">
+                                            <textarea
+                                                value={roughNote}
+                                                onChange={(e) => setRoughNote(e.target.value)}
+                                                placeholder="Speak or type your rough trading note..."
+                                                rows={5}
+                                                className="w-full bg-[#1a1a2e]/5 border-2 border-transparent focus:border-[#2563eb]/30 rounded-xl px-4 py-3 text-[15px] font-medium text-[#1a1a2e] placeholder-[#9ca3af] outline-none transition-all resize-none shadow-inner"
+                                            />
+                                            {/* Fake multimedia buttons purely for UI demonstration */}
+                                            <div className="absolute bottom-3 right-3 flex gap-2">
+                                                <div className="p-2 bg-white rounded-lg cursor-not-allowed hover:bg-gray-50 border border-gray-100 shadow-sm text-gray-400 hint-group relative" title="Whisper Voice STT (Coming Soon)">
+                                                    <Mic size={18} />
+                                                </div>
+                                                <div className="p-2 bg-white rounded-lg cursor-not-allowed hover:bg-gray-50 border border-gray-100 shadow-sm text-gray-400 hint-group relative" title="Chart Photo Parse (Coming Soon)">
+                                                    <Camera size={18} />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={handleMagicParse}
+                                            disabled={isParsing || !roughNote.trim()}
+                                            className="w-full h-[52px] bg-[#2563eb] text-white font-bold rounded-full shadow-lg shadow-[#2563eb]/20 active:scale-[0.98] transition-transform text-[15px] flex items-center justify-center gap-2 disabled:opacity-50"
+                                        >
+                                            {isParsing ? (
+                                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            ) : (
+                                                <>
+                                                    <Wand2 size={18} />
+                                                    Extract Structured Data
+                                                </>
+                                            )}
+                                        </button>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="manual"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 20 }}
+                                    >
+                                        {/* Pair + Direction */}
+                                        <div className="flex gap-3 mb-5">
+                                            <div className="flex-1">
+                                                <label className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-wider ml-1 mb-1.5 block">Pair</label>
+                                                <input
+                                                    type="text"
+                                                    value={pair}
+                                                    onChange={(e) => setPair(e.target.value)}
+                                                    placeholder="EUR/USD"
+                                                    className="w-full h-[48px] bg-[#1a1a2e]/5 rounded-xl px-4 text-[15px] font-semibold text-[#1a1a2e] placeholder-[#9ca3af] focus:ring-2 focus:ring-[#2563eb] border-none outline-none"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-wider ml-1 mb-1.5 block">Direction</label>
+                                                <div className="flex h-[48px] bg-[#1a1a2e]/5 rounded-xl overflow-hidden">
+                                                    <button
+                                                        onClick={() => setDirection('Long')}
+                                                        className={`px-5 text-[13px] font-bold transition-all ${direction === 'Long' ? 'bg-[#22c55e] text-white' : 'text-[#6b7280]'}`}
+                                                    >
+                                                        Long
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setDirection('Short')}
+                                                        className={`px-5 text-[13px] font-bold transition-all ${direction === 'Short' ? 'bg-[#ef4444] text-white' : 'text-[#6b7280]'}`}
+                                                    >
+                                                        Short
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
 
                             {/* Entry / Exit */}
                             <div className="flex gap-3 mb-5">
@@ -240,13 +350,16 @@ export default function TradeEntryModal({ isOpen, onClose }: TradeEntryModalProp
                                 />
                             </div>
 
-                            {/* Submit */}
-                            <button
-                                onClick={handleSubmit}
-                                className="w-full h-[52px] bg-[#1a1a2e] text-white font-bold rounded-full shadow-lg active:scale-[0.98] transition-transform text-[15px]"
-                            >
-                                Save Trade
-                            </button>
+                                        {/* Submit */}
+                                        <button
+                                            onClick={handleSubmit}
+                                            className="w-full h-[52px] bg-[#1a1a2e] text-white font-bold rounded-full shadow-lg active:scale-[0.98] transition-transform text-[15px]"
+                                        >
+                                            Save Trade
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </motion.div>
                 </>

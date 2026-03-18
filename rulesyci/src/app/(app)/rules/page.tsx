@@ -14,32 +14,62 @@ import {
     Lock,
     Search,
     Check,
-    X
+    X,
+    BookOpen
 } from 'lucide-react';
 
-const CATEGORIES = ['All', 'Risk Management', 'Entry', 'Exit', 'Mindset', 'Session', 'Review'];
-
-const RULE_LIBRARY = [
-    { id: 'l1', text: "Never risk more than 2% per trade", emoji: "🛡️", category: "Risk Management", image: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&q=80&w=400" },
-    { id: 'l2', text: "Always use a stop loss", emoji: "🛑", category: "Risk Management", image: "https://images.unsplash.com/photo-1621361891114-c10151f7a512?auto=format&fit=crop&q=80&w=400" },
-    { id: 'l3', text: "Wait for confirmation candle", emoji: "🕯️", category: "Entry", image: "https://images.unsplash.com/photo-1611974717482-58a05a74bf4f?auto=format&fit=crop&q=80&w=400" },
-    { id: 'l4', text: "No revenge trading", emoji: "🧠", category: "Mindset", image: "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?auto=format&fit=crop&q=80&w=400" },
-    { id: 'l5', text: "Max 3 trades per session", emoji: "🔢", category: "Session", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400" },
-    { id: 'l6', text: "Stop after 2 consecutive losses", emoji: "⏸️", category: "Risk Management", image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80&w=400" },
-    { id: 'l7', text: "Check higher timeframe first", emoji: "📅", category: "Entry", image: "https://images.unsplash.com/photo-1551288049-bbbda536639a?auto=format&fit=crop&q=80&w=400" },
-    { id: 'l8', text: "Set take profit before entering", emoji: "🎯", category: "Risk Management", image: "https://images.unsplash.com/photo-1544377193-33dcf4d68fb5?auto=format&fit=crop&q=80&w=400" },
+const MASTER_LIBRARIES = [
+    {
+        title: "Jesse Livermore's Rules",
+        author: "Reminiscences of a Stock Operator",
+        icon: "🏛️",
+        rules: [
+            { id: 'jl1', text: "Never average losses", emoji: "📉", category: "Risk Management" },
+            { id: 'jl2', text: "Buy rising stocks, sell falling", emoji: "📈", category: "Trend Following" },
+            { id: 'jl3', text: "Don't become an involuntary investor", emoji: "🛑", category: "Exit" },
+            { id: 'jl4', text: "Money is made by sitting, not trading", emoji: "🧘", category: "Mindset" },
+        ]
+    },
+    {
+        title: "Mark Douglas",
+        author: "Trading in the Zone",
+        icon: "🧠",
+        rules: [
+            { id: 'md1', text: "I objectively identify my edges", emoji: "🔍", category: "Mindset" },
+            { id: 'md2', text: "Predefine risk on every trade", emoji: "🛡️", category: "Risk Management" },
+            { id: 'md3', text: "Completely accept the risk", emoji: "🤝", category: "Mindset" },
+            { id: 'md4', text: "Act on edges without reservation", emoji: "⚡", category: "Execution" },
+            { id: 'md5', text: "Pay myself as the market makes money available", emoji: "💰", category: "Exit" },
+        ]
+    },
+    {
+        title: "Van Tharp",
+        author: "Trade Your Way to Financial Freedom",
+        icon: "📊",
+        rules: [
+            { id: 'vt1', text: "Max 1R risk per trade", emoji: "1️⃣", category: "Position Sizing" },
+            { id: 'vt2', text: "Cut losses immediately when hit", emoji: "✂️", category: "Risk Management" },
+            { id: 'vt3', text: "Let profits run to target", emoji: "🏃", category: "Exit" },
+        ]
+    },
+    {
+        title: "Day Trading Basics",
+        author: "RuleSci Default Library",
+        icon: "⚡",
+        rules: [
+            { id: 'dt1', text: "Wait for confirmation candle", emoji: "🕯️", category: "Entry" },
+            { id: 'dt2', text: "No revenge trading", emoji: "🚫", category: "Mindset" },
+            { id: 'dt3', text: "Max 3 trades per session", emoji: "🔢", category: "Session" },
+            { id: 'dt4', text: "Check higher timeframe first", emoji: "📅", category: "Analysis" },
+        ]
+    }
 ];
 
 export default function RulesPage() {
-    const { rules, trades, addRule, removeRule, toggleRuleActive, addRuleFromLibrary, showToast } = useRuleSci();
-    const [activeCategory, setActiveCategory] = useState('All');
+    const { rules, trades, addRule, toggleRuleActive, addRuleFromLibrary, showToast } = useRuleSci();
     const [isCreating, setIsCreating] = useState(false);
     const [newRuleText, setNewRuleText] = useState('');
     const [newRuleEmoji, setNewRuleEmoji] = useState('🎯');
-
-    const filteredLibrary = RULE_LIBRARY.filter(r =>
-        activeCategory === 'All' || r.category === activeCategory
-    );
 
     // Compute per-rule compliance from trade data
     const getRuleCompliance = (ruleId: string) => {
@@ -70,10 +100,10 @@ export default function RulesPage() {
         setIsCreating(false);
     };
 
-    const handleAddFromLibrary = (libRule: typeof RULE_LIBRARY[0]) => {
+    const handleAddFromLibrary = (libRule: any) => {
         const alreadyExists = rules.find(r => r.text === libRule.text);
         if (alreadyExists) {
-            showToast('Rule already added!', 'info');
+            showToast('Rule already active!', 'info');
             return;
         }
         addRuleFromLibrary({
@@ -83,7 +113,7 @@ export default function RulesPage() {
             category: libRule.category,
             isActive: true,
         });
-        showToast(`Added: ${libRule.text}`, 'success');
+        showToast(`Imported: ${libRule.text}`, 'success');
     };
 
     const emojiOptions = ['🎯', '🛡️', '🛑', '🧠', '📊', '⚡', '🔥', '💎', '🚀', '⏸️', '📅', '🕯️'];
@@ -92,8 +122,8 @@ export default function RulesPage() {
         <div className="flex flex-col gap-12 pb-12">
             {/* Header */}
             <header>
-                <h1 className="text-[22px] font-bold text-[#1a1a2e] mb-2">My Rules</h1>
-                <p className="text-base text-[#6b7280]">Build your trading framework, one rule at a time.</p>
+                <h1 className="text-[22px] font-bold text-[#1a1a2e] mb-2">Rule Library</h1>
+                <p className="text-base text-[#6b7280]">Manage your active framework or import rules from trading legends.</p>
             </header>
 
             {/* Active Rules List */}
@@ -109,11 +139,11 @@ export default function RulesPage() {
                             const compliance = getRuleCompliance(rule.id);
                             return (
                                 <div key={rule.id} className="bg-white rounded-2xl px-4 py-3.5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-[#1a1a2e]/5 rounded-xl flex items-center justify-center text-xl">
+                                    <div className="w-10 h-10 bg-[#1a1a2e]/5 rounded-xl flex items-center justify-center text-xl shrink-0">
                                         {rule.emoji || '🎯'}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <span className={`block text-[16px] font-semibold ${rule.isActive ? 'text-[#1a1a2e]' : 'text-[#9ca3af] line-through'}`}>{rule.text}</span>
+                                        <span className={`block text-[16px] font-semibold truncate ${rule.isActive ? 'text-[#1a1a2e]' : 'text-[#9ca3af] line-through'}`}>{rule.text}</span>
                                         <span className={`text-[11px] font-bold uppercase tracking-wider ${
                                             compliance === null ? 'text-[#9ca3af]' :
                                             compliance >= 80 ? 'text-[#22c55e]' :
@@ -124,7 +154,7 @@ export default function RulesPage() {
                                     </div>
                                     <button
                                         onClick={() => toggleRuleActive(rule.id)}
-                                        className={`w-10 h-6 rounded-full relative p-1 cursor-pointer transition-colors ${rule.isActive ? 'bg-[#2563eb]' : 'bg-[#9ca3af]/30'}`}
+                                        className={`w-10 h-6 shrink-0 rounded-full relative p-1 cursor-pointer transition-colors ${rule.isActive ? 'bg-[#2563eb]' : 'bg-[#9ca3af]/30'}`}
                                     >
                                         <motion.div
                                             animate={{ x: rule.isActive ? 16 : 0 }}
@@ -143,7 +173,7 @@ export default function RulesPage() {
                     {/* Create Your Own Rule */}
                     {isCreating ? (
                         <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.06)] flex flex-col gap-3">
-                            <div className="flex gap-2 overflow-x-auto pb-1">
+                            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                                 {emojiOptions.map(e => (
                                     <button
                                         key={e}
@@ -184,58 +214,46 @@ export default function RulesPage() {
                 </div>
             </section>
 
-            {/* Rule Library */}
+            {/* Open Source / Legend Libraries */}
             <section>
-                <div className="mb-8">
-                    <h2 className="text-xl font-bold text-[#1a1a2e] mb-2">Rule Library</h2>
-                    <p className="text-sm text-[#6b7280]">Tap + to add to your rules</p>
+                <div className="mb-6 flex items-center gap-2">
+                    <BookOpen size={20} className="text-[#1a1a2e]" />
+                    <h2 className="text-xl font-bold text-[#1a1a2e]">Master Libraries</h2>
                 </div>
 
-                {/* Category Pills */}
-                <div className="flex gap-2 overflow-x-auto pb-6 scrollbar-hide">
-                    {CATEGORIES.map((cat) => (
-                        <button
-                            key={cat}
-                            onClick={() => setActiveCategory(cat)}
-                            className={`px-6 h-11 flex-shrink-0 rounded-full text-sm font-bold transition-all ${activeCategory === cat
-                                    ? 'bg-[#1a1a2e] text-white'
-                                    : 'bg-[#1a1a2e]/5 text-[#6b7280] hover:bg-[#1a1a2e]/10'
-                                }`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Grid of Library Cards */}
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredLibrary.map((rule) => {
-                        const alreadyAdded = rules.some(r => r.text === rule.text);
-                        return (
-                            <div
-                                key={rule.id}
-                                className="relative aspect-square rounded-[24px] overflow-hidden shadow-sm group cursor-pointer"
-                                onClick={() => !alreadyAdded && handleAddFromLibrary(rule)}
-                            >
-                                <img
-                                    src={rule.image}
-                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                    alt={rule.text}
-                                />
-                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-
-                                <div className="absolute bottom-3 left-3 right-3 bg-white rounded-full p-2 flex items-center justify-between shadow-md">
-                                    <div className="flex items-center gap-2 min-w-0">
-                                        <span className="text-sm shrink-0">{rule.emoji}</span>
-                                        <span className="text-[10px] font-bold text-[#1a1a2e] truncate">{rule.text}</span>
-                                    </div>
-                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ml-2 ${alreadyAdded ? 'bg-[#22c55e] text-white' : 'bg-[#1a1a2e] text-white'}`}>
-                                        {alreadyAdded ? <Check size={14} strokeWidth={3} /> : <Plus size={14} strokeWidth={3} />}
-                                    </div>
-                                </div>
+                <div className="flex flex-col gap-8">
+                    {MASTER_LIBRARIES.map((lib, i) => (
+                        <div key={i} className="flex flex-col gap-4">
+                            <div>
+                                <h3 className="text-[17px] font-bold text-[#1a1a2e] flex items-center gap-2">
+                                    {lib.icon} {lib.title}
+                                </h3>
+                                <p className="text-[13px] text-[#6b7280]">{lib.author}</p>
                             </div>
-                        );
-                    })}
+
+                            <div className="bg-white rounded-2xl border-2 border-[#1a1a2e]/5 overflow-hidden">
+                                {lib.rules.map((rule, j) => {
+                                    const alreadyAdded = rules.some(r => r.text === rule.text);
+                                    return (
+                                        <div key={rule.id} className={`flex items-center gap-3 p-4 ${j !== lib.rules.length - 1 ? 'border-b border-[#1a1a2e]/5' : ''}`}>
+                                            <div className="text-lg w-8 flex-shrink-0 text-center">{rule.emoji}</div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-[14.5px] font-semibold text-[#1a1a2e]">{rule.text}</p>
+                                                <p className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-wider">{rule.category}</p>
+                                            </div>
+                                            <button
+                                                disabled={alreadyAdded}
+                                                onClick={() => !alreadyAdded && handleAddFromLibrary(rule)}
+                                                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${alreadyAdded ? 'bg-[#22c55e]/10 text-[#22c55e]' : 'bg-[#1a1a2e]/5 text-[#1a1a2e] hover:bg-[#1a1a2e]/10'}`}
+                                            >
+                                                {alreadyAdded ? <Check size={16} strokeWidth={3} /> : <Plus size={16} strokeWidth={2.5} />}
+                                            </button>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </section>
         </div>
