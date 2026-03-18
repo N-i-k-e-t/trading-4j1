@@ -98,11 +98,14 @@ export default function PricingPage() {
                     </Link>
                 </div>
 
+                <p className="text-[14px] font-bold text-[#f59e0b] mb-3 uppercase tracking-wider">
+                    🎉 Includes 3-Day Free Trial
+                </p>
                 <Link
                     href="/signup"
                     className="w-full bg-[#1a1a2e] text-white h-14 flex items-center justify-center rounded-full text-base font-bold shadow-xl hover:translate-y-[-2px] transition-all mb-4"
                 >
-                    CONTINUE
+                    Start 3-Day Free Trial
                 </Link>
                 <p className="text-[14px] text-[#9ca3af] mb-1">Cancel anytime.</p>
                 <div className="flex items-center justify-center gap-2 text-[14px] font-semibold text-[#1a1a2e] mb-20">

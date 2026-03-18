@@ -48,7 +48,7 @@ export default function LoginPage() {
                     className="bg-white rounded-[24px] p-8 shadow-[0_2px_12px_rgba(0,0,0,0.06)]"
                 >
                     <h1 className="text-2xl font-bold text-[#1a1a2e] mb-2 text-center">Welcome back</h1>
-                    <p className="text-sm text-[#6b7280] mb-8 text-center">Continue your journey to trading discipline.</p>
+                    <p className="text-sm text-[#f59e0b] font-bold mb-8 text-center uppercase tracking-wide">Login to start or continue your 3-Day Trial</p>
 
                     {error && (
                         <div className="mb-6 p-4 bg-[#ef4444]/10 border border-[#ef4444]/20 rounded-xl text-xs text-[#ef4444] font-semibold text-center leading-relaxed">
@@ -73,7 +73,7 @@ export default function LoginPage() {
                         </div>
 
                         {!isAuthorizedForPasswordless && (
-                            <motion.div
+                            <motion.div 
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 className="flex flex-col gap-1.5"
@@ -104,14 +104,13 @@ export default function LoginPage() {
                             </motion.div>
                         )}
 
-                        <button
+                        <button 
                             type="submit"
                             className="w-full h-14 bg-[#1a1a2e] text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all mt-4"
                         >
-                            {isAuthorizedForPasswordless ? 'Instant Access' : 'Log In'}
+                            {isAuthorizedForPasswordless ? 'Instant Access' : 'Login / Start 3-Day Trial'}
                         </button>
                     </form>
-
 
                     <div className="relative my-8">
                         <div className="absolute inset-0 flex items-center">

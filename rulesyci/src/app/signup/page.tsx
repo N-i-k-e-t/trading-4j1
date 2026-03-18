@@ -41,7 +41,7 @@ export default function SignupPage() {
                     className="bg-white rounded-[24px] p-8 shadow-[0_2px_12px_rgba(0,0,0,0.06)]"
                 >
                     <h1 className="text-2xl font-bold text-[#1a1a2e] mb-2 text-center">Create your account</h1>
-                    <p className="text-sm text-[#6b7280] mb-8 text-center">Start your journey to trading discipline.</p>
+                    <p className="text-sm text-[#f59e0b] font-bold mb-8 text-center uppercase tracking-wide">Start your 3-Day Free Trial</p>
 
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1.5">
@@ -94,7 +94,7 @@ export default function SignupPage() {
                         </div>
 
                         <button className="w-full h-14 bg-[#1a1a2e] text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all mt-4">
-                            Create Account
+                            Start 3-Day Free Trial
                         </button>
                     </form>
 
