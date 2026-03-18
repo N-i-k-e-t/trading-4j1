@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 export default function StatsPage() {
-    const { trades, rules, dailyLogs } = useRuleSci();
+    const { trades, rules, dailyLogs, userModel } = useRuleSci();
     const [period, setPeriod] = useState('All');
 
     // Filter trades by period
@@ -114,8 +114,8 @@ export default function StatsPage() {
 
     // AI Insights
     const aiOutput = useMemo(() => {
-        return runOrchestrator(trades, rules, dailyLogs, streak, bestStreak, null);
-    }, [trades, rules, dailyLogs, streak, bestStreak]);
+        return runOrchestrator(trades, rules, dailyLogs, streak, bestStreak, null, userModel);
+    }, [trades, rules, dailyLogs, streak, bestStreak, userModel]);
 
     const streakPercent = bestStreak > 0 ? Math.min((streak / Math.max(bestStreak, 1)) * 100, 100) : (streak > 0 ? 100 : 0);
 
