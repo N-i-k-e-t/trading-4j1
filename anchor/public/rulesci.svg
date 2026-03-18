@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+  <!-- Geometric square frame — structured, stable, controlled -->
+  <rect x="3" y="3" width="26" height="26" rx="4" stroke="#2A9D8F" stroke-width="1.5" fill="none"/>
+  <!-- R letterform — clean, minimal -->
+  <path d="M11 9 L11 23" stroke="#2A9D8F" stroke-width="2" stroke-linecap="round"/>
+  <path d="M11 9 L18 9 C20.2 9 22 10.8 22 13 C22 15.2 20.2 17 18 17 L11 17" stroke="#2A9D8F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M17 17 L22 23" stroke="#2A9D8F" stroke-width="2" stroke-linecap="round"/>
+</svg>

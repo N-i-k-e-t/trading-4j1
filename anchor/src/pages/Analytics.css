@@ -1,0 +1,232 @@
+/* ============================================
+   Analytics Page — RuleSci
+   ============================================ */
+
+.analytics-page {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+/* Metrics Row */
+.analytics-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.metric-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+}
+
+.metric-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--off-white);
+    line-height: 1;
+}
+
+.metric-value.capitalize {
+    text-transform: capitalize;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: var(--slate-light);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+}
+
+/* Analytics Panels */
+.analytics-sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.analytics-panel {
+    overflow: hidden;
+}
+
+.analytics-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0;
+    color: var(--off-white);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.analytics-panel-header:hover {
+    color: var(--muted-teal);
+}
+
+.analytics-panel-header h3 {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.analytics-panel-body {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Mini Bar Chart */
+.mini-chart {
+    margin-bottom: var(--space-lg);
+}
+
+.mini-chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-sm);
+    height: 120px;
+    padding: 0 var(--space-sm);
+}
+
+.mini-bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+}
+
+.mini-bar {
+    width: 100%;
+    max-width: 40px;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 8px;
+}
+
+.mini-bar-label {
+    font-size: 0.6875rem;
+    color: var(--slate-light);
+    letter-spacing: 0.04em;
+}
+
+.analytics-summary {
+    padding: var(--space-md) 0 0;
+}
+
+.analytics-summary p {
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: var(--mist-gray);
+}
+
+.analytics-summary strong {
+    color: var(--off-white);
+    font-weight: 500;
+}
+
+/* Baseline Breakdown */
+.baseline-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.baseline-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.baseline-name {
+    font-size: 0.8125rem;
+    color: var(--off-white);
+    min-width: 80px;
+    font-weight: 400;
+}
+
+.baseline-name.capitalize {
+    text-transform: capitalize;
+}
+
+.baseline-bar-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.baseline-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.baseline-count {
+    font-size: 0.8125rem;
+    color: var(--slate-light);
+    min-width: 20px;
+    text-align: right;
+}
+
+/* Behavior Stats */
+.behavior-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-md);
+}
+
+.behavior-stat {
+    text-align: center;
+    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+}
+
+.behavior-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--off-white);
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.behavior-label {
+    display: block;
+    font-size: 0.6875rem;
+    color: var(--slate-light);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* Deviation Analysis */
+.deviation-analysis {
+    padding: var(--space-md) 0;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+@media (max-width: 768px) {
+    .analytics-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .behavior-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
