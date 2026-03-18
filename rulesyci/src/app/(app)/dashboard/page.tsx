@@ -14,6 +14,8 @@ import {
   Activity
 } from 'lucide-react';
 import { calculateTiltScore } from '@/lib/agents/riskSentinel';
+import WeekStrip from '@/components/calendar/WeekStrip';
+import { DailyLog } from '@/types/trading';
 
 export default function TodayPage() {
   const { rules, user, trades, dailyLogs, playbooks, showToast, logDaily } = useRuleSci();
@@ -46,6 +48,8 @@ export default function TodayPage() {
         mood: mood || '',
         rulesFollowed: checkedIds.length,
         rulesBroken: activeRules.length - checkedIds.length,
+        pnl: todayPnL,
+        grade: calculateGrade(activeRules.length > 0 ? (checkedIds.length / activeRules.length) * 100 : 100)
       });
       return next;
     });
@@ -61,6 +65,8 @@ export default function TodayPage() {
       mood: value,
       rulesFollowed: checkedIds.length,
       rulesBroken: activeRules.length - checkedIds.length,
+      pnl: todayPnL,
+      grade: calculateGrade(compliance)
     });
     showToast('Mood saved', 'success');
   };
@@ -112,6 +118,17 @@ export default function TodayPage() {
     { label: "Great", emoji: "😄", value: "great" },
   ];
 
+  const calculateGrade = (compl: number): DailyLog['grade'] => {
+    if (compl >= 100) return 'A';
+    if (compl >= 80) return 'B';
+    if (compl >= 60) return 'C';
+    if (compl >= 40) return 'D';
+    return 'F';
+  };
+
+  const todayPnL = useMemo(() => todayTrades.reduce((sum, t) => sum + (t.pnl || 0), 0), [todayTrades]);
+
+
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       {/* Header */}
@@ -129,6 +146,9 @@ export default function TodayPage() {
         </div>
         <p className="text-base text-[#6b7280]">{dateStr}</p>
       </header>
+
+      {/* Week Strip Calendar */}
+      <WeekStrip />
 
       {/* Tilt Meter - Signature Feature */}
       <section>

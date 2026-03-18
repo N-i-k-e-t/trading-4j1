@@ -9,11 +9,13 @@ import {
     ScrollText,
     BarChart3,
     Settings,
-    Target
+    Target,
+    Activity
 } from 'lucide-react';
 
 const navItems = [
-    { to: '/dashboard', icon: Calendar, label: 'Today' },
+    { to: '/dashboard', icon: Activity, label: 'Today' },
+    { to: '/calendar', icon: Calendar, label: 'Calendar' },
     { to: '/journal', icon: BookOpen, label: 'Journal' },
     { to: '/rules', icon: ScrollText, label: 'Rules' },
     { to: '/stats', icon: BarChart3, label: 'Stats' },

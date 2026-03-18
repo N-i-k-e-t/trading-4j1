@@ -98,6 +98,16 @@ export interface RiskAlert {
     timestamp: string;
 }
 
+export interface MarketEvent {
+    id: string;
+    date: string; // YYYY-MM-DD
+    time?: string; // HH:mm
+    title: string;
+    impact: 'low' | 'medium' | 'high' | 'critical';
+    country?: string; // India, US, etc.
+    type?: string; // CPI, FOMC, RBI, Expiry
+}
+
 // Daily activity log for streaks + heatmap
 export interface DailyLog {
     date: string; // YYYY-MM-DD
@@ -106,4 +116,7 @@ export interface DailyLog {
     mood: string;
     rulesFollowed: number;
     rulesBroken: number;
+    pnl?: number; // Total PnL for the day
+    grade?: 'A' | 'B' | 'C' | 'D' | 'F' | 'None'; // Discipline Grade
+    events?: string[]; // MarketEvent IDs that happened this day
 }

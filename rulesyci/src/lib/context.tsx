@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react';
-import { Rule, Trade, Observation, Session, Analytics, BaselineState, User, DailyLog, PatternInsight, CoachMessage, RiskAlert, Playbook } from '@/types/trading';
+import { Rule, Trade, Observation, Session, Analytics, BaselineState, User, DailyLog, PatternInsight, CoachMessage, RiskAlert, Playbook, MarketEvent } from '@/types/trading';
 import { checkRisks } from '@/lib/agents/riskSentinel';
 
 const ALLOWED_PRO_EMAILS = ['niketpatil1624@gmail.com', 'adityaparerao8@gmail.com'];
@@ -20,6 +20,7 @@ interface AppState {
     coachMessages: CoachMessage[];
     riskAlerts: RiskAlert[];
     playbooks: Playbook[];
+    marketEvents: MarketEvent[];
     toasts: { id: string; message: string; type: 'success' | 'error' | 'info' }[];
 }
 
@@ -44,6 +45,8 @@ type Action =
     | { type: 'ADD_COACH_MESSAGE'; payload: CoachMessage }
     | { type: 'ADD_RISK_ALERT'; payload: RiskAlert }
     | { type: 'ADD_PLAYBOOK'; payload: Playbook }
+    | { type: 'SET_MARKET_EVENTS'; payload: MarketEvent[] }
+    | { type: 'ADD_MARKET_EVENT'; payload: MarketEvent }
     | { type: 'SHOW_TOAST'; payload: { id: string; message: string; type: 'success' | 'error' | 'info' } }
     | { type: 'DISMISS_TOAST'; payload: string }
     | { type: 'LOGOUT' };
@@ -85,6 +88,12 @@ const initialState: AppState = {
     riskAlerts: [],
     playbooks: [
         { id: 'pb1', name: 'NIFTY Opening Range Breakout', description: 'Trading the 15min range break in morning', criteria: ['High volume', 'Vix < 25', 'RSI > 60'] }
+    ],
+    marketEvents: [
+        { id: 'ev1', date: '2026-03-18', time: '10:00', title: 'CPI India Data', impact: 'high', country: 'India', type: 'CPI' },
+        { id: 'ev2', date: '2026-03-19', time: '14:30', title: 'NIFTY Weekly Expiry', impact: 'high', country: 'India', type: 'Expiry' },
+        { id: 'ev3', date: '2026-03-25', time: '12:00', title: 'RBI MPC Meeting', impact: 'critical', country: 'India', type: 'RBI' },
+        { id: 'ev4', date: '2026-03-20', time: '14:00', title: 'FOMC Minutes', impact: 'medium', country: 'US', type: 'FOMC' },
     ],
     toasts: [],
 };
@@ -178,6 +187,12 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
         case 'ADD_PLAYBOOK':
             return { ...state, playbooks: [...state.playbooks, action.payload] };
 
+        case 'SET_MARKET_EVENTS':
+            return { ...state, marketEvents: action.payload };
+
+        case 'ADD_MARKET_EVENT':
+            return { ...state, marketEvents: [...state.marketEvents, action.payload] };
+
         case 'SHOW_TOAST':
             return { ...state, toasts: [...state.toasts, action.payload] };
 
@@ -214,6 +229,8 @@ interface RuleSciContextType extends AppState {
     addCoachMessage: (msg: CoachMessage) => void;
     addRiskAlert: (alert: RiskAlert) => void;
     addPlaybook: (pb: Playbook) => void;
+    setMarketEvents: (events: MarketEvent[]) => void;
+    addMarketEvent: (event: MarketEvent) => void;
     showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
     dismissToast: (id: string) => void;
 }
@@ -306,6 +323,8 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
     const addCoachMessage = useCallback((msg: CoachMessage) => dispatch({ type: 'ADD_COACH_MESSAGE', payload: msg }), []);
     const addRiskAlert = useCallback((alert: RiskAlert) => dispatch({ type: 'ADD_RISK_ALERT', payload: alert }), []);
     const addPlaybook = useCallback((pb: Playbook) => dispatch({ type: 'ADD_PLAYBOOK', payload: pb }), []);
+    const setMarketEvents = useCallback((events: MarketEvent[]) => dispatch({ type: 'SET_MARKET_EVENTS', payload: events }), []);
+    const addMarketEvent = useCallback((event: MarketEvent) => dispatch({ type: 'ADD_MARKET_EVENT', payload: event }), []);
 
     const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
         const id = `toast_${Date.now()}`;
@@ -338,6 +357,8 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         addCoachMessage,
         addRiskAlert,
         addPlaybook,
+        setMarketEvents,
+        addMarketEvent,
         showToast,
         dismissToast,
     };
