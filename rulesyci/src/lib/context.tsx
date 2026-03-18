@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react';
 import { Rule, Trade, Observation, Session, Analytics, BaselineState, User } from '@/types/trading';
 
 const ALLOWED_PRO_EMAILS = ['niketpatil1624@gmail.com', 'adityaparerao8@gmail.com'];
@@ -26,7 +26,8 @@ type Action =
     | { type: 'TOGGLE_RULE_VIOLATION'; payload: string }
     | { type: 'ADD_OBSERVATION'; payload: Observation }
     | { type: 'SET_EMOTIONAL_BASELINE'; payload: BaselineState }
-    | { type: 'COMPLETE_PRE_SESSION' };
+    | { type: 'COMPLETE_PRE_SESSION' }
+    | { type: 'HYDRATE_STATE'; payload: AppState };
 
 const initialState: AppState = {
     sidebarCollapsed: false,
@@ -104,6 +105,8 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
                 ...state,
                 session: { ...state.session, preSessionComplete: true },
             };
+        case 'HYDRATE_STATE':
+            return { ...action.payload, labMode: false }; // Keep lab mode false on reload
         default:
             return state;
     }
@@ -128,16 +131,49 @@ const RuleSciContext = createContext<RuleSciContextType | null>(null);
 export function RuleSciProvider({ children }: { children: ReactNode }) {
     const [state, dispatch] = useReducer(ruleSciReducer, initialState);
 
+    // Load from LocalStorage
+    useEffect(() => {
+        const saved = localStorage.getItem('rulesci_data');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (parsed) dispatch({ type: 'HYDRATE_STATE', payload: parsed });
+            } catch (e) {
+                console.error('Failed to parse local data', e);
+            }
+        }
+    }, []);
+
+    // Save to LocalStorage
+    useEffect(() => {
+        if (state !== initialState) {
+            localStorage.setItem('rulesci_data', JSON.stringify(state));
+        }
+    }, [state]);
+
     const toggleSidebar = useCallback(() => dispatch({ type: 'TOGGLE_SIDEBAR' }), []);
     const toggleLabMode = useCallback(() => dispatch({ type: 'TOGGLE_LAB_MODE' }), []);
     const setLabMode = useCallback((val: boolean) => dispatch({ type: 'SET_LAB_MODE', payload: val }), []);
     const setUser = useCallback((user: User | null) => dispatch({ type: 'SET_USER', payload: user }), []);
 
-    const login = useCallback((email: string, name: string = 'Beta User') => {
+    const login = useCallback((email: string, name: string = 'Trader') => {
         const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
+        
+        // Handle trial period
+        const saved = localStorage.getItem('rulesci_data');
+        let parsed = null;
+        if (saved) {
+            try { parsed = JSON.parse(saved); } catch(e){}
+        }
+        
+        let trialStartDate = parsed?.user?.trialStartDate;
+        if (!trialStartDate && !isPro) {
+            trialStartDate = new Date().toISOString();
+        }
+
         dispatch({
             type: 'SET_USER',
-            payload: { email, name, isPro }
+            payload: { email, name, isPro, trialStartDate }
         });
     }, []);
 

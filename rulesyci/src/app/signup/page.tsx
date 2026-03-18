@@ -3,17 +3,24 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useRuleSci } from '@/lib/context';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, Target, User } from 'lucide-react';
 
 export default function SignupPage() {
+    const { login } = useRuleSci();
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Redirect to welcome tour for now
+        
+        if (formData.email) {
+            login(formData.email, formData.name || formData.email.split('@')[0]);
+        }
+
+        // Redirect to welcome tour
         router.push('/welcome');
     };
 

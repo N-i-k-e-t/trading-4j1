@@ -16,21 +16,18 @@ export default function LoginPage() {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
 
-    const isAuthorizedForPasswordless = ALLOWED_EMAILS.includes(formData.email.toLowerCase());
+    const isAuthorizedForPasswordless = true; // MVP: Passwordless for ALL to start 3-day trial
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
-        if (isAuthorizedForPasswordless) {
-            // Passwordless bypass + Pro Access for specific users
+        if (formData.email) {
+            // MVP: Passwordless login / Setup Trial for all users
             login(formData.email, formData.email.split('@')[0]);
             router.push('/dashboard');
-        } else if (formData.email && formData.password) {
-            // Placeholder for real auth
-            setError('Account verification required. Only authorized beta users can access without a password currently.');
         } else {
-            setError('Please enter your email and password.');
+            setError('Please enter your email.');
         }
     };
 

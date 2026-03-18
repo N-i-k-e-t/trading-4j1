@@ -4,6 +4,7 @@ export interface User {
     email: string;
     name: string;
     isPro: boolean;
+    trialStartDate?: string;
 }
 
 export interface Rule {
