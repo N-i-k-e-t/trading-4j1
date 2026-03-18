@@ -1,6 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useRuleSci } from '@/lib/context';
 import { motion } from 'framer-motion';
 import { Shield, Target, ArrowRight } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
@@ -43,6 +46,20 @@ function RuleCard({
 }
 
 export default function LandingPage() {
+    const { user } = useRuleSci();
+    const router = useRouter();
+    const [isHydrated, setIsHydrated] = useState(false);
+
+    useEffect(() => {
+        setIsHydrated(true);
+    }, []);
+
+    useEffect(() => {
+        if (isHydrated && user) {
+            router.push('/dashboard');
+        }
+    }, [isHydrated, user, router]);
+
     const rulesRow1 = [
         { title: "No revenge trading", emoji: "📉", image: "https://images.unsplash.com/photo-1611974717482-58a05a74bf4f?auto=format&fit=crop&q=80&w=400" },
         { title: "Follow the setup", emoji: "🎯", image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80&w=400" },
@@ -57,10 +74,19 @@ export default function LandingPage() {
         { title: "Review weekly", emoji: "📊", image: "https://images.unsplash.com/photo-1551288049-bbbda536639a?auto=format&fit=crop&q=80&w=400" },
     ];
 
+    if (!isHydrated || user) {
+        return <div className="min-h-screen bg-transparent" />; // Wait to route
+    }
+
     return (
         <div className="min-h-screen flex flex-col pt-20">
             {/* Navbar */}
-            <nav className="fixed top-0 left-0 right-0 z-[100] h-20 flex items-center justify-between px-6 md:px-12 bg-transparent transition-all">
+            <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between h-16 md:h-20 bg-transparent transition-all"
+                style={{
+                    paddingLeft: 'max(env(safe-area-inset-left, 0px), 20px)',
+                    paddingRight: 'max(env(safe-area-inset-right, 0px), 20px)',
+                }}
+            >
                 <div className="flex items-center gap-2">
                     <div className="w-10 h-10 bg-[#f59e0b]/10 text-[#f59e0b] rounded-full flex items-center justify-center shadow-sm">
                         <Target size={22} strokeWidth={2.5} />
@@ -88,7 +114,7 @@ export default function LandingPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="text-[48px] md:text-[64px] leading-[1.1] font-bold text-[#1a1a2e] mb-6"
+                        className="text-[36px] md:text-[64px] leading-[1.1] font-bold text-[#1a1a2e] mb-4"
                     >
                         Build Trading <br />
                         <span className="text-[#2563eb]">Discipline.</span>
@@ -110,16 +136,30 @@ export default function LandingPage() {
                     >
                         <Link
                             href="/onboarding"
-                            className="inline-flex items-center justify-center bg-[#1a1a2e] text-white text-base font-bold px-12 h-14 rounded-full shadow-lg hover:shadow-xl hover:translate-y-[-2px] active:translate-y-[0] transition-all min-w-[280px]"
+                            className="flex items-center justify-center bg-[#1a1a2e] text-white text-[15px] font-bold h-[52px] rounded-full w-full sm:w-auto sm:min-w-[220px] sm:px-10 active:scale-[0.98] transition-transform shadow-lg hover:shadow-xl"
                         >
-                            START NOW
+                            Start Now — Free
                         </Link>
                     </motion.div>
                 </div>
 
                 {/* Right Side: Visual Collage */}
-                <div className="flex-1 relative w-full h-[500px] md:h-auto overflow-visible pointer-events-none md:pointer-events-auto">
-                    <div className="md:absolute md:top-1/2 md:-translate-y-1/2 md:right-0 w-full flex flex-col gap-4 items-center">
+                <div className="flex-1 relative w-full h-auto overflow-visible pointer-events-none md:pointer-events-auto">
+                    {/* Mobile rows stack */}
+                    <div className="md:hidden flex flex-col gap-3 pb-4 overflow-hidden pointer-events-none select-none w-full">
+                        <div className="flex gap-4">
+                            {rulesRow1.map((rule, i) => (
+                                <RuleCard key={`mob1-${i}`} {...rule} rotation={[2, -3, 3, -2][i]} delay={0.2} />
+                            ))}
+                        </div>
+                        <div className="flex gap-4 -ml-16">
+                            {rulesRow2.map((rule, i) => (
+                                <RuleCard key={`mob2-${i}`} {...rule} rotation={[-3, 2, -2, 3][i]} delay={0.4} />
+                            ))}
+                        </div>
+                    </div>
+                
+                    <div className="hidden md:flex md:absolute md:top-1/2 md:-translate-y-1/2 md:right-0 w-full flex-col gap-4 items-center">
                         {/* Row 1 */}
                         <div className="flex gap-4 md:translate-x-[40px]">
                             {rulesRow1.map((rule, i) => (

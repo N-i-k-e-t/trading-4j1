@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useRuleSci } from '@/lib/context';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const tourSteps = [
@@ -23,8 +24,20 @@ const tourSteps = [
 ];
 
 export default function WelcomeTour() {
+    const { user } = useRuleSci();
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(0);
+    const [isHydrated, setIsHydrated] = useState(false);
+
+    useEffect(() => {
+        setIsHydrated(true);
+    }, []);
+
+    useEffect(() => {
+        if (isHydrated && !user) {
+            router.push('/login');
+        }
+    }, [isHydrated, user, router]);
 
     const handleNext = () => {
         if (currentStep < tourSteps.length - 1) {
@@ -33,6 +46,10 @@ export default function WelcomeTour() {
             router.push('/dashboard');
         }
     };
+
+    if (!isHydrated || !user) {
+        return <div className="min-h-screen" />; // Wait to route
+    }
 
     const step = tourSteps[currentStep];
 

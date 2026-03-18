@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useRuleSci } from '@/lib/context';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Check } from 'lucide-react';
 
@@ -86,11 +87,23 @@ const steps: Step[] = [
 ];
 
 export default function OnboardingPage() {
+    const { user } = useRuleSci();
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(0);
     const [answers, setAnswers] = useState<Record<number, string | string[]>>({});
     const [isProcessing, setIsProcessing] = useState(false);
     const [loadingText, setLoadingText] = useState("Analyzing your trading style...");
+    const [isHydrated, setIsHydrated] = useState(false);
+
+    useEffect(() => {
+        setIsHydrated(true);
+    }, []);
+
+    useEffect(() => {
+        if (isHydrated && user) {
+            router.push('/dashboard');
+        }
+    }, [isHydrated, user, router]);
 
     const progress = ((currentStep + 1) / (steps.length + 1)) * 100;
 
@@ -149,6 +162,10 @@ export default function OnboardingPage() {
             router.push('/');
         }
     };
+
+    if (!isHydrated || user) {
+        return <div className="min-h-screen" />; // Wait to route
+    }
 
     if (isProcessing) {
         return (

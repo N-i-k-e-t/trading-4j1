@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { useRuleSci } from '@/lib/context';
 import {
   Check,
@@ -13,13 +14,88 @@ import {
 } from 'lucide-react';
 
 export default function TodayPage() {
-  const { rules, user } = useRuleSci();
+  const { rules, user, trades, dailyLogs, showToast, logDaily } = useRuleSci();
+  const router = useRouter();
   const [mood, setMood] = useState<string | null>(null);
   const [checkedRules, setCheckedRules] = useState<Record<string, boolean>>({});
 
+  const today = new Date().toISOString().split('T')[0];
+
+  // Restore today's checks from dailyLogs
+  useEffect(() => {
+    const todayLog = dailyLogs.find(d => d.date === today);
+    if (todayLog) {
+      const restored: Record<string, boolean> = {};
+      todayLog.rulesChecked.forEach(id => { restored[id] = true; });
+      setCheckedRules(restored);
+      if (todayLog.mood) setMood(todayLog.mood);
+    }
+  }, [dailyLogs, today]);
+
   const toggleRule = (id: string) => {
-    setCheckedRules(prev => ({ ...prev, [id]: !prev[id] }));
+    setCheckedRules(prev => {
+      const next = { ...prev, [id]: !prev[id] };
+      // Persist to daily log
+      const checkedIds = Object.entries(next).filter(([, v]) => v).map(([k]) => k);
+      logDaily({
+        date: today,
+        tradesLogged: todayTrades.length,
+        rulesChecked: checkedIds,
+        mood: mood || '',
+        rulesFollowed: checkedIds.length,
+        rulesBroken: activeRules.length - checkedIds.length,
+      });
+      return next;
+    });
   };
+
+  const handleMoodSelect = (value: string) => {
+    setMood(value);
+    const checkedIds = Object.entries(checkedRules).filter(([, v]) => v).map(([k]) => k);
+    logDaily({
+      date: today,
+      tradesLogged: todayTrades.length,
+      rulesChecked: checkedIds,
+      mood: value,
+      rulesFollowed: checkedIds.length,
+      rulesBroken: activeRules.length - checkedIds.length,
+    });
+    showToast('Mood saved', 'success');
+  };
+
+  // Dynamic date
+  const dateStr = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  // Time-aware greeting
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+  // Real streak calculation
+  const streak = useMemo(() => {
+    let count = 0;
+    const sortedLogs = [...dailyLogs].sort((a, b) => b.date.localeCompare(a.date));
+    const d = new Date();
+    for (let i = 0; i < 365; i++) {
+      const dateStr = d.toISOString().split('T')[0];
+      const log = sortedLogs.find(l => l.date === dateStr);
+      if (log && (log.rulesChecked.length > 0 || log.tradesLogged > 0)) {
+        count++;
+      } else if (i > 0) {
+        break;
+      }
+      d.setDate(d.getDate() - 1);
+    }
+    return count;
+  }, [dailyLogs]);
+
+  const activeRules = rules.filter(r => r.isActive);
+  const todayTrades = trades.filter(t => t.date === today);
+  const checkedCount = Object.values(checkedRules).filter(Boolean).length;
+  const compliance = activeRules.length > 0 ? Math.round((checkedCount / activeRules.length) * 100) : 0;
 
   const moods = [
     { label: "Very Bad", emoji: "😢", value: "very_bad" },
@@ -30,36 +106,38 @@ export default function TodayPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-6 md:gap-8">
       {/* Header */}
       <header>
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-[28px] font-bold text-[#1a1a2e]">
-            Good evening, {user?.name?.split(' ')[0] || 'Trader'}
+          <h1 className="text-[22px] font-bold text-[#1a1a2e] leading-tight">
+            {greeting}, {user?.name?.split(' ')[0] || 'Trader'}
           </h1>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f59e0b]/10 text-[#f59e0b] rounded-full">
-            <Flame size={16} fill="currentColor" />
-            <span className="text-[13px] font-bold">4-day streak</span>
-          </div>
+          {streak > 0 && (
+            <div className="flex items-center gap-1 px-3 py-1.5 bg-[#f59e0b]/10 text-[#f59e0b] rounded-full flex-shrink-0 ml-3">
+              <Flame size={14} fill="currentColor" />
+              <span className="text-[12px] font-bold">{streak}-day streak</span>
+            </div>
+          )}
         </div>
-        <p className="text-base text-[#6b7280]">Saturday, February 21</p>
+        <p className="text-base text-[#6b7280]">{dateStr}</p>
       </header>
 
       {/* Main Section: Today's Rules */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-[#1a1a2e]">Today's Rules</h2>
-          <span className="text-sm font-bold text-[#2563eb]">Edit</span>
+          <h2 className="text-xl font-bold text-[#1a1a2e]">Today&apos;s Rules</h2>
+          <button onClick={() => router.push('/rules')} className="text-sm font-bold text-[#2563eb]">Edit</button>
         </div>
 
         <div className="flex flex-col gap-3">
-          {rules.length > 0 ? (
-            rules.map((rule) => (
+          {activeRules.length > 0 ? (
+            activeRules.map((rule) => (
               <motion.div
                 key={rule.id}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => toggleRule(rule.id)}
-                className="card flex items-center gap-4 cursor-pointer"
+                className="bg-white rounded-2xl px-4 py-3.5 flex items-center gap-3.5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] cursor-pointer"
               >
                 <div className="w-10 h-10 bg-[#1a1a2e]/5 rounded-xl flex items-center justify-center text-xl">
                   {rule.emoji || '🎯'}
@@ -78,10 +156,13 @@ export default function TodayPage() {
               </motion.div>
             ))
           ) : (
-            <div className="card text-center p-12">
+            <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] text-center p-12">
               <ShieldCheck size={48} className="mx-auto text-[#9ca3af] mb-4 opacity-20" />
               <p className="text-[#6b7280] font-medium mb-4">No active rules for today</p>
-              <button className="bg-[#1a1a2e] text-white px-6 py-2 rounded-full text-sm font-bold">
+              <button
+                onClick={() => router.push('/rules')}
+                className="bg-[#1a1a2e] text-white px-6 py-2 rounded-full text-sm font-bold"
+              >
                 Add Rules
               </button>
             </div>
@@ -91,13 +172,13 @@ export default function TodayPage() {
 
       {/* Quick Check-in */}
       <section>
-        <div className="card">
+        <div className="bg-white rounded-2xl px-5 py-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
           <h3 className="text-sm font-bold text-[#6b7280] uppercase tracking-wider mb-6">How are you feeling?</h3>
           <div className="flex justify-between gap-2">
             {moods.map((m) => (
               <button
                 key={m.value}
-                onClick={() => setMood(m.value)}
+                onClick={() => handleMoodSelect(m.value)}
                 className={`flex flex-col items-center gap-2 flex-1 pt-3 pb-4 rounded-2xl transition-all ${mood === m.value
                   ? 'bg-[#2563eb]/10 ring-2 ring-[#2563eb]'
                   : 'bg-[#1a1a2e]/5 hover:bg-[#1a1a2e]/10'
@@ -116,35 +197,37 @@ export default function TodayPage() {
 
       {/* Today's Summary */}
       <section>
-        <div className="card flex flex-col gap-6">
+        <div className="bg-white rounded-2xl px-5 py-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex flex-col gap-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-[#2563eb]/10 text-[#2563eb] rounded-xl flex items-center justify-center">
               <BarChart2 size={20} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-[#1a1a2e]">Today's Summary</h3>
-              <p className="text-[12px] text-[#6b7280] font-medium uppercase tracking-wider">Based on 3 trades logged</p>
+              <h3 className="text-base font-bold text-[#1a1a2e]">Today&apos;s Summary</h3>
+              <p className="text-[12px] text-[#6b7280] font-medium uppercase tracking-wider">
+                Based on {todayTrades.length} trade{todayTrades.length !== 1 ? 's' : ''} logged
+              </p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-[#1a1a2e]/5 rounded-2xl p-4">
+            <div className="bg-[#1a1a2e]/[0.04] rounded-xl p-3">
               <span className="block text-[11px] font-bold text-[#9ca3af] uppercase tracking-wider mb-1">Trades</span>
-              <span className="text-2xl font-bold text-[#1a1a2e]">3</span>
+              <span className="text-2xl font-bold text-[#1a1a2e]">{todayTrades.length}</span>
             </div>
-            <div className="bg-[#1a1a2e]/5 rounded-2xl p-4">
+            <div className="bg-[#1a1a2e]/[0.04] rounded-xl p-3">
               <span className="block text-[11px] font-bold text-[#9ca3af] uppercase tracking-wider mb-1">Rules</span>
-              <span className="text-2xl font-bold text-[#1a1a2e]">5/6</span>
+              <span className="text-2xl font-bold text-[#1a1a2e]">{checkedCount}/{activeRules.length}</span>
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center">
               <span className="text-sm font-bold text-[#1a1a2e]">Compliance</span>
-              <span className="text-sm font-bold text-[#2563eb]">83%</span>
+              <span className="text-sm font-bold text-[#2563eb]">{compliance}%</span>
             </div>
             <div className="w-full h-2 bg-[#1a1a2e]/5 rounded-full overflow-hidden">
-              <div className="h-full bg-[#2563eb]" style={{ width: '83%' }} />
+              <div className="h-full bg-[#2563eb] transition-all duration-500" style={{ width: `${compliance}%` }} />
             </div>
           </div>
         </div>

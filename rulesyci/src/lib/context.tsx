@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react';
-import { Rule, Trade, Observation, Session, Analytics, BaselineState, User } from '@/types/trading';
+import { Rule, Trade, Observation, Session, Analytics, BaselineState, User, DailyLog, PatternInsight, CoachMessage, RiskAlert } from '@/types/trading';
 
 const ALLOWED_PRO_EMAILS = ['niketpatil1624@gmail.com', 'adityaparerao8@gmail.com'];
 
@@ -14,6 +14,11 @@ interface AppState {
     trades: Trade[];
     observations: Observation[];
     analytics: Analytics;
+    dailyLogs: DailyLog[];
+    insights: PatternInsight[];
+    coachMessages: CoachMessage[];
+    riskAlerts: RiskAlert[];
+    toasts: { id: string; message: string; type: 'success' | 'error' | 'info' }[];
 }
 
 type Action =
@@ -27,7 +32,18 @@ type Action =
     | { type: 'ADD_OBSERVATION'; payload: Observation }
     | { type: 'SET_EMOTIONAL_BASELINE'; payload: BaselineState }
     | { type: 'COMPLETE_PRE_SESSION' }
-    | { type: 'HYDRATE_STATE'; payload: AppState };
+    | { type: 'HYDRATE_STATE'; payload: AppState }
+    | { type: 'ADD_RULE'; payload: Rule }
+    | { type: 'REMOVE_RULE'; payload: string }
+    | { type: 'TOGGLE_RULE_ACTIVE'; payload: string }
+    | { type: 'ADD_RULE_FROM_LIBRARY'; payload: Rule }
+    | { type: 'LOG_DAILY'; payload: DailyLog }
+    | { type: 'SET_INSIGHTS'; payload: PatternInsight[] }
+    | { type: 'ADD_COACH_MESSAGE'; payload: CoachMessage }
+    | { type: 'ADD_RISK_ALERT'; payload: RiskAlert }
+    | { type: 'SHOW_TOAST'; payload: { id: string; message: string; type: 'success' | 'error' | 'info' } }
+    | { type: 'DISMISS_TOAST'; payload: string }
+    | { type: 'LOGOUT' };
 
 const initialState: AppState = {
     sidebarCollapsed: false,
@@ -60,6 +76,11 @@ const initialState: AppState = {
         consistencyDays: 4,
         primaryDeviation: 'Impulse entry after win',
     },
+    dailyLogs: [],
+    insights: [],
+    coachMessages: [],
+    riskAlerts: [],
+    toasts: [],
 };
 
 function ruleSciReducer(state: AppState, action: Action): AppState {
@@ -106,7 +127,57 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
                 session: { ...state.session, preSessionComplete: true },
             };
         case 'HYDRATE_STATE':
-            return { ...action.payload, labMode: false }; // Keep lab mode false on reload
+            return { ...action.payload, labMode: false, toasts: [] };
+
+        // New actions
+        case 'ADD_RULE':
+            return { ...state, rules: [...state.rules, action.payload] };
+
+        case 'REMOVE_RULE':
+            return { ...state, rules: state.rules.filter(r => r.id !== action.payload) };
+
+        case 'TOGGLE_RULE_ACTIVE':
+            return {
+                ...state,
+                rules: state.rules.map(r =>
+                    r.id === action.payload ? { ...r, isActive: !r.isActive } : r
+                ),
+            };
+
+        case 'ADD_RULE_FROM_LIBRARY': {
+            const exists = state.rules.find(r => r.text === action.payload.text);
+            if (exists) return state;
+            return { ...state, rules: [...state.rules, action.payload] };
+        }
+
+        case 'LOG_DAILY': {
+            const existingIdx = state.dailyLogs.findIndex(d => d.date === action.payload.date);
+            if (existingIdx >= 0) {
+                const updated = [...state.dailyLogs];
+                updated[existingIdx] = action.payload;
+                return { ...state, dailyLogs: updated };
+            }
+            return { ...state, dailyLogs: [...state.dailyLogs, action.payload] };
+        }
+
+        case 'SET_INSIGHTS':
+            return { ...state, insights: action.payload };
+
+        case 'ADD_COACH_MESSAGE':
+            return { ...state, coachMessages: [action.payload, ...state.coachMessages].slice(0, 20) };
+
+        case 'ADD_RISK_ALERT':
+            return { ...state, riskAlerts: [action.payload, ...state.riskAlerts].slice(0, 10) };
+
+        case 'SHOW_TOAST':
+            return { ...state, toasts: [...state.toasts, action.payload] };
+
+        case 'DISMISS_TOAST':
+            return { ...state, toasts: state.toasts.filter(t => t.id !== action.payload) };
+
+        case 'LOGOUT':
+            return { ...initialState };
+
         default:
             return state;
     }
@@ -118,12 +189,23 @@ interface RuleSciContextType extends AppState {
     setLabMode: (val: boolean) => void;
     setUser: (user: User | null) => void;
     login: (email: string, name?: string) => void;
+    logout: () => void;
     updateSession: (data: Partial<Session>) => void;
     addTrade: (trade: Trade) => void;
     toggleRuleViolation: (id: string) => void;
     addObservation: (obs: Observation) => void;
     setEmotionalBaseline: (em: BaselineState) => void;
     completePreSession: () => void;
+    addRule: (rule: Rule) => void;
+    removeRule: (id: string) => void;
+    toggleRuleActive: (id: string) => void;
+    addRuleFromLibrary: (rule: Rule) => void;
+    logDaily: (log: DailyLog) => void;
+    setInsights: (insights: PatternInsight[]) => void;
+    addCoachMessage: (msg: CoachMessage) => void;
+    addRiskAlert: (alert: RiskAlert) => void;
+    showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
+    dismissToast: (id: string) => void;
 }
 
 const RuleSciContext = createContext<RuleSciContextType | null>(null);
@@ -137,7 +219,7 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                if (parsed) dispatch({ type: 'HYDRATE_STATE', payload: parsed });
+                if (parsed) dispatch({ type: 'HYDRATE_STATE', payload: { ...initialState, ...parsed } });
             } catch (e) {
                 console.error('Failed to parse local data', e);
             }
@@ -147,7 +229,8 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
     // Save to LocalStorage
     useEffect(() => {
         if (state !== initialState) {
-            localStorage.setItem('rulesci_data', JSON.stringify(state));
+            const { toasts, ...persistable } = state;
+            localStorage.setItem('rulesci_data', JSON.stringify(persistable));
         }
     }, [state]);
 
@@ -158,14 +241,13 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
 
     const login = useCallback((email: string, name: string = 'Trader') => {
         const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
-        
-        // Handle trial period
+
         const saved = localStorage.getItem('rulesci_data');
         let parsed = null;
         if (saved) {
-            try { parsed = JSON.parse(saved); } catch(e){}
+            try { parsed = JSON.parse(saved); } catch (e) { /* ignore */ }
         }
-        
+
         let trialStartDate = parsed?.user?.trialStartDate;
         if (!trialStartDate && !isPro) {
             trialStartDate = new Date().toISOString();
@@ -177,12 +259,35 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         });
     }, []);
 
+    const logout = useCallback(() => {
+        localStorage.removeItem('rulesci_data');
+        dispatch({ type: 'LOGOUT' });
+    }, []);
+
     const updateSession = useCallback((data: Partial<Session>) => dispatch({ type: 'UPDATE_SESSION', payload: data }), []);
     const addTrade = useCallback((trade: Trade) => dispatch({ type: 'ADD_TRADE', payload: trade }), []);
     const toggleRuleViolation = useCallback((id: string) => dispatch({ type: 'TOGGLE_RULE_VIOLATION', payload: id }), []);
     const addObservation = useCallback((obs: Observation) => dispatch({ type: 'ADD_OBSERVATION', payload: obs }), []);
     const setEmotionalBaseline = useCallback((em: BaselineState) => dispatch({ type: 'SET_EMOTIONAL_BASELINE', payload: em }), []);
     const completePreSession = useCallback(() => dispatch({ type: 'COMPLETE_PRE_SESSION' }), []);
+
+    // New action dispatchers
+    const addRule = useCallback((rule: Rule) => dispatch({ type: 'ADD_RULE', payload: rule }), []);
+    const removeRule = useCallback((id: string) => dispatch({ type: 'REMOVE_RULE', payload: id }), []);
+    const toggleRuleActive = useCallback((id: string) => dispatch({ type: 'TOGGLE_RULE_ACTIVE', payload: id }), []);
+    const addRuleFromLibrary = useCallback((rule: Rule) => dispatch({ type: 'ADD_RULE_FROM_LIBRARY', payload: rule }), []);
+    const logDaily = useCallback((log: DailyLog) => dispatch({ type: 'LOG_DAILY', payload: log }), []);
+    const setInsights = useCallback((insights: PatternInsight[]) => dispatch({ type: 'SET_INSIGHTS', payload: insights }), []);
+    const addCoachMessage = useCallback((msg: CoachMessage) => dispatch({ type: 'ADD_COACH_MESSAGE', payload: msg }), []);
+    const addRiskAlert = useCallback((alert: RiskAlert) => dispatch({ type: 'ADD_RISK_ALERT', payload: alert }), []);
+
+    const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
+        const id = `toast_${Date.now()}`;
+        dispatch({ type: 'SHOW_TOAST', payload: { id, message, type } });
+        setTimeout(() => dispatch({ type: 'DISMISS_TOAST', payload: id }), 3000);
+    }, []);
+
+    const dismissToast = useCallback((id: string) => dispatch({ type: 'DISMISS_TOAST', payload: id }), []);
 
     const value = {
         ...state,
@@ -191,12 +296,23 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         setLabMode,
         setUser,
         login,
+        logout,
         updateSession,
         addTrade,
         toggleRuleViolation,
         addObservation,
         setEmotionalBaseline,
         completePreSession,
+        addRule,
+        removeRule,
+        toggleRuleActive,
+        addRuleFromLibrary,
+        logDaily,
+        setInsights,
+        addCoachMessage,
+        addRiskAlert,
+        showToast,
+        dismissToast,
     };
 
     return <RuleSciContext.Provider value={value}>{children}</RuleSciContext.Provider>;

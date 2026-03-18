@@ -67,6 +67,11 @@
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
 }
 
+html {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+}
+
 body {
   background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%);
   background-attachment: fixed;
@@ -90,6 +95,8 @@ h4 {
 /* Typography Helpers - Force Sentence Case */
 * {
   text-transform: none;
+  -webkit-tap-highlight-color: transparent;  /* removes iOS blue flash on tap */
+  -webkit-text-size-adjust: 100%;
 }
 
 /* Scrollbar — Minimal */
@@ -140,10 +147,15 @@ h4 {
   transition: all var(--transition-base);
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--accent-primary);
+@media (hover: hover) and (pointer: fine) {
+  .card {
+    transition: box-shadow var(--transition-base), transform var(--transition-base), border-color var(--transition-base);
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-primary);
+  }
 }
 
 .card-focus {
@@ -288,10 +300,21 @@ button.primary {
 
 button.primary:hover {
   opacity: 0.95;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
 }
 
 button.primary:active {
-  transform: translateY(0);
+  transform: scale(0.97);  /* iOS scale-down feel, not translate */
+}
+
+/* 44px minimum touch targets everywhere iOS standard */
+button, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
 }

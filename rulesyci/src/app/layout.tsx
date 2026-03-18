@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { RuleSciProvider } from "@/lib/context";
+import ToastContainer from "@/components/Toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,6 +14,12 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,6 +29,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className={inter.className}>
         <RuleSciProvider>
+          <ToastContainer />
           {children}
         </RuleSciProvider>
       </body>

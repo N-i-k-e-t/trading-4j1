@@ -2,10 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useRuleSci } from '@/lib/context';
 import { Star, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export default function PricingPage() {
+    const { user } = useRuleSci();
+    const router = useRouter();
     const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
+    const [isHydrated, setIsHydrated] = useState(false);
+
+    useEffect(() => {
+        setIsHydrated(true);
+    }, []);
+
+    useEffect(() => {
+        if (isHydrated && user) {
+            router.push('/dashboard');
+        }
+    }, [isHydrated, user, router]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -19,6 +34,10 @@ export default function PricingPage() {
         const s = seconds % 60;
         return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     };
+
+    if (!isHydrated || user) {
+        return <div className="min-h-screen bg-transparent" />; // Wait to route
+    }
 
     return (
         <div className="min-h-screen bg-transparent pb-24">

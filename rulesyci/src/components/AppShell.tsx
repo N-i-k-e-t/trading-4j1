@@ -13,9 +13,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
     const [isTrialExpired, setIsTrialExpired] = useState(false);
     const [daysLeft, setDaysLeft] = useState(3);
+    const [isHydrated, setIsHydrated] = useState(false);
 
     useEffect(() => {
-        if (!user) return; // Wait for hydrate
+        setIsHydrated(true);
+    }, []);
+
+    // Route Protection
+    useEffect(() => {
+        if (isHydrated && !user) {
+            router.push('/login');
+        }
+    }, [isHydrated, user, router]);
+
+    useEffect(() => {
+        if (!user) return;
         if (user.isPro) return;
 
         if (user.trialStartDate) {
@@ -31,10 +43,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         }
     }, [user]);
 
+    // Don't render shell until hydrated and user checked to prevent flash
+    if (!isHydrated || !user) {
+        return <div className="min-h-screen bg-[#f8f9fa]" />;
+    }
+
     if (isTrialExpired) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#f8f9fa] text-center">
-                <div className="max-w-[400px] w-full bg-white p-8 rounded-[24px] shadow-xl">
+            <div className="min-h-[100dvh] flex flex-col items-center justify-center px-5 bg-[#f8f9fa] text-center">
+                <div className="w-full max-w-[360px] bg-white p-6 rounded-[24px] shadow-xl">
                     <h2 className="text-2xl font-bold text-[#1a1a2e] mb-4">Trial Expired</h2>
                     <p className="text-[#6b7280] mb-8">Your 3-day free trial has ended. Upgrade to RuleSci Pro to continue executing with discipline.</p>
                     <button 
@@ -52,10 +69,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex min-h-screen">
             <Sidebar />
             <main
-                className={`flex-1 flex flex-col pt-6 pb-[100px] md:pb-20 md:ml-[240px] px-6 transition-all duration-300 ${labMode ? 'focus-mode' : ''
+                className={`flex-1 flex flex-col pt-5 px-4 md:px-8 md:ml-[240px] md:mr-12 transition-all duration-300 ${labMode ? 'focus-mode' : ''
                     }`}
+                style={{
+                    paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 76px)',
+                }}
             >
-                <div className="max-w-[480px] md:max-w-[800px] mx-auto w-full">
+                <div className="w-full max-w-[430px] mx-auto xl:max-w-[780px]">
                     {!user?.isPro && user?.trialStartDate && !labMode && (
                         <div className="mb-6 p-4 bg-[#f59e0b]/10 border border-[#f59e0b]/20 text-[#1a1a2e] rounded-2xl flex items-center justify-between shadow-sm">
                             <span className="text-sm font-semibold">
@@ -76,9 +96,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
             {!labMode && <BottomTabs />}
             {labMode && <LabMode />}
-
-            {/* Legal Footer - Only on desktop or hidden in app? The prompt says centered centered centered. */}
-            {/* We'll keep it simple for now as per the prompt's focus on the 5 tabs. */}
         </div>
     );
 }

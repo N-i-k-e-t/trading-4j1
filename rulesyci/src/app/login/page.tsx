@@ -5,28 +5,28 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRuleSci } from '@/lib/context';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, Target, User } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Target } from 'lucide-react';
 
-export default function SignupPage() {
+export default function LoginPage() {
     const { login, showToast } = useRuleSci();
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
-    const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+    const [formData, setFormData] = useState({ email: '', password: '' });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
         if (!formData.email || !formData.password) {
-            showToast('Please fill in all fields', 'error');
+            showToast('Please enter both email and password', 'error');
             return;
         }
         
-        if (formData.email) {
-            login(formData.email, formData.name || formData.email.split('@')[0]);
-        }
-
-        // Redirect to welcome tour
-        router.push('/welcome');
+        // Log them in (name defaults to email prefix in app context if no name)
+        login(formData.email);
+        showToast('Welcome back!', 'success');
+        
+        // Redirect to dashboard
+        router.push('/dashboard');
     };
 
     const handleSocialAuth = (provider: string) => {
@@ -49,25 +49,10 @@ export default function SignupPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="bg-white rounded-[24px] p-8 shadow-[0_2px_12px_rgba(0,0,0,0.06)]"
                 >
-                    <h1 className="text-2xl font-bold text-[#1a1a2e] mb-2 text-center">Create your account</h1>
-                    <p className="text-sm text-[#f59e0b] font-bold mb-8 text-center uppercase tracking-wide">Start your 3-Day Free Trial</p>
+                    <h1 className="text-2xl font-bold text-[#1a1a2e] mb-2 text-center">Welcome back</h1>
+                    <p className="text-sm text-[#6b7280] mb-8 text-center">Log in to your account</p>
 
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-sm font-semibold text-[#1a1a2e] ml-1">Full Name</label>
-                            <div className="relative">
-                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9ca3af]" size={18} />
-                                <input
-                                    type="text"
-                                    placeholder="Niket Patil"
-                                    className="w-full h-14 bg-[#1a1a2e]/5 border-none rounded-full pl-12 pr-4 text-base focus:ring-2 focus:ring-[#2563eb] transition-all"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    required
-                                />
-                            </div>
-                        </div>
-
                         <div className="flex flex-col gap-1.5">
                             <label className="text-sm font-semibold text-[#1a1a2e] ml-1">Email</label>
                             <div className="relative">
@@ -98,15 +83,21 @@ export default function SignupPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9ca3af] hover:text-[#1a1a2e] z-10"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9ca3af] hover:text-[#1a1a2e]"
                                 >
                                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
                         </div>
+                        
+                        <div className="flex justify-end mt-[-4px]">
+                            <button type="button" onClick={() => showToast('Password reset coming soon', 'info')} className="text-[12px] font-bold text-[#2563eb] hover:underline">
+                                Forgot password?
+                            </button>
+                        </div>
 
-                        <button className="w-full h-14 bg-[#1a1a2e] text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all mt-4">
-                            Start 3-Day Free Trial
+                        <button className="w-full h-14 bg-[#1a1a2e] text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:translate-y-[-2px] hover:bg-[#2563eb] transition-all mt-4">
+                            Log In
                         </button>
                     </form>
 
@@ -120,11 +111,11 @@ export default function SignupPage() {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <button type="button" onClick={() => handleSocialAuth('Google')} className="w-full h-12 rounded-full border-2 border-[#1a1a2e]/5 flex items-center justify-center gap-3 text-sm font-bold text-[#1a1a2e] hover:bg-[#1a1a2e]/5 transition-all">
+                        <button onClick={() => handleSocialAuth('Google')} className="w-full h-12 rounded-full border-2 border-[#1a1a2e]/5 flex items-center justify-center gap-3 text-sm font-bold text-[#1a1a2e] hover:bg-[#1a1a2e]/5 transition-all">
                             <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="Google" />
                             Continue with Google
                         </button>
-                        <button type="button" onClick={() => handleSocialAuth('Apple')} className="w-full h-12 rounded-full border-2 border-[#1a1a2e]/5 flex items-center justify-center gap-3 text-sm font-bold text-[#1a1a2e] hover:bg-[#1a1a2e]/5 transition-all">
+                        <button onClick={() => handleSocialAuth('Apple')} className="w-full h-12 rounded-full border-2 border-[#1a1a2e]/5 flex items-center justify-center gap-3 text-sm font-bold text-[#1a1a2e] hover:bg-[#1a1a2e]/5 transition-all">
                             <img src="https://github.com/favicon.ico" className="w-4 h-4" alt="Apple" />
                             Continue with Apple
                         </button>
@@ -132,9 +123,9 @@ export default function SignupPage() {
                 </motion.div>
 
                 <p className="mt-8 text-center text-sm text-[#6b7280]">
-                    Already have an account?{' '}
-                    <Link href="/login" className="text-[#2563eb] font-bold hover:underline">
-                        Log in
+                    Don't have an account?{' '}
+                    <Link href="/signup" className="text-[#2563eb] font-bold hover:underline">
+                        Sign up
                     </Link>
                 </p>
             </div>

@@ -22,7 +22,14 @@ export default function BottomTabs() {
     const pathname = usePathname();
 
     return (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[72px] bg-white border-t border-[#1a1a2e]/5 flex items-center justify-around px-2 z-[90] pb-2">
+        <nav
+            className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#1a1a2e]/5 flex items-start justify-around px-2 z-[90]"
+            style={{
+                paddingTop: '10px',
+                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)',
+                minHeight: '60px',
+            }}
+        >
             {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.to;
@@ -30,11 +37,15 @@ export default function BottomTabs() {
                     <Link
                         key={item.to}
                         href={item.to}
-                        className={`flex flex-col items-center gap-1 min-w-[64px] transition-colors ${isActive ? 'text-[#2563eb]' : 'text-[#9ca3af]'
-                            }`}
+                        className={`flex flex-col items-center gap-[3px] transition-colors ${
+                            isActive ? 'text-[#2563eb]' : 'text-[#9ca3af]'
+                        }`}
+                        style={{ minWidth: '44px', minHeight: '44px', justifyContent: 'center' }}
                     >
-                        <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'opacity-100' : 'opacity-60'}`}>
+                        <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                        <span className={`text-[10px] font-bold uppercase tracking-wider leading-none ${
+                            isActive ? 'opacity-100' : 'opacity-50'
+                        }`}>
                             {item.label}
                         </span>
                     </Link>

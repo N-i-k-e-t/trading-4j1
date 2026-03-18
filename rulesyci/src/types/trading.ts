@@ -56,3 +56,35 @@ export interface Analytics {
     consistencyDays: number;
     primaryDeviation: string;
 }
+
+// AI Agent Types
+export interface PatternInsight {
+    id: string;
+    pattern: string;
+    confidence: number;
+    suggestion: string;
+    agentSource: 'analyst' | 'coach' | 'risk';
+}
+
+export interface CoachMessage {
+    message: string;
+    tone: 'encouraging' | 'neutral' | 'warning';
+    priority: number;
+}
+
+export interface RiskAlert {
+    alert: string;
+    severity: 'info' | 'warning' | 'critical';
+    action?: string;
+    timestamp: string;
+}
+
+// Daily activity log for streaks + heatmap
+export interface DailyLog {
+    date: string; // YYYY-MM-DD
+    tradesLogged: number;
+    rulesChecked: string[]; // rule IDs checked off
+    mood: string;
+    rulesFollowed: number;
+    rulesBroken: number;
+}
