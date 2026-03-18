@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react';
-import { Rule, Trade, Observation, Session, Analytics, BaselineState, User, DailyLog, PatternInsight, CoachMessage, RiskAlert } from '@/types/trading';
+import { Rule, Trade, Observation, Session, Analytics, BaselineState, User, DailyLog, PatternInsight, CoachMessage, RiskAlert, Playbook } from '@/types/trading';
+import { checkRisks } from '@/lib/agents/riskSentinel';
 
 const ALLOWED_PRO_EMAILS = ['niketpatil1624@gmail.com', 'adityaparerao8@gmail.com'];
 
@@ -18,6 +19,7 @@ interface AppState {
     insights: PatternInsight[];
     coachMessages: CoachMessage[];
     riskAlerts: RiskAlert[];
+    playbooks: Playbook[];
     toasts: { id: string; message: string; type: 'success' | 'error' | 'info' }[];
 }
 
@@ -41,6 +43,7 @@ type Action =
     | { type: 'SET_INSIGHTS'; payload: PatternInsight[] }
     | { type: 'ADD_COACH_MESSAGE'; payload: CoachMessage }
     | { type: 'ADD_RISK_ALERT'; payload: RiskAlert }
+    | { type: 'ADD_PLAYBOOK'; payload: Playbook }
     | { type: 'SHOW_TOAST'; payload: { id: string; message: string; type: 'success' | 'error' | 'info' } }
     | { type: 'DISMISS_TOAST'; payload: string }
     | { type: 'LOGOUT' };
@@ -80,6 +83,9 @@ const initialState: AppState = {
     insights: [],
     coachMessages: [],
     riskAlerts: [],
+    playbooks: [
+        { id: 'pb1', name: 'NIFTY Opening Range Breakout', description: 'Trading the 15min range break in morning', criteria: ['High volume', 'Vix < 25', 'RSI > 60'] }
+    ],
     toasts: [],
 };
 
@@ -169,6 +175,9 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
         case 'ADD_RISK_ALERT':
             return { ...state, riskAlerts: [action.payload, ...state.riskAlerts].slice(0, 10) };
 
+        case 'ADD_PLAYBOOK':
+            return { ...state, playbooks: [...state.playbooks, action.payload] };
+
         case 'SHOW_TOAST':
             return { ...state, toasts: [...state.toasts, action.payload] };
 
@@ -204,6 +213,7 @@ interface RuleSciContextType extends AppState {
     setInsights: (insights: PatternInsight[]) => void;
     addCoachMessage: (msg: CoachMessage) => void;
     addRiskAlert: (alert: RiskAlert) => void;
+    addPlaybook: (pb: Playbook) => void;
     showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
     dismissToast: (id: string) => void;
 }
@@ -265,7 +275,22 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const updateSession = useCallback((data: Partial<Session>) => dispatch({ type: 'UPDATE_SESSION', payload: data }), []);
-    const addTrade = useCallback((trade: Trade) => dispatch({ type: 'ADD_TRADE', payload: trade }), []);
+    
+    const addTrade = useCallback((trade: Trade) => {
+        dispatch({ type: 'ADD_TRADE', payload: trade });
+        
+        // After trade is added, run Risk Sentinel
+        // We use state.trades + new trade
+        const newTrades = [trade, ...state.trades];
+        const activeRules = state.rules.filter(r => r.isActive);
+        const alerts = checkRisks(newTrades, activeRules, state.session.emotionalBaseline);
+        
+        // Update alerts in state
+        alerts.forEach(alert => {
+            dispatch({ type: 'ADD_RISK_ALERT', payload: alert });
+        });
+    }, [state.trades, state.rules, state.session.emotionalBaseline]);
+
     const toggleRuleViolation = useCallback((id: string) => dispatch({ type: 'TOGGLE_RULE_VIOLATION', payload: id }), []);
     const addObservation = useCallback((obs: Observation) => dispatch({ type: 'ADD_OBSERVATION', payload: obs }), []);
     const setEmotionalBaseline = useCallback((em: BaselineState) => dispatch({ type: 'SET_EMOTIONAL_BASELINE', payload: em }), []);
@@ -280,6 +305,7 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
     const setInsights = useCallback((insights: PatternInsight[]) => dispatch({ type: 'SET_INSIGHTS', payload: insights }), []);
     const addCoachMessage = useCallback((msg: CoachMessage) => dispatch({ type: 'ADD_COACH_MESSAGE', payload: msg }), []);
     const addRiskAlert = useCallback((alert: RiskAlert) => dispatch({ type: 'ADD_RISK_ALERT', payload: alert }), []);
+    const addPlaybook = useCallback((pb: Playbook) => dispatch({ type: 'ADD_PLAYBOOK', payload: pb }), []);
 
     const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
         const id = `toast_${Date.now()}`;
@@ -311,6 +337,7 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         setInsights,
         addCoachMessage,
         addRiskAlert,
+        addPlaybook,
         showToast,
         dismissToast,
     };

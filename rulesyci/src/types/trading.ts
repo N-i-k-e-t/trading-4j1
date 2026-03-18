@@ -16,6 +16,15 @@ export interface Rule {
     violated?: boolean; // Keep for backward compat or temporary state
 }
 
+export interface Playbook {
+    id: string;
+    name: string;
+    description: string;
+    criteria: string[];
+    avgR?: number;
+    winRate?: number;
+}
+
 export interface Trade {
     id: string;
     date: string;
@@ -23,11 +32,20 @@ export interface Trade {
     type: 'Long' | 'Short';
     entry: string;
     exit: string;
+    plannedEntry?: string;
+    plannedSL?: string;
+    actualSL?: string;
+    plannedTP?: string;
+    pnl?: number;
+    pnlR?: number; // R-Multiple
     rules_followed: string[]; // Rule IDs followed
     rules_broken: string[]; // Rule IDs broken
-    emotion: BaselineState;
+    emotion: BaselineState; // Combined/Final emotion
+    moodBefore?: BaselineState; // Tilt Tracker
+    moodAfter?: BaselineState; // Tilt Tracker
+    setupId?: string; // Link to Playbook
+    setupQuality?: number; // 1-10 string
     notes: string;
-    pnl?: number;
 }
 
 export interface Observation {

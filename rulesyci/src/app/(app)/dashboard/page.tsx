@@ -10,11 +10,13 @@ import {
   BarChart2,
   Plus,
   ShieldCheck,
-  Target
+  Target,
+  Activity
 } from 'lucide-react';
+import { calculateTiltScore } from '@/lib/agents/riskSentinel';
 
 export default function TodayPage() {
-  const { rules, user, trades, dailyLogs, showToast, logDaily } = useRuleSci();
+  const { rules, user, trades, dailyLogs, playbooks, showToast, logDaily } = useRuleSci();
   const router = useRouter();
   const [mood, setMood] = useState<string | null>(null);
   const [checkedRules, setCheckedRules] = useState<Record<string, boolean>>({});
@@ -97,6 +99,11 @@ export default function TodayPage() {
   const checkedCount = Object.values(checkedRules).filter(Boolean).length;
   const compliance = activeRules.length > 0 ? Math.round((checkedCount / activeRules.length) * 100) : 0;
 
+  const tiltScore = useMemo(() => calculateTiltScore(todayTrades), [todayTrades]);
+  
+  const tiltColor = tiltScore > 70 ? '#ef4444' : tiltScore > 40 ? '#f59e0b' : '#22c55e';
+  const tiltMessage = tiltScore > 70 ? 'CRITICAL TILT' : tiltScore > 40 ? 'CAUTION' : 'STABLE';
+
   const moods = [
     { label: "Very Bad", emoji: "😢", value: "very_bad" },
     { label: "Bad", emoji: "😕", value: "bad" },
@@ -122,6 +129,43 @@ export default function TodayPage() {
         </div>
         <p className="text-base text-[#6b7280]">{dateStr}</p>
       </header>
+
+      {/* Tilt Meter - Signature Feature */}
+      <section>
+        <div className="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-[#1a1a2e]/5 overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-4 opacity-[0.03]">
+                <Activity size={120} />
+            </div>
+            
+            <div className="flex items-center justify-between mb-6">
+                <div>
+                    <h3 className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-[0.2em] mb-1">Tilt Meter</h3>
+                    <p className={`text-sm font-bold`} style={{ color: tiltColor }}>{tiltMessage}</p>
+                </div>
+                <div className="text-right">
+                    <span className="text-3xl font-black text-[#1a1a2e]">{tiltScore}</span>
+                    <span className="text-[10px] font-bold text-[#9ca3af] ml-1">/100</span>
+                </div>
+            </div>
+
+            <div className="relative h-3 w-full bg-[#1a1a2e]/5 rounded-full overflow-hidden mb-4">
+                <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${tiltScore}%` }}
+                    className="h-full transition-colors duration-500"
+                    style={{ backgroundColor: tiltColor }}
+                />
+            </div>
+
+            <p className="text-[12px] text-[#6b7280] leading-relaxed">
+                {tiltScore > 70 
+                    ? "Your emotional threshold is breached. Force-stop all trading immediately." 
+                    : tiltScore > 40 
+                    ? "Warning: Frustration is mounting. Take a 15-minute reset walk."
+                    : "Execution is disciplined. Stay in the zone."}
+            </p>
+        </div>
+      </section>
 
       {/* Main Section: Today's Rules */}
       <section>
@@ -194,6 +238,34 @@ export default function TodayPage() {
           </div>
         </div>
       </section>
+
+      {/* Playbook Distribution */}
+      {todayTrades.length > 0 && (
+        <section>
+            <div className="bg-white rounded-2xl px-5 py-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+                <h3 className="text-sm font-bold text-[#6b7280] uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <Target size={14} /> Setup Performance
+                </h3>
+                <div className="flex flex-col gap-3">
+                    {Array.from(new Set(todayTrades.map(t => t.setupId))).map(setupId => {
+                        const setupName = playbooks.find(p => p.id === setupId)?.name || 'Unknown Setup';
+                        const count = todayTrades.filter(t => t.setupId === setupId).length;
+                        return (
+                            <div key={setupId} className="flex items-center justify-between">
+                                <span className="text-[13px] font-semibold text-[#1a1a2e]">{setupName}</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[12px] font-bold text-[#6b7280]">{count} trade{count !== 1 ? 's' : ''}</span>
+                                    <div className="w-16 h-1.5 bg-[#1a1a2e]/5 rounded-full overflow-hidden">
+                                        <div className="h-full bg-[#1a1a2e]/20" style={{ width: `${(count / todayTrades.length) * 100}%` }} />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </section>
+      )}
 
       {/* Today's Summary */}
       <section>

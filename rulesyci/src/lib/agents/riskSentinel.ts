@@ -60,7 +60,52 @@ export function checkRisks(
         });
     }
 
+    // 5. Emotional Tilt Score
+    const tiltScore = calculateTiltScore(todayTrades);
+    if (tiltScore >= 70) {
+        alerts.push({
+            alert: `TILT WARNING (Score: ${tiltScore}/100): Your emotional state and execution patterns indicate critical instability. Stop now.`,
+            severity: 'critical',
+            action: 'CLOSE PLATFORM',
+            timestamp: new Date().toISOString(),
+        });
+    } else if (tiltScore >= 40) {
+        alerts.push({
+            alert: `TILT ALERT (Score: ${tiltScore}/100): You are showing signs of emotional decay. Step away and reset.`,
+            severity: 'warning',
+            action: '10 min break',
+            timestamp: new Date().toISOString(),
+        });
+    }
+
     return alerts;
+}
+
+export function calculateTiltScore(todayTrades: Trade[]): number {
+    let score = 0;
+    
+    // Mood deterioration (before vs after)
+    const moodMap: Record<string, number> = { 'very_bad': 0, 'bad': 1, 'neutral': 2, 'good': 3, 'great': 4 };
+    
+    todayTrades.forEach(t => {
+        const before = moodMap[t.moodBefore || 'neutral'];
+        const after = moodMap[t.moodAfter || 'neutral'];
+        
+        if (after < before) score += 20; // Dropped mood after trade
+        if (after === 0) score += 30;    // Very bad mood after trade
+        if (t.rules_broken.length > 0) score += 10 * t.rules_broken.length;
+    });
+
+    // Rapid fires
+    if (todayTrades.length > 2) {
+        const last = new Date(todayTrades[todayTrades.length - 1].date);
+        const prev = new Date(todayTrades[todayTrades.length - 2].date);
+        // If trades are < 5 mins apart (simplified here as we don't have full timestamps yet)
+        // just use trade count for now
+        score += (todayTrades.length - 2) * 15;
+    }
+
+    return Math.min(score, 100);
 }
 
 function getConsecutiveBrokenCount(trades: Trade[]): number {
