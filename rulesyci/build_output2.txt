@@ -1,0 +1,24 @@
+
+> rulesyci@0.1.0 build
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local, .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.5s
+  Running TypeScript ...
+Failed to compile.
+
+./src/app/(app)/analytics/page.tsx:66:50
+Type error: Property 'followedRules' does not exist on type 'Trade'.
+
+[0m [90m 64 |[39m     [36mconst[39m { analytics[33m,[39m trades[33m,[39m observations } [33m=[39m useRuleSci()[33m;[39m
+ [90m 65 |[39m
+[31m[1m>[22m[39m[90m 66 |[39m     [36mconst[39m rulesFollowed [33m=[39m trades[33m.[39mfilter((t) [33m=>[39m t[33m.[39mfollowedRules)[33m.[39mlength[33m;[39m
+ [90m    |[39m                                                  [31m[1m^[22m[39m
+ [90m 67 |[39m     [36mconst[39m totalTrades [33m=[39m trades[33m.[39mlength[33m;[39m
+ [90m 68 |[39m     [36mconst[39m adherenceRate [33m=[39m totalTrades [33m>[39m [35m0[39m [33m?[39m [33mMath[39m[33m.[39mround((rulesFollowed [33m/[39m totalTrades) [33m*[39m [35m100[39m) [33m:[39m [35m0[39m[33m;[39m
+ [90m 69 |[39m[0m
+Next.js build worker exited with code: 1 and signal: null
