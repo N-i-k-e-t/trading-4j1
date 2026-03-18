@@ -1,0 +1,138 @@
+/* ============================================
+   Lab Mode — RuleSci observation overlay
+   ============================================ */
+
+.lab-mode-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--deep-navy);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn var(--transition-slow) forwards;
+}
+
+.lab-exit-btn {
+    position: absolute;
+    top: var(--space-xl);
+    right: var(--space-xl);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    color: var(--slate-light);
+    transition: all var(--transition-fast);
+}
+
+.lab-exit-btn:hover {
+    color: var(--off-white);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.lab-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    max-width: 420px;
+    text-align: center;
+}
+
+/* Icon */
+.lab-icon {
+    color: var(--muted-teal);
+    opacity: 0.5;
+    animation: pulse-soft 5s ease-in-out infinite;
+}
+
+/* Timer */
+.lab-timer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.875rem;
+    color: var(--slate-light);
+    font-variant-numeric: tabular-nums;
+}
+
+/* State */
+.lab-state h2 {
+    font-size: 1.75rem;
+    font-weight: 500;
+    margin-bottom: var(--space-md);
+    letter-spacing: -0.02em;
+}
+
+.lab-baseline {
+    font-size: 0.9375rem;
+    color: var(--mist-gray);
+    margin-bottom: 4px;
+}
+
+.lab-baseline .capitalize {
+    text-transform: capitalize;
+    color: var(--muted-teal);
+    font-weight: 500;
+}
+
+.lab-executions {
+    font-size: 0.875rem;
+    color: var(--slate-light);
+}
+
+/* Principle */
+.lab-principle {
+    max-width: 360px;
+    padding: var(--space-lg);
+    border-left: 2px solid rgba(42, 157, 143, 0.2);
+    text-align: left;
+}
+
+.lab-principle p {
+    font-size: 0.9375rem;
+    color: var(--mist-gray);
+    line-height: 1.7;
+}
+
+/* Rhythm indicator */
+.lab-rhythm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+}
+
+.rhythm-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--muted-teal);
+    opacity: 0.4;
+    animation: rhythm 4s ease-in-out infinite;
+}
+
+@keyframes rhythm {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.2);
+    }
+}
+
+.rhythm-label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--slate-light);
+    animation: pulse-soft 4s ease-in-out infinite;
+}

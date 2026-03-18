@@ -1,0 +1,7 @@
+# Ignore the mobile app folder during Vercel builds
+DisciplineOS/
+anchor/
+PUSH_ANCHOR_UPDATE.bat
+deploy_rulesci.bat
+DEPLOY_TO_GITHUB.bat
+READ_ME_TO_FIX_GIT_ERROR.txt

@@ -1,0 +1,120 @@
+/* ============================================
+   Settings Page
+   ============================================ */
+
+.settings-page {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.settings-sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.settings-section {
+    padding: var(--space-xl);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    color: var(--muted-teal);
+}
+
+.section-header h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--off-white);
+}
+
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+}
+
+.setting-item label {
+    font-size: 0.875rem;
+    color: var(--mist-gray);
+    flex-shrink: 0;
+}
+
+.small-input {
+    width: 120px;
+    text-align: center;
+}
+
+/* Toggle Switch */
+.setting-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+}
+
+.setting-toggle-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--off-white);
+    font-weight: 400;
+    margin-bottom: 2px;
+}
+
+.setting-toggle-desc {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--slate-light);
+}
+
+.toggle-switch {
+    width: 48px;
+    height: 28px;
+    border-radius: 14px;
+    background: var(--slate-mid);
+    padding: 3px;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-switch.active {
+    background: var(--muted-teal);
+}
+
+.toggle-knob {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--off-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--transition-base);
+    color: var(--cool-slate);
+}
+
+.toggle-switch.active .toggle-knob {
+    transform: translateX(20px);
+}
+
+/* Footer */
+.settings-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
