@@ -2,14 +2,30 @@
 
 import { useRuleSci } from '@/lib/context';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link2, ShieldCheck, Info, ChevronRight, Activity, Terminal, Key, Database, MoreVertical, Plus, Trash2 } from 'lucide-react';
+import { Link2, ShieldCheck, Info, ChevronRight, Activity, Terminal, Key, Database, MoreVertical, Plus, Trash2, ShieldAlert } from 'lucide-react';
 
 /**
  * ApiKeysPage: The 'Connections' hub.
  * Allows traders to connect their broker accounts (Zerodha, Angel, Upstox)
  * and manage AI-agent credentials (OpenAI) with high encryption.
+ * Restricted to Pro Users only.
  */
 export default function ApiKeysPage() {
+    const { user } = useRuleSci();
+
+    if (!user?.isPro && !user?.isAdmin) {
+        return (
+            <div className="flex flex-col items-center justify-center py-40 text-center">
+                <div className="w-20 h-20 bg-blue-50 text-blue-500 rounded-[32px] flex items-center justify-center mb-6">
+                    <ShieldAlert size={32} />
+                </div>
+                <h1 className="text-2xl font-black text-[#1a1a2e]">Pro Connection Required</h1>
+                <p className="text-[#6b7280] mt-2 mb-8 max-w-[320px]">Real-time broker synchronization and AI Agent orchestration require a Pro subscription.</p>
+                <button className="px-8 py-4 bg-[#1a1a2e] text-white rounded-2xl font-bold text-sm shadow-xl shadow-[#1a1a2e]/20 hover:scale-[1.05] transition-all">Upgrade to Pro</button>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col gap-8 md:gap-10 pb-12">
             {/* Header */}

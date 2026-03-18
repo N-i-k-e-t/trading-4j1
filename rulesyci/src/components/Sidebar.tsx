@@ -23,7 +23,6 @@ const navItems = [
     { to: '/journal', icon: ScrollText, label: 'Journal' },
     { to: '/rules', icon: Target, label: 'Rules' },
     { to: '/stats', icon: BarChart3, label: 'Stats' },
-    { to: '/api-keys', icon: Link2, label: 'Connections' },
 ];
 
 export default function Sidebar() {
@@ -62,6 +61,21 @@ export default function Sidebar() {
                     );
                 })}
 
+                {/* Connections - Restricted to Pro/Admin */}
+                {(user?.isPro || user?.isAdmin) && (
+                    <Link
+                        href="/api-keys"
+                        className={`flex items-center gap-4 p-3 rounded-2xl text-[15px] font-bold transition-all ${pathname === '/api-keys'
+                            ? 'bg-blue-500/10 text-blue-600'
+                            : 'text-[#6b7280] hover:bg-[#1a1a2e]/5 hover:text-[#1a1a2e]'
+                            }`}
+                    >
+                        <Link2 size={22} strokeWidth={pathname === '/api-keys' ? 2.5 : 2} />
+                        <span>Connections</span>
+                    </Link>
+                )}
+
+                {/* Admin - Restricted to Admin */}
                 {user?.isAdmin && (
                     <Link
                         href="/admin"
