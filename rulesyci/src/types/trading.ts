@@ -27,6 +27,7 @@ export interface Trade {
     rules_broken: string[]; // Rule IDs broken
     emotion: BaselineState;
     notes: string;
+    pnl?: number;
 }
 
 export interface Observation {

@@ -10,13 +10,15 @@ import {
     Clock,
     Brain,
     TrendingUp,
-    Zap,
     Lock,
     Search,
     Check,
     X,
-    BookOpen
+    BookOpen,
+    Sparkles,
+    ArrowRight
 } from 'lucide-react';
+import { generateRuleSuggestions } from '@/lib/agents/ruleSuggester';
 
 const MASTER_LIBRARIES = [
     {
@@ -70,6 +72,9 @@ export default function RulesPage() {
     const [isCreating, setIsCreating] = useState(false);
     const [newRuleText, setNewRuleText] = useState('');
     const [newRuleEmoji, setNewRuleEmoji] = useState('🎯');
+
+    // Generate smart suggestion based on recent history
+    const { suggestedRule, reason: suggestionReason } = generateRuleSuggestions(trades, rules.filter(r => r.isActive));
 
     // Compute per-rule compliance from trade data
     const getRuleCompliance = (ruleId: string) => {
@@ -134,6 +139,53 @@ export default function RulesPage() {
                 </div>
 
                 <div className="flex flex-col gap-3">
+                    
+                    {/* AI Suggestion Banner */}
+                    {suggestedRule && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: -10 }} 
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-gradient-to-r from-[#2563eb]/10 to-[#60a5fa]/10 border-2 border-[#2563eb]/20 rounded-[20px] p-5 mb-2 relative overflow-hidden group"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 blur-3xl rounded-full translate-x-10 translate-y-[-10px]" />
+                            
+                            <div className="flex items-start gap-3 relative z-10">
+                                <div className="w-10 h-10 rounded-full bg-[#2563eb] text-white flex items-center justify-center shrink-0 shadow-lg shadow-[#2563eb]/30">
+                                    <Sparkles size={18} />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-sm font-bold text-[#1e3a8a] mb-1">AI Suggestion</h3>
+                                    <p className="text-[13px] text-[#1e3a8a]/80 mb-3 leading-relaxed">
+                                        {suggestionReason}
+                                    </p>
+                                    
+                                    <div className="bg-white rounded-xl p-3 shadow-sm border border-[#2563eb]/10 flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                            <span className="text-lg shrink-0">{suggestedRule.emoji}</span>
+                                            <span className="text-sm font-bold text-[#1a1a2e] truncate">{suggestedRule.text}</span>
+                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                const rule = {
+                                                    id: `ai_suggested_${Date.now()}`,
+                                                    text: suggestedRule.text!,
+                                                    emoji: suggestedRule.emoji!,
+                                                    category: suggestedRule.category!,
+                                                    isActive: true,
+                                                };
+                                                addRule(rule);
+                                                showToast('Smart rule adopted!', 'success');
+                                            }}
+                                            className="px-4 h-8 bg-[#2563eb] text-white text-[12px] font-bold rounded-lg flex items-center gap-1 shrink-0 hover:bg-[#1d4ed8] transition-colors shadow-sm"
+                                        >
+                                            Adopt <ArrowRight size={12} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+
                     {rules.length > 0 ? (
                         rules.map((rule) => {
                             const compliance = getRuleCompliance(rule.id);

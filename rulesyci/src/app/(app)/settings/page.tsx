@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useRuleSci } from '@/lib/context';
+import JSZip from 'jszip';
+import { tradeToMarkdown, markdownToTrade } from '@/lib/utils/markdownUtils';
+import { Trade } from '@/types/trading';
 import {
     User,
     Mail,
@@ -23,7 +26,7 @@ import {
 } from 'lucide-react';
 
 export default function SettingsPage() {
-    const { user, trades, rules, logout, showToast, login } = useRuleSci();
+    const { user, trades, rules, logout, showToast, login, addTrade } = useRuleSci();
     const router = useRouter();
     const [notifications, setNotifications] = useState(true);
     const [isEditingName, setIsEditingName] = useState(false);
@@ -70,6 +73,64 @@ export default function SettingsPage() {
         a.click();
         URL.revokeObjectURL(url);
         showToast(`Exported ${trades.length} trades!`, 'success');
+    };
+
+    const handleExportObsidian = async () => {
+        if (trades.length === 0) {
+            showToast('No trades to export', 'info');
+            return;
+        }
+
+        const zip = new JSZip();
+        trades.forEach(trade => {
+            const dateStr = new Date(trade.date).toISOString().split('T')[0];
+            const safePair = (trade.pair || 'Unknown').replace(/[^a-zA-Z0-9]/g, '');
+            const filename = `${dateStr}_${safePair}_${trade.id.substring(0, 6)}.md`;
+            const mdContent = tradeToMarkdown(trade);
+            zip.file(filename, mdContent);
+        });
+
+        try {
+            const blob = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rulesci_obsidian_export_${new Date().toISOString().split('T')[0]}.zip`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Exported ${trades.length} markdown files!`, 'success');
+        } catch (e) {
+            showToast('Failed to create ZIP', 'error');
+        }
+    };
+
+    const handleImportObsidian = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        let importCount = 0;
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const text = event.target?.result as string;
+                if (text) {
+                    const partialTrade = markdownToTrade(text);
+                    if (partialTrade.date && (partialTrade.pair || partialTrade.entry)) {
+                        addTrade(partialTrade as Trade);
+                        importCount++;
+                    }
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Simulating async completion for the toast
+        setTimeout(() => {
+            if (importCount > 0) showToast(`Imported ${importCount} trades!`, 'success');
+        }, 1000);
+        
+        // Reset input
+        e.target.value = '';
     };
 
     const Group = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -182,7 +243,17 @@ export default function SettingsPage() {
 
                 <Group title="Data">
                     <Item icon={Download} label="Export Trading Data" value="CSV" onClick={handleExportCSV} />
-                    <Item icon={FileUp} label="Import Rules" onClick={() => showToast('Coming soon!', 'info')} />
+                    <Item icon={Download} label="Export to Obsidian" value="Markdown ZIP" onClick={handleExportObsidian} />
+                    <div className="relative">
+                        <input 
+                            type="file" 
+                            multiple 
+                            accept=".md"
+                            onChange={handleImportObsidian}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <Item icon={FileUp} label="Import from Obsidian" value="Select .md files" />
+                    </div>
                 </Group>
 
                 <Group title="Danger Zone">
