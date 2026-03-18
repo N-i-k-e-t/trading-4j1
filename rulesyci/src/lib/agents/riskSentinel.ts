@@ -60,25 +60,44 @@ export function checkRisks(
         });
     }
 
-    // 5. Emotional Tilt Score
+    // 5. Emotional Tilt Level Escalation
     const tiltScore = calculateTiltScore(todayTrades);
-    if (tiltScore >= 70) {
+    const tiltCost = calculateTiltCost(todayTrades);
+
+    if (tiltScore >= 75) {
         alerts.push({
-            alert: `TILT WARNING (Score: ${tiltScore}/100): Your emotional state and execution patterns indicate critical instability. Stop now.`,
+            alert: `CRITICAL TILT (Score: ${tiltScore}): You've lost ₹${tiltCost.toLocaleString()} while trading in an unstable state. CLOSE PLATFORM IMMEDIATELY.`,
             severity: 'critical',
-            action: 'CLOSE PLATFORM',
+            action: 'Hard Stop',
             timestamp: new Date().toISOString(),
         });
-    } else if (tiltScore >= 40) {
+    } else if (tiltScore >= 45) {
         alerts.push({
-            alert: `TILT ALERT (Score: ${tiltScore}/100): You are showing signs of emotional decay. Step away and reset.`,
+            alert: `TILT WARNING (Score: ${tiltScore}): Emotional decay detected. Adherence is dropping. Take a 30-min reset walk.`,
             severity: 'warning',
-            action: '10 min break',
+            action: 'Take a break',
+            timestamp: new Date().toISOString(),
+        });
+    } else if (tiltScore >= 25) {
+        alerts.push({
+            alert: "Ambient Score Active: Discipline is high. Take it slow and stay process-driven.",
+            severity: 'info',
             timestamp: new Date().toISOString(),
         });
     }
 
     return alerts;
+}
+
+export function calculateTiltCost(todayTrades: Trade[]): number {
+    let cost = 0;
+    todayTrades.forEach(t => {
+        const isBadMood = t.moodAfter === 'bad' || t.moodAfter === 'very_bad';
+        if (isBadMood && t.pnl && t.pnl < 0) {
+            cost += Math.abs(t.pnl);
+        }
+    });
+    return cost;
 }
 
 export function calculateTiltScore(todayTrades: Trade[]): number {
@@ -96,14 +115,10 @@ export function calculateTiltScore(todayTrades: Trade[]): number {
         if (t.rules_broken.length > 0) score += 10 * t.rules_broken.length;
     });
 
-    // Rapid fires
-    if (todayTrades.length > 2) {
-        const last = new Date(todayTrades[todayTrades.length - 1].date);
-        const prev = new Date(todayTrades[todayTrades.length - 2].date);
-        // If trades are < 5 mins apart (simplified here as we don't have full timestamps yet)
-        // just use trade count for now
-        score += (todayTrades.length - 2) * 15;
-    }
+    // Escalation based on loss streaks
+    const consecutiveLosses = [...todayTrades].reverse().findIndex(t => (t.pnl || 0) > 0);
+    const lossStreak = consecutiveLosses === -1 ? todayTrades.length : consecutiveLosses;
+    if (lossStreak >= 3) score += 40;
 
     return Math.min(score, 100);
 }

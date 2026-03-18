@@ -1,11 +1,11 @@
 import type { Trade, Rule, DailyLog, PatternInsight, CoachMessage, RiskAlert } from '@/types/trading';
 import { analyzePatterns } from './patternAnalyst';
-import { getCoachMessage } from './disciplineCoach';
+import { generateCoachCards } from './disciplineCoach';
 import { checkRisks } from './riskSentinel';
 
 export interface OrchestratorOutput {
     insights: PatternInsight[];
-    coachMessage: CoachMessage;
+    coachMessages: CoachMessage[];
     riskAlerts: RiskAlert[];
 }
 
@@ -19,12 +19,12 @@ export function runOrchestrator(
 ): OrchestratorOutput {
     // Run all agents
     const insights = analyzePatterns(trades, rules, dailyLogs);
-    const coachMessage = getCoachMessage(trades, dailyLogs, streak, bestStreak, todayMood);
+    const coachMessages = generateCoachCards(trades, dailyLogs, streak, bestStreak, todayMood);
     const riskAlerts = checkRisks(trades, rules, todayMood);
 
     return {
         insights,
-        coachMessage,
+        coachMessages,
         riskAlerts,
     };
 }

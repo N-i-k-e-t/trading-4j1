@@ -15,10 +15,12 @@ import {
 } from 'lucide-react';
 import { calculateTiltScore } from '@/lib/agents/riskSentinel';
 import WeekStrip from '@/components/calendar/WeekStrip';
+import InsightCards from '@/components/InsightCards';
+import { runOrchestrator } from '@/lib/agents/orchestrator';
 import { DailyLog } from '@/types/trading';
 
 export default function TodayPage() {
-  const { rules, user, trades, dailyLogs, playbooks, showToast, logDaily } = useRuleSci();
+  const { rules, user, trades, dailyLogs, playbooks, showToast, logDaily, setCoachMessages, setInsights, analytics } = useRuleSci();
   const router = useRouter();
   const [mood, setMood] = useState<string | null>(null);
   const [checkedRules, setCheckedRules] = useState<Record<string, boolean>>({});
@@ -118,6 +120,23 @@ export default function TodayPage() {
     { label: "Great", emoji: "😄", value: "great" },
   ];
 
+  // Run Orchestrator for insights
+  useEffect(() => {
+    if (trades.length > 0) {
+      const output = runOrchestrator(
+        trades, 
+        rules, 
+        dailyLogs, 
+        streak, 
+        analytics.consistencyDays, 
+        mood
+      );
+      setCoachMessages(output.coachMessages);
+      setInsights(output.insights);
+    }
+  }, [trades, rules, dailyLogs, streak, analytics.consistencyDays, mood, setCoachMessages, setInsights]);
+
+
   const calculateGrade = (compl: number): DailyLog['grade'] => {
     if (compl >= 100) return 'A';
     if (compl >= 80) return 'B';
@@ -146,6 +165,9 @@ export default function TodayPage() {
         </div>
         <p className="text-base text-[#6b7280]">{dateStr}</p>
       </header>
+
+      {/* Ambient Intelligence Cards */}
+      <InsightCards />
 
       {/* Week Strip Calendar */}
       <WeekStrip />

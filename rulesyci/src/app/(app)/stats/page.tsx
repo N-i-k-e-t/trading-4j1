@@ -243,25 +243,27 @@ export default function StatsPage() {
             {/* AI Insights */}
             <section className="flex flex-col gap-4">
                 {/* Coach Message */}
-                <div className="bg-white rounded-2xl px-5 py-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border-2 border-[#2563eb]/10">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-[#2563eb] text-white rounded-xl flex items-center justify-center">
-                            <Lightbulb size={20} />
+                {aiOutput.coachMessages.length > 0 && (
+                    <div className="bg-white rounded-2xl px-5 py-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border-2 border-[#2563eb]/10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 bg-[#2563eb] text-white rounded-xl flex items-center justify-center">
+                                <Lightbulb size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-base font-bold text-[#1a1a2e]">AI Coach</h3>
+                                <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                                    aiOutput.coachMessages[0].tone === 'encouraging' ? 'text-[#22c55e]' :
+                                    aiOutput.coachMessages[0].tone === 'warning' ? 'text-[#f59e0b]' : 'text-[#9ca3af]'
+                                }`}>
+                                    {aiOutput.coachMessages[0].tone}
+                                </span>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="text-base font-bold text-[#1a1a2e]">AI Coach</h3>
-                            <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                                aiOutput.coachMessage.tone === 'encouraging' ? 'text-[#22c55e]' :
-                                aiOutput.coachMessage.tone === 'warning' ? 'text-[#f59e0b]' : 'text-[#9ca3af]'
-                            }`}>
-                                {aiOutput.coachMessage.tone}
-                            </span>
-                        </div>
+                        <p className="text-[15px] text-[#6b7280] leading-relaxed italic">
+                            &ldquo;{aiOutput.coachMessages[0].message}&rdquo;
+                        </p>
                     </div>
-                    <p className="text-[15px] text-[#6b7280] leading-relaxed italic">
-                        &ldquo;{aiOutput.coachMessage.message}&rdquo;
-                    </p>
-                </div>
+                )}
 
                 {/* Pattern Insights */}
                 {aiOutput.insights.map(insight => (

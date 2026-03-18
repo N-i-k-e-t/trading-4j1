@@ -42,7 +42,8 @@ type Action =
     | { type: 'ADD_RULE_FROM_LIBRARY'; payload: Rule }
     | { type: 'LOG_DAILY'; payload: DailyLog }
     | { type: 'SET_INSIGHTS'; payload: PatternInsight[] }
-    | { type: 'ADD_COACH_MESSAGE'; payload: CoachMessage }
+    | { type: 'SET_COACH_MESSAGES'; payload: CoachMessage[] }
+    | { type: 'REMOVE_COACH_MESSAGE'; payload: string }
     | { type: 'ADD_RISK_ALERT'; payload: RiskAlert }
     | { type: 'ADD_PLAYBOOK'; payload: Playbook }
     | { type: 'SET_MARKET_EVENTS'; payload: MarketEvent[] }
@@ -178,8 +179,11 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
         case 'SET_INSIGHTS':
             return { ...state, insights: action.payload };
 
-        case 'ADD_COACH_MESSAGE':
-            return { ...state, coachMessages: [action.payload, ...state.coachMessages].slice(0, 20) };
+        case 'SET_COACH_MESSAGES':
+            return { ...state, coachMessages: action.payload };
+
+        case 'REMOVE_COACH_MESSAGE':
+            return { ...state, coachMessages: state.coachMessages.filter(m => m.id !== action.payload) };
 
         case 'ADD_RISK_ALERT':
             return { ...state, riskAlerts: [action.payload, ...state.riskAlerts].slice(0, 10) };
@@ -226,7 +230,8 @@ interface RuleSciContextType extends AppState {
     addRuleFromLibrary: (rule: Rule) => void;
     logDaily: (log: DailyLog) => void;
     setInsights: (insights: PatternInsight[]) => void;
-    addCoachMessage: (msg: CoachMessage) => void;
+    setCoachMessages: (msgs: CoachMessage[]) => void;
+    removeCoachMessage: (id: string) => void;
     addRiskAlert: (alert: RiskAlert) => void;
     addPlaybook: (pb: Playbook) => void;
     setMarketEvents: (events: MarketEvent[]) => void;
@@ -320,7 +325,8 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
     const addRuleFromLibrary = useCallback((rule: Rule) => dispatch({ type: 'ADD_RULE_FROM_LIBRARY', payload: rule }), []);
     const logDaily = useCallback((log: DailyLog) => dispatch({ type: 'LOG_DAILY', payload: log }), []);
     const setInsights = useCallback((insights: PatternInsight[]) => dispatch({ type: 'SET_INSIGHTS', payload: insights }), []);
-    const addCoachMessage = useCallback((msg: CoachMessage) => dispatch({ type: 'ADD_COACH_MESSAGE', payload: msg }), []);
+    const setCoachMessages = useCallback((msgs: CoachMessage[]) => dispatch({ type: 'SET_COACH_MESSAGES', payload: msgs }), []);
+    const removeCoachMessage = useCallback((id: string) => dispatch({ type: 'REMOVE_COACH_MESSAGE', payload: id }), []);
     const addRiskAlert = useCallback((alert: RiskAlert) => dispatch({ type: 'ADD_RISK_ALERT', payload: alert }), []);
     const addPlaybook = useCallback((pb: Playbook) => dispatch({ type: 'ADD_PLAYBOOK', payload: pb }), []);
     const setMarketEvents = useCallback((events: MarketEvent[]) => dispatch({ type: 'SET_MARKET_EVENTS', payload: events }), []);
@@ -354,7 +360,8 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         addRuleFromLibrary,
         logDaily,
         setInsights,
-        addCoachMessage,
+        setCoachMessages,
+        removeCoachMessage,
         addRiskAlert,
         addPlaybook,
         setMarketEvents,

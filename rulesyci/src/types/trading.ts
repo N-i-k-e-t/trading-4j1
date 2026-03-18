@@ -86,9 +86,12 @@ export interface PatternInsight {
 }
 
 export interface CoachMessage {
+    id: string;
     message: string;
     tone: 'encouraging' | 'neutral' | 'warning';
     priority: number;
+    timestamp: string;
+    type?: 'weekly_review' | 'session_start' | 'tilt_alert';
 }
 
 export interface RiskAlert {
