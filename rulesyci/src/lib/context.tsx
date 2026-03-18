@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react';
-import { Rule, Trade, Observation, Session, Analytics, BaselineState, User, DailyLog, PatternInsight, CoachMessage, RiskAlert, Playbook, MarketEvent } from '@/types/trading';
+import { Rule, Trade, Observation, Session, Analytics, BaselineState, User, DailyLog, PatternInsight, CoachMessage, RiskAlert, Playbook, MarketEvent, UserModel, DiaryEntry } from '@/types/trading';
 import { checkRisks } from '@/lib/agents/riskSentinel';
 
 const ALLOWED_PRO_EMAILS = ['niketpatil1624@gmail.com', 'adityaparerao8@gmail.com'];
@@ -21,6 +21,8 @@ interface AppState {
     riskAlerts: RiskAlert[];
     playbooks: Playbook[];
     marketEvents: MarketEvent[];
+    userModel: UserModel;
+    diaryEntries: DiaryEntry[];
     toasts: { id: string; message: string; type: 'success' | 'error' | 'info' }[];
 }
 
@@ -49,13 +51,22 @@ type Action =
     | { type: 'SET_MARKET_EVENTS'; payload: MarketEvent[] }
     | { type: 'ADD_MARKET_EVENT'; payload: MarketEvent }
     | { type: 'SHOW_TOAST'; payload: { id: string; message: string; type: 'success' | 'error' | 'info' } }
+    | { type: 'UPDATE_USER_MODEL'; payload: Partial<UserModel> }
+    | { type: 'ADD_DIARY_ENTRY'; payload: DiaryEntry }
+    | { type: 'UPDATE_DIARY_ENTRY'; payload: Partial<DiaryEntry> & { id: string } }
     | { type: 'DISMISS_TOAST'; payload: string }
     | { type: 'LOGOUT' };
 
 const initialState: AppState = {
     sidebarCollapsed: false,
     labMode: false,
-    user: null,
+    user: {
+        email: 'niketpatil1624@gmail.com',
+        name: 'Niket Patil',
+        isPro: true,
+        isAdmin: true,
+        role: 'admin'
+    },
     session: {
         date: new Date().toISOString().split('T')[0],
         emotionalBaseline: 'neutral',
@@ -96,6 +107,37 @@ const initialState: AppState = {
         { id: 'ev3', date: '2026-03-25', time: '12:00', title: 'RBI MPC Meeting', impact: 'critical', country: 'India', type: 'RBI' },
         { id: 'ev4', date: '2026-03-20', time: '14:00', title: 'FOMC Minutes', impact: 'medium', country: 'US', type: 'FOMC' },
     ],
+    userModel: {
+        primary_style: 'day_trading',
+        primary_market: 'NIFTY_options',
+        session_preference: 'morning',
+        avg_trades_per_day: 3.2,
+        typical_position_size_pct: 1.8,
+        dominant_weakness: 'moved_sl',
+        tilt_trigger: 'consecutive_losses',
+        tilt_threshold: 2,
+        revenge_trade_pattern: true,
+        fomo_pattern: false,
+        overconfidence_pattern: true,
+        best_time_window: '09:30-10:15',
+        worst_time_window: '14:00-15:00',
+        best_day: 'wednesday',
+        worst_day: 'thursday',
+        edge_setup: 'breakout',
+        losing_setup: 'reversal',
+        news_sensitivity: 'high',
+        responds_to: 'data',
+        insight_engagement_rate: 0.84,
+        preferred_input: 'voice',
+        average_note_length: 'short',
+        discipline_trajectory: 'improving',
+        streak_sensitivity: 'high',
+        goal: 'consistency',
+        confidence_level: 3.2,
+        model_updated_at: new Date().toISOString(),
+        model_confidence: 0.82
+    },
+    diaryEntries: [],
     toasts: [],
 };
 
@@ -200,6 +242,18 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
         case 'SHOW_TOAST':
             return { ...state, toasts: [...state.toasts, action.payload] };
 
+        case 'UPDATE_USER_MODEL':
+            return { ...state, userModel: { ...state.userModel, ...action.payload } };
+
+        case 'ADD_DIARY_ENTRY':
+            return { ...state, diaryEntries: [action.payload, ...state.diaryEntries] };
+
+        case 'UPDATE_DIARY_ENTRY':
+            return { 
+                ...state, 
+                diaryEntries: state.diaryEntries.map(e => e.id === action.payload.id ? { ...e, ...action.payload } : e)
+            };
+
         case 'DISMISS_TOAST':
             return { ...state, toasts: state.toasts.filter(t => t.id !== action.payload) };
 
@@ -236,6 +290,9 @@ interface RuleSciContextType extends AppState {
     addPlaybook: (pb: Playbook) => void;
     setMarketEvents: (events: MarketEvent[]) => void;
     addMarketEvent: (event: MarketEvent) => void;
+    updateUserModel: (model: Partial<UserModel>) => void;
+    addDiaryEntry: (entry: DiaryEntry) => void;
+    updateDiaryEntry: (entry: Partial<DiaryEntry> & { id: string }) => void;
     showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
     dismissToast: (id: string) => void;
 }
@@ -331,6 +388,9 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
     const addPlaybook = useCallback((pb: Playbook) => dispatch({ type: 'ADD_PLAYBOOK', payload: pb }), []);
     const setMarketEvents = useCallback((events: MarketEvent[]) => dispatch({ type: 'SET_MARKET_EVENTS', payload: events }), []);
     const addMarketEvent = useCallback((event: MarketEvent) => dispatch({ type: 'ADD_MARKET_EVENT', payload: event }), []);
+    const updateUserModel = useCallback((model: Partial<UserModel>) => dispatch({ type: 'UPDATE_USER_MODEL', payload: model }), []);
+    const addDiaryEntry = useCallback((entry: DiaryEntry) => dispatch({ type: 'ADD_DIARY_ENTRY', payload: entry }), []);
+    const updateDiaryEntry = useCallback((entry: Partial<DiaryEntry> & { id: string }) => dispatch({ type: 'UPDATE_DIARY_ENTRY', payload: entry }), []);
 
     const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
         const id = `toast_${Date.now()}`;
@@ -366,6 +426,9 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         addPlaybook,
         setMarketEvents,
         addMarketEvent,
+        updateUserModel,
+        addDiaryEntry,
+        updateDiaryEntry,
         showToast,
         dismissToast,
     };

@@ -4,6 +4,8 @@ export interface User {
     email: string;
     name: string;
     isPro: boolean;
+    isAdmin?: boolean;
+    role?: 'admin' | 'trader';
     trialStartDate?: string;
 }
 
@@ -122,4 +124,57 @@ export interface DailyLog {
     pnl?: number; // Total PnL for the day
     grade?: 'A' | 'B' | 'C' | 'D' | 'F' | 'None'; // Discipline Grade
     events?: string[]; // MarketEvent IDs that happened this day
+}
+
+export type ScanType = 'trade_note' | 'pre_plan' | 'weekly_review' | 'rule_list' | 'pnl_table' | 'chart_annotation' | 'whiteboard';
+
+export interface DiaryEntry {
+    id: string;
+    date: string;
+    imagePath: string;
+    type: ScanType;
+    extractedData: any;
+    confidence: number;
+    rawText?: string;
+    status: 'pending' | 'reviewed' | 'discarded';
+}
+
+export interface UserModel {
+    primary_style: string;
+    primary_market: string;
+    session_preference: string;
+    avg_trades_per_day: number;
+    typical_position_size_pct: number;
+    
+    // Psychology
+    dominant_weakness: string;
+    tilt_trigger: string;
+    tilt_threshold: number;
+    revenge_trade_pattern: boolean;
+    fomo_pattern: boolean;
+    overconfidence_pattern: boolean;
+    
+    // Performance
+    best_time_window: string;
+    worst_time_window: string;
+    best_day: string;
+    worst_day: string;
+    edge_setup: string;
+    losing_setup: string;
+    news_sensitivity: 'low' | 'medium' | 'high';
+    
+    // Learning
+    responds_to: 'data' | 'encouragement' | 'warnings';
+    insight_engagement_rate: number;
+    preferred_input: 'voice' | 'text';
+    average_note_length: 'short' | 'medium' | 'long';
+    
+    // Progress
+    discipline_trajectory: 'improving' | 'declining' | 'stable';
+    streak_sensitivity: 'low' | 'medium' | 'high';
+    goal: string;
+    confidence_level: number;
+    
+    model_updated_at: string;
+    model_confidence: number;
 }

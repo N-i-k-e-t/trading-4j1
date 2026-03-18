@@ -10,16 +10,20 @@ import {
     BarChart3,
     Settings,
     Target,
-    Activity
+    Activity,
+    Zap,
+    Link2,
+    ShieldCheck
 } from 'lucide-react';
 
 const navItems = [
-    { to: '/dashboard', icon: Activity, label: 'Today' },
+    { to: '/dashboard', icon: Zap, label: 'Today' },
+    { to: '/diary', icon: BookOpen, label: 'Diary' },
     { to: '/calendar', icon: Calendar, label: 'Calendar' },
-    { to: '/journal', icon: BookOpen, label: 'Journal' },
-    { to: '/rules', icon: ScrollText, label: 'Rules' },
+    { to: '/journal', icon: ScrollText, label: 'Journal' },
+    { to: '/rules', icon: Target, label: 'Rules' },
     { to: '/stats', icon: BarChart3, label: 'Stats' },
-    { to: '/settings', icon: Settings, label: 'Settings' },
+    { to: '/api-keys', icon: Link2, label: 'Connections' },
 ];
 
 export default function Sidebar() {
@@ -57,9 +61,22 @@ export default function Sidebar() {
                         </Link>
                     );
                 })}
+
+                {user?.isAdmin && (
+                    <Link
+                        href="/admin"
+                        className={`flex items-center gap-4 p-3 rounded-2xl text-[15px] font-bold transition-all ${pathname === '/admin'
+                            ? 'bg-purple-500/10 text-purple-600'
+                            : 'text-[#6b7280] hover:bg-[#1a1a2e]/5 hover:text-[#1a1a2e]'
+                            }`}
+                    >
+                        <ShieldCheck size={22} strokeWidth={pathname === '/admin' ? 2.5 : 2} />
+                        <span>Admin Panel</span>
+                    </Link>
+                )}
             </nav>
 
-            {/* Profile/Bottom section could go here */}
+            {/* Profile/Bottom section */}
             <div className="pt-6 border-t border-[#1a1a2e]/5">
                 <div className="flex items-center gap-3 px-2">
                     <div className="w-8 h-8 rounded-full bg-[#1a1a2e] flex items-center justify-center text-[12px] font-bold text-white shadow-sm">
