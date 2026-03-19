@@ -38,7 +38,7 @@ export async function updateSession(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     // Protected routes logic
-    const isAppPage = request.nextUrl.pathname.startsWith('/dashboard') || 
+    const isAppPage = request.nextUrl.pathname.startsWith('/today') || 
                       request.nextUrl.pathname.startsWith('/diary') ||
                       request.nextUrl.pathname.startsWith('/calendar') ||
                       request.nextUrl.pathname.startsWith('/journal') ||
