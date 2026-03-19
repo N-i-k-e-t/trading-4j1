@@ -40,6 +40,33 @@ export default function PnLCalendar() {
     const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
     const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
 
+    // Calculate Monthly Summary
+    const stats = useMemo(() => {
+        const monthTrades = trades.filter(t => new Date(t.date).getMonth() === month);
+        const uniqueDays = new Set(monthTrades.map(t => t.date)).size;
+        
+        const dayStats = Array.from(new Set(monthTrades.map(t => t.date))).map(d => {
+            const dayTrades = monthTrades.filter(t => t.date === d);
+            const pnl = dayTrades.reduce((acc, t) => acc + (t.pnl || 0), 0);
+            const perfect = dayTrades.every(t => t.rules_broken.length === 0);
+            return { pnl, perfect };
+        });
+
+        const aDays = dayStats.filter(s => s.pnl > 0 && s.perfect).length;
+        let grade = 'N/A';
+        let gradeColor = 'text-gray-400';
+
+        if (uniqueDays > 0) {
+            const ratio = aDays / uniqueDays;
+            if (ratio >= 0.8) { grade = 'A'; gradeColor = 'text-green-600'; }
+            else if (ratio >= 0.6) { grade = 'B'; gradeColor = 'text-blue-600'; }
+            else if (ratio >= 0.4) { grade = 'C'; gradeColor = 'text-amber-600'; }
+            else { grade = 'D'; gradeColor = 'text-red-600'; }
+        }
+
+        return { uniqueDays, grade, gradeColor };
+    }, [trades, month]);
+
     const selectedLog = dailyLogs.find(l => l.date === selectedDate);
     const selectedTrades = trades.filter(t => t.date === selectedDate);
     const selectedEvents = marketEvents.filter(e => e.date === selectedDate);
@@ -119,17 +146,25 @@ export default function PnLCalendar() {
                     })}
                 </div>
 
-                <div className="mt-8 flex items-center justify-between border-t border-[#1a1a2e]/5 pt-6">
-                    <div className="flex gap-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-[#ef4444]" />
-                            <span className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-wider">High News</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-[#f59e0b]" />
-                            <span className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-wider">Mid News</span>
-                        </div>
+                <div className="mt-8 pt-6 border-t border-[#1a1a2e]/5 grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50/50 p-4 rounded-2xl">
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Discipline Grade</p>
+                        <p className={`text-2xl font-black ${stats.gradeColor}`}>{stats.grade}</p>
                     </div>
+                    <div className="bg-gray-50/50 p-4 rounded-2xl">
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Trading Days</p>
+                        <p className="text-2xl font-black text-[#1a1a2e]">{stats.uniqueDays}</p>
+                    </div>
+                </div>
+
+                <div className="mt-6 flex flex-col gap-3">
+                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Upcoming High Impact</h4>
+                    {marketEvents.filter(e => e.impact === 'high' || e.impact === 'critical').slice(0, 3).map(e => (
+                        <div key={e.id} className="flex items-center justify-between bg-red-50/30 p-3 rounded-xl border border-red-50/50">
+                            <span className="text-[13px] font-bold text-red-900">{e.title}</span>
+                            <span className="text-[11px] font-black text-red-400">{new Date(e.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
+                        </div>
+                    ))}
                 </div>
             </div>
 

@@ -9,6 +9,8 @@ import LabMode from './LabMode';
 import InstallPrompt from './InstallPrompt';
 import CaptureHub from './capture/CaptureHub';
 import DailyStateCheck from './DailyStateCheck';
+import SettingsSheet from './SettingsSheet';
+import { Target } from 'lucide-react';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
     const { labMode, user, isCheckingAuth } = useRuleSci();
@@ -17,6 +19,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const [isTrialExpired, setIsTrialExpired] = useState(false);
     const [daysLeft, setDaysLeft] = useState(3);
     const [isHydrated, setIsHydrated] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     useEffect(() => {
         setIsHydrated(true);
@@ -76,11 +79,29 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="flex min-h-[100dvh] bg-white overflow-x-hidden">
+            {/* Mobile Header */}
+            {!labMode && (
+                <header className="md:hidden fixed top-0 left-0 right-0 h-[60px] bg-white/80 backdrop-blur-md border-b border-gray-100 z-[80] flex items-center justify-between px-5 pt-[env(safe-area-inset-top)]">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-[#f59e0b]/10 text-[#f59e0b] rounded-full flex items-center justify-center shadow-sm">
+                            <Target size={18} strokeWidth={2.5} />
+                        </div>
+                        <span className="text-[17px] font-black tracking-tight text-[#1a1a2e]">RuleSci</span>
+                    </div>
+                    <button 
+                        onClick={() => setIsSettingsOpen(true)}
+                        className="w-8 h-8 rounded-full bg-[#1a1a2e] flex items-center justify-center text-[10px] font-black text-white shadow-sm active:scale-90 transition-transform"
+                    >
+                        {user?.name?.substring(0, 2).toUpperCase() || 'TR'}
+                    </button>
+                </header>
+            )}
+
             {/* Sidebar — Desktop Only */}
-            <Sidebar />
+            <Sidebar onSettingsOpen={() => setIsSettingsOpen(true)} />
             
             <main
-                className={`flex-1 flex flex-col pt-0 md:pt-5 md:ml-[240px] transition-all duration-300 ${labMode ? 'focus-mode' : ''}`}
+                className={`flex-1 flex flex-col ${labMode ? 'pt-0' : 'pt-[60px]'} md:pt-5 md:ml-[240px] transition-all duration-300 ${labMode ? 'focus-mode' : ''}`}
                 style={{
                     paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 84px)',
                 }}
@@ -110,6 +131,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <InstallPrompt />
             <CaptureHub />
             <DailyStateCheck />
+            <SettingsSheet isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
         </div>
     );
 }

@@ -18,7 +18,7 @@ export default function LandingPage() {
 
     useEffect(() => {
         if (isHydrated && user) {
-            router.push('/dashboard');
+            router.push('/today');
         }
     }, [isHydrated, user, router]);
 
