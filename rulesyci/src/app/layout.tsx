@@ -6,31 +6,46 @@ import ToastContainer from "@/components/Toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "RuleSci — Trade by Rules. Think by Science.",
-  description: "A psychology-first trading discipline system focused on behavior, not profits.",
-  icons: {
-    icon: "/favicon.svg",
-  },
-};
-
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: 'cover',
+  themeColor: '#ffffff',
+};
+
+export const metadata: Metadata = {
+  title: 'RuleSci — Ambient Trading Discipline',
+  description: 'Proactive habit architecture for modern traders.',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'RuleSci',
+  },
+  manifest: '/manifest.json',
+  icons: {
+    apple: '/icon-192.png',
+  },
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'apple-mobile-web-app-title': 'RuleSci',
+    'theme-color': '#ffffff',
+  }
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} bg-[#1a1a2e] text-white antialiased min-h-[100dvh] overflow-x-hidden`}>
         <RuleSciProvider>
-          <ToastContainer />
           {children}
+          <ToastContainer />
         </RuleSciProvider>
       </body>
     </html>

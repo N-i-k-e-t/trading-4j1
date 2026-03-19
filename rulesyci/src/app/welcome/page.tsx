@@ -48,13 +48,13 @@ export default function WelcomeTour() {
     };
 
     if (!isHydrated || !user) {
-        return <div className="min-h-screen" />; // Wait to route
+        return <div className="min-h-[100dvh]" />; // Wait to route
     }
 
     const step = tourSteps[currentStep];
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center px-6">
+        <div className="min-h-[100dvh] flex flex-col items-center justify-center px-6">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={currentStep}

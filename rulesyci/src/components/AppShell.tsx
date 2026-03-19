@@ -6,9 +6,11 @@ import Sidebar from './Sidebar';
 import BottomTabs from './BottomTabs';
 import { useRuleSci } from '@/lib/context';
 import LabMode from './LabMode';
+import InstallPrompt from './InstallPrompt';
+import CaptureHub from './capture/CaptureHub';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-    const { labMode, user } = useRuleSci();
+    const { labMode, user, isCheckingAuth } = useRuleSci();
     const router = useRouter();
 
     const [isTrialExpired, setIsTrialExpired] = useState(false);
@@ -21,10 +23,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
     // Route Protection
     useEffect(() => {
-        if (isHydrated && !user) {
+        if (isHydrated && !isCheckingAuth && !user) {
             router.push('/login');
         }
-    }, [isHydrated, user, router]);
+    }, [isHydrated, isCheckingAuth, user, router]);
 
     useEffect(() => {
         if (!user) return;
@@ -43,9 +45,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         }
     }, [user]);
 
-    // Don't render shell until hydrated and user checked to prevent flash
-    if (!isHydrated || !user) {
-        return <div className="min-h-screen bg-[#f8f9fa]" />;
+    // Don't render shell until hydrated and auth checked 
+    if (!isHydrated || isCheckingAuth) {
+        return <div className="min-h-[100dvh] bg-white flex items-center justify-center">
+            <div className="w-8 h-8 border-4 border-[#1a1a2e] border-t-transparent rounded-full animate-spin" />
+        </div>;
+    }
+
+    if (!user) {
+        return null;
     }
 
     if (isTrialExpired) {
@@ -66,7 +74,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex min-h-[100dvh]">
             <Sidebar />
             <main
                 className={`flex-1 flex flex-col pt-5 px-4 md:px-8 md:ml-[240px] md:mr-12 transition-all duration-300 ${labMode ? 'focus-mode' : ''
@@ -96,6 +104,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
             {!labMode && <BottomTabs />}
             {labMode && <LabMode />}
+            
+            {/* PWA Prompt Drivers */}
+            <InstallPrompt />
+
+            {/* Core Interaction Hub */}
+            <CaptureHub />
         </div>
     );
 }

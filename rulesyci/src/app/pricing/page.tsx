@@ -36,11 +36,11 @@ export default function PricingPage() {
     };
 
     if (!isHydrated || user) {
-        return <div className="min-h-screen bg-transparent" />; // Wait to route
+        return <div className="min-h-[100dvh] bg-transparent" />; // Wait to route
     }
 
     return (
-        <div className="min-h-screen bg-transparent pb-24">
+        <div className="min-h-[100dvh] bg-transparent pb-24">
             {/* Sticky Top Bar */}
             <div className="sticky top-0 left-0 right-0 z-[110] bg-white border-b border-[#1a1a2e]/5 px-6 h-20 flex items-center justify-between shadow-sm">
                 <div className="flex flex-col">

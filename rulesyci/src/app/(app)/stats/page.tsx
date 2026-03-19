@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRuleSci } from '@/lib/context';
 import { runOrchestrator } from '@/lib/agents/orchestrator';
+import EmptyState from '@/components/ui/EmptyState';
 import {
     Flame,
     Lightbulb,
@@ -14,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export default function StatsPage() {
-    const { trades, rules, dailyLogs, userModel } = useRuleSci();
+    const { trades, rules, dailyLogs, userModel, setCaptureOpen } = useRuleSci();
     const [period, setPeriod] = useState('All');
 
     // Filter trades by period
@@ -120,19 +121,19 @@ export default function StatsPage() {
     const streakPercent = bestStreak > 0 ? Math.min((streak / Math.max(bestStreak, 1)) * 100, 100) : (streak > 0 ? 100 : 0);
 
     return (
-        <div className="flex flex-col gap-8 md:gap-10 pb-12">
+        <div className="flex flex-col gap-4 px-5 pb-[calc(env(safe-area-inset-bottom)+84px)] italic-none">
             {/* Header */}
-            <header>
-                <h1 className="text-[22px] font-bold text-[#1a1a2e] mb-2">Performance</h1>
-                <p className="text-base text-[#6b7280]">Analyze your discipline patterns and growth.</p>
+            <header className="pt-6">
+                <h1 className="text-[20px] font-black text-[#1a1a2e]">Performance</h1>
+                <p className="text-[13px] font-bold text-[#b1b1c1]">Analyze your discipline patterns and growth.</p>
             </header>
 
             {/* Streak & Score */}
-            <section className="flex flex-col items-center justify-center p-8 bg-white rounded-[32px] shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+            <section className="bg-white rounded-[32px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col items-center">
                 <div className="relative w-40 h-40 flex items-center justify-center">
                     <svg className="w-full h-full transform -rotate-90">
                         <circle cx="80" cy="80" r="70" stroke="rgba(37, 99, 235, 0.05)" strokeWidth="12" fill="transparent" />
-                        <circle cx="80" cy="80" r="70" stroke="#2563eb" strokeWidth="12"
+                        <motion.circle cx="80" cy="80" r="70" stroke="#2563eb" strokeWidth="12"
                             strokeDasharray={440}
                             strokeDashoffset={440 - (440 * streakPercent / 100)}
                             strokeLinecap="round" fill="transparent"
@@ -140,34 +141,25 @@ export default function StatsPage() {
                         />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-5xl font-bold text-[#1a1a2e]">{streak}</span>
-                        <span className="text-[11px] font-bold text-[#6b7280] uppercase tracking-widest mt-1">Day Streak</span>
+                        <span className="text-5xl font-black text-[#1a1a2e] tabular-nums">{streak}</span>
+                        <span className="text-[11px] font-black text-[#9ca3af] uppercase tracking-widest mt-1">Day Streak</span>
                     </div>
-                    {streak > 0 && (
-                        <motion.div
-                            animate={{ scale: [1, 1.2, 1] }}
-                            transition={{ repeat: Infinity, duration: 2 }}
-                            className="absolute top-0 right-0 p-2 bg-[#f59e0b] text-white rounded-full shadow-lg"
-                        >
-                            <Flame size={20} fill="currentColor" />
-                        </motion.div>
-                    )}
                 </div>
-                <p className="mt-8 text-sm font-bold text-[#9ca3af] uppercase tracking-wider">
-                    Best streak: {bestStreak} day{bestStreak !== 1 ? 's' : ''}
+                <p className="mt-8 text-[11px] font-black text-[#9ca3af] uppercase tracking-widest">
+                    Best streak: <span className="tabular-nums">{bestStreak} day{bestStreak !== 1 ? 's' : ''}</span>
                 </p>
             </section>
 
             {/* Rule Compliance Chart */}
             <section>
-                <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-xl font-bold text-[#1a1a2e]">Rule Compliance</h2>
-                    <div className="flex gap-2 bg-[#1a1a2e]/5 p-1 rounded-full">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-[13px] font-black text-gray-400 uppercase tracking-widest">Rule Compliance</h3>
+                    <div className="flex gap-1.5 bg-gray-50 p-1 rounded-full">
                         {['Week', 'Month', 'All'].map(p => (
                             <button
                                 key={p}
                                 onClick={() => setPeriod(p)}
-                                className={`px-4 h-8 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all ${period === p ? 'bg-white text-[#1a1a2e] shadow-sm' : 'text-[#6b7280]'}`}
+                                className={`px-3 h-7 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${period === p ? 'bg-white text-[#1a1a2e] shadow-sm' : 'text-gray-300'}`}
                             >
                                 {p}
                             </button>
@@ -176,16 +168,16 @@ export default function StatsPage() {
                 </div>
 
                 {compliance.length > 0 ? (
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-4">
                         {compliance.map((item, i) => (
-                            <div key={i} className="flex flex-col gap-2">
+                            <div key={i} className="flex flex-col gap-1.5">
                                 <div className="flex justify-between items-center px-1">
-                                    <span className="text-[15px] font-semibold text-[#1a1a2e]">{item.rule}</span>
-                                    <span className={`text-sm font-bold ${item.value > 80 ? 'text-[#22c55e]' : item.value > 60 ? 'text-[#f59e0b]' : 'text-[#ef4444]'}`}>
+                                    <span className="text-[14px] font-bold text-[#1a1a2e]">{item.rule}</span>
+                                    <span className={`text-[13px] font-black tabular-nums ${item.value > 80 ? 'text-[#22c55e]' : item.value > 60 ? 'text-[#f59e0b]' : 'text-[#ef4444]'}`}>
                                         {item.value}%
                                     </span>
                                 </div>
-                                <div className="w-full h-3 bg-[#1a1a2e]/5 rounded-full overflow-hidden">
+                                <div className="w-full h-2 bg-gray-50 rounded-full overflow-hidden">
                                     <motion.div
                                         initial={{ width: 0 }}
                                         animate={{ width: `${item.value}%` }}
@@ -197,44 +189,47 @@ export default function StatsPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-8 text-[#9ca3af]">
-                        <p className="font-medium">No compliance data yet</p>
-                        <p className="text-sm mt-1">Log trades and mark rule compliance to see stats here</p>
+                    <div className="py-2 flex flex-col items-center">
+                        <EmptyState 
+                            emoji="📈"
+                            title="Growth Ahead"
+                            description="Log trades and mark rule compliance to see your performance stats here."
+                            ctaText="Log First Trade"
+                            onCtaClick={() => setCaptureOpen(true)}
+                        />
                     </div>
                 )}
             </section>
 
             {/* Trading Pattern Insights */}
-            <section className="grid grid-cols-2 gap-4">
-                <div className="bg-white rounded-2xl px-4 py-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex flex-col gap-4 border-l-4 border-[#22c55e]">
-                    <span className="text-[11px] font-bold text-[#6b7280] uppercase tracking-wider">Rules Followed</span>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-[#1a1a2e]">{followedWinRate}%</span>
-                        <span className="text-[12px] font-bold text-[#22c55e]">Clean</span>
+            <section className="grid grid-cols-2 gap-3">
+                <div className="bg-white rounded-[24px] px-4 py-4 shadow-sm flex flex-col gap-1 border border-gray-100">
+                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Rules Followed</span>
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-[24px] font-black text-[#1a1a2e] tabular-nums">{followedWinRate}%</span>
+                        <span className="text-[10px] font-black text-green-500 uppercase">Win</span>
                     </div>
-                    <TrendingUp size={24} className="text-[#22c55e] opacity-20 ml-auto" />
                 </div>
-                <div className="bg-white rounded-2xl px-4 py-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex flex-col gap-4 border-l-4 border-[#ef4444]">
-                    <span className="text-[11px] font-bold text-[#6b7280] uppercase tracking-wider">Broke Rules</span>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-[#1a1a2e]">{brokenWinRate}%</span>
-                        <span className="text-[12px] font-bold text-[#ef4444]">Violated</span>
+                <div className="bg-white rounded-[24px] px-4 py-4 shadow-sm flex flex-col gap-1 border border-gray-100">
+                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Broke Rules</span>
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-[24px] font-black text-[#1a1a2e] tabular-nums">{brokenWinRate}%</span>
+                        <span className="text-[10px] font-black text-red-500 uppercase">Win</span>
                     </div>
-                    <TrendingDown size={24} className="text-[#ef4444] opacity-20 ml-auto" />
                 </div>
             </section>
 
             {/* Heatmap */}
-            <section className="bg-white rounded-2xl px-5 py-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-sm font-bold text-[#6b7280] uppercase tracking-wider">Weekly Discipline</h3>
-                    <Info size={14} className="text-[#9ca3af]" />
+            <section className="bg-gray-50/50 rounded-[28px] px-5 py-5 border border-gray-100">
+                <div className="flex items-center justify-between mb-4 px-1">
+                    <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Weekly Discipline</h3>
+                    <Info size={14} className="text-gray-200" />
                 </div>
-                <div className="flex justify-between gap-2">
+                <div className="flex justify-between gap-1">
                     {heatmap.map((item, i) => (
-                        <div key={i} className="flex flex-col items-center gap-3">
-                            <div className={`w-10 h-10 rounded-xl ${item.color}`} />
-                            <span className="text-[11px] font-bold text-[#9ca3af]">{item.day}</span>
+                        <div key={i} className="flex flex-col items-center gap-2">
+                            <div className={`w-9 h-9 rounded-xl ${item.color} border border-gray-100/50`} />
+                            <span className="text-[10px] font-black text-gray-300">{item.day}</span>
                         </div>
                     ))}
                 </div>
@@ -296,9 +291,15 @@ export default function StatsPage() {
                     </div>
                 ))}
 
-                {aiOutput.insights.length === 0 && trades.length < 3 && (
-                    <div className="text-center py-6 text-[#9ca3af]">
-                        <p className="font-medium">Log at least 3 trades to unlock AI pattern analysis</p>
+                {aiOutput.insights.length === 0 && (
+                    <div className="py-4">
+                        <EmptyState 
+                            emoji="🧠"
+                            title="Brain Power Pending"
+                            description={`Log at least ${Math.max(0, 3 - trades.length)} more trades to unlock AI pattern analysis.`}
+                            ctaText="Log a Trade"
+                            onCtaClick={() => setCaptureOpen(true)}
+                        />
                     </div>
                 )}
             </section>

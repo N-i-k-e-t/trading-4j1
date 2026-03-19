@@ -122,6 +122,9 @@ export interface DailyLog {
     rulesFollowed: number;
     rulesBroken: number;
     pnl?: number; // Total PnL for the day
+    hasPrePlan?: boolean; // 25% of grade
+    hasPostNote?: boolean; // 25% of grade
+    complianceScore?: number; // 0-100 total
     grade?: 'A' | 'B' | 'C' | 'D' | 'F' | 'None'; // Discipline Grade
     events?: string[]; // MarketEvent IDs that happened this day
 }

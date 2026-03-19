@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react';
 import { Rule, Trade, Observation, Session, Analytics, BaselineState, User, DailyLog, PatternInsight, CoachMessage, RiskAlert, Playbook, MarketEvent, UserModel, DiaryEntry } from '@/types/trading';
 import { checkRisks } from '@/lib/agents/riskSentinel';
+import { createClient } from '@/utils/supabase/client';
 
 const ALLOWED_PRO_EMAILS = ['niketpatil1624@gmail.com', 'adityaparerao8@gmail.com'];
 
@@ -24,6 +25,8 @@ interface AppState {
     userModel: UserModel;
     diaryEntries: DiaryEntry[];
     toasts: { id: string; message: string; type: 'success' | 'error' | 'info' }[];
+    isCheckingAuth: boolean;
+    isCaptureOpen: boolean;
 }
 
 type Action =
@@ -55,18 +58,15 @@ type Action =
     | { type: 'ADD_DIARY_ENTRY'; payload: DiaryEntry }
     | { type: 'UPDATE_DIARY_ENTRY'; payload: Partial<DiaryEntry> & { id: string } }
     | { type: 'DISMISS_TOAST'; payload: string }
+    | { type: 'SET_CHECKING_AUTH'; payload: boolean }
+    | { type: 'SET_CAPTURE_OPEN'; payload: boolean }
     | { type: 'LOGOUT' };
 
 const initialState: AppState = {
     sidebarCollapsed: false,
     labMode: false,
-    user: {
-        email: 'niketpatil1624@gmail.com',
-        name: 'Niket Patil',
-        isPro: true,
-        isAdmin: true,
-        role: 'admin'
-    },
+    user: null, // Start as null to prevent auth hydration loops
+
     session: {
         date: new Date().toISOString().split('T')[0],
         emotionalBaseline: 'neutral',
@@ -139,6 +139,8 @@ const initialState: AppState = {
     },
     diaryEntries: [],
     toasts: [],
+    isCheckingAuth: true,
+    isCaptureOpen: false,
 };
 
 function ruleSciReducer(state: AppState, action: Action): AppState {
@@ -256,9 +258,15 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
 
         case 'DISMISS_TOAST':
             return { ...state, toasts: state.toasts.filter(t => t.id !== action.payload) };
+        
+        case 'SET_CHECKING_AUTH':
+            return { ...state, isCheckingAuth: action.payload };
 
         case 'LOGOUT':
-            return { ...initialState };
+            return { ...initialState, isCheckingAuth: false, isCaptureOpen: false };
+        
+        case 'SET_CAPTURE_OPEN':
+            return { ...state, isCaptureOpen: action.payload };
 
         default:
             return state;
@@ -295,6 +303,8 @@ interface RuleSciContextType extends AppState {
     updateDiaryEntry: (entry: Partial<DiaryEntry> & { id: string }) => void;
     showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
     dismissToast: (id: string) => void;
+    isCheckingAuth: boolean;
+    setCaptureOpen: (open: boolean) => void;
 }
 
 const RuleSciContext = createContext<RuleSciContextType | null>(null);
@@ -302,56 +312,93 @@ const RuleSciContext = createContext<RuleSciContextType | null>(null);
 export function RuleSciProvider({ children }: { children: ReactNode }) {
     const [state, dispatch] = useReducer(ruleSciReducer, initialState);
 
-    // Load from LocalStorage
+    const supabase = createClient();
+
+    // Sync with Supabase Auth (PWA Persistent)
+    useEffect(() => {
+        const syncUser = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+                const email = session.user.email || '';
+                const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
+                dispatch({ 
+                    type: 'SET_USER', 
+                    payload: { 
+                        email, 
+                        name: session.user.user_metadata?.full_name || 'Trader',
+                        isPro,
+                        isAdmin: isPro && email === 'niketpatil1624@gmail.com'
+                    } 
+                });
+            }
+            dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
+        };
+
+        syncUser();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (session?.user) {
+                const email = session.user.email || '';
+                const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
+                dispatch({ 
+                    type: 'SET_USER', 
+                    payload: { 
+                        email, 
+                        name: session.user.user_metadata?.full_name || 'Trader',
+                        isPro,
+                        isAdmin: isPro && email === 'niketpatil1624@gmail.com'
+                    } 
+                });
+            } else {
+                dispatch({ type: 'SET_USER', payload: null });
+            }
+            dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    // Load from LocalStorage (Fallback / Non-Auth data)
     useEffect(() => {
         const saved = localStorage.getItem('rulesci_data');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                if (parsed) dispatch({ type: 'HYDRATE_STATE', payload: { ...initialState, ...parsed } });
+                if (parsed) {
+                    // Hydrate everything except user (which comes from Supabase)
+                    const { user, ...rest } = parsed;
+                    dispatch({ type: 'HYDRATE_STATE', payload: { ...initialState, ...rest } });
+                }
             } catch (e) {
                 console.error('Failed to parse local data', e);
             }
         }
-    }, []);
+    }, [initialState]);
 
-    // Save to LocalStorage
+    // Save to LocalStorage (Incremental backup)
     useEffect(() => {
         if (state !== initialState) {
-            const { toasts, ...persistable } = state;
+            const { toasts, user, ...persistable } = state; 
             localStorage.setItem('rulesci_data', JSON.stringify(persistable));
         }
-    }, [state]);
+    }, [state, initialState]);
 
     const toggleSidebar = useCallback(() => dispatch({ type: 'TOGGLE_SIDEBAR' }), []);
     const toggleLabMode = useCallback(() => dispatch({ type: 'TOGGLE_LAB_MODE' }), []);
     const setLabMode = useCallback((val: boolean) => dispatch({ type: 'SET_LAB_MODE', payload: val }), []);
     const setUser = useCallback((user: User | null) => dispatch({ type: 'SET_USER', payload: user }), []);
 
-    const login = useCallback((email: string, name: string = 'Trader') => {
-        const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
-
-        const saved = localStorage.getItem('rulesci_data');
-        let parsed = null;
-        if (saved) {
-            try { parsed = JSON.parse(saved); } catch (e) { /* ignore */ }
-        }
-
-        let trialStartDate = parsed?.user?.trialStartDate;
-        if (!trialStartDate && !isPro) {
-            trialStartDate = new Date().toISOString();
-        }
-
-        dispatch({
-            type: 'SET_USER',
-            payload: { email, name, isPro, trialStartDate }
-        });
+    const login = useCallback(async (email: string, name: string = 'Trader') => {
+        // This is now reactive via onAuthStateChange
+        // But we can keep it as a placeholder for manual overrides if needed
+        console.log('Login initiated for', email);
     }, []);
 
-    const logout = useCallback(() => {
+    const logout = useCallback(async () => {
+        await supabase.auth.signOut();
         localStorage.removeItem('rulesci_data');
         dispatch({ type: 'LOGOUT' });
-    }, []);
+    }, [supabase]);
 
     const updateSession = useCallback((data: Partial<Session>) => dispatch({ type: 'UPDATE_SESSION', payload: data }), []);
     
@@ -391,6 +438,7 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
     const updateUserModel = useCallback((model: Partial<UserModel>) => dispatch({ type: 'UPDATE_USER_MODEL', payload: model }), []);
     const addDiaryEntry = useCallback((entry: DiaryEntry) => dispatch({ type: 'ADD_DIARY_ENTRY', payload: entry }), []);
     const updateDiaryEntry = useCallback((entry: Partial<DiaryEntry> & { id: string }) => dispatch({ type: 'UPDATE_DIARY_ENTRY', payload: entry }), []);
+    const setCaptureOpen = useCallback((open: boolean) => dispatch({ type: 'SET_CAPTURE_OPEN', payload: open }), []);
 
     const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
         const id = `toast_${Date.now()}`;
@@ -431,6 +479,7 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         updateDiaryEntry,
         showToast,
         dismissToast,
+        setCaptureOpen,
     };
 
     return <RuleSciContext.Provider value={value}>{children}</RuleSciContext.Provider>;

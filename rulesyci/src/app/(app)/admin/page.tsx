@@ -138,27 +138,31 @@ export default function AdminPage() {
                         </div>
 
                         {/* Real-time Agent Logs Stream */}
-                        <div className="bg-[#1a1a2e] rounded-[40px] p-8 flex flex-col shadow-2xl shadow-[#1a1a2e]/20">
-                            <div className="flex items-center justify-between mb-6">
+                        <div className="bg-[#1a1a2e] rounded-[40px] p-8 flex flex-col shadow-2xl shadow-[#1a1a2e]/20 relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="flex items-center justify-between mb-6 relative z-10">
                                 <h3 className="text-sm font-bold text-white flex items-center gap-2 uppercase tracking-widest">
                                     <Terminal size={18} className="text-blue-400" />
-                                    Live Agent Flux
+                                    Intelligence Flux
                                 </h3>
-                                <span className="w-2 h-2 bg-green-500 rounded-full animate-ping" />
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Syncing</span>
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                                </div>
                             </div>
-                            <div className="flex-1 space-y-4 font-mono">
+                            <div className="flex-1 space-y-4 font-mono relative z-10">
                                 <AnimatePresence initial={false}>
                                     {logs.map((log) => (
                                         <motion.div 
                                             key={log.id} 
                                             initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-                                            className="text-[11px] leading-relaxed flex gap-3"
+                                            className="text-[10px] leading-relaxed flex gap-3 border-l border-white/5 pl-3 hover:bg-white/5 transition-colors cursor-default"
                                         >
-                                            <span className="text-gray-500 whitespace-nowrap">[{log.time}]</span>
+                                            <span className="text-blue-500/50 whitespace-nowrap">0x{Math.floor(Math.random()*1000)}</span>
                                             <span className={`${
-                                                log.type === 'warning' ? 'text-orange-400' :
+                                                log.type === 'warning' ? 'text-red-400' :
                                                 log.type === 'success' ? 'text-green-400' :
-                                                log.type === 'security' ? 'text-purple-400' : 'text-blue-300'
+                                                log.type === 'security' ? 'text-purple-400' : 'text-blue-200'
                                             }`}>
                                                 {log.msg}
                                             </span>
@@ -166,9 +170,31 @@ export default function AdminPage() {
                                     ))}
                                 </AnimatePresence>
                             </div>
-                            <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between text-[10px] font-bold text-gray-500">
-                                <span>STATUS: CLUSTER_READY</span>
-                                <span>NODES: 128_ACTIVE</span>
+                            
+                            {/* Neural Connection Visualization */}
+                            <div className="mt-8 pt-6 border-t border-white/5">
+                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Rule Diffusion Heatmap</p>
+                                <div className="grid grid-cols-10 gap-1.5">
+                                    {Array.from({ length: 40 }).map((_, i) => (
+                                        <motion.div 
+                                            key={i} 
+                                            initial={{ opacity: 0 }} animate={{ opacity: Math.random() * 0.8 + 0.2 }}
+                                            className={`h-2.5 rounded-sm ${i % 7 === 0 ? 'bg-red-500/80' : i % 3 === 0 ? 'bg-blue-500/80' : 'bg-green-500/80'}`}
+                                            title="Active Framework Node"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="mt-6 pt-4 flex items-center justify-between text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                                <div className="flex items-center gap-2">
+                                    <Database size={10} />
+                                    COLLECTOR_V2
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Cpu size={10} />
+                                    NODE_01_OK
+                                </div>
                             </div>
                         </div>
 

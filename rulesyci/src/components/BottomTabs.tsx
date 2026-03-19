@@ -6,20 +6,22 @@ import {
     Calendar,
     BookOpen,
     ScrollText,
-    BarChart3,
-    Settings
+    Settings,
+    Plus
 } from 'lucide-react';
+import { useRuleSci } from '@/lib/context';
 
 const navItems = [
     { to: '/dashboard', icon: Calendar, label: 'Today' },
     { to: '/journal', icon: BookOpen, label: 'Journal' },
+    { to: 'CAPTURE', icon: Plus, label: '' },
     { to: '/rules', icon: ScrollText, label: 'Rules' },
-    { to: '/stats', icon: BarChart3, label: 'Stats' },
-    { to: '/settings', icon: Settings, label: 'Settings' },
+    { to: '/settings', icon: Settings, label: 'Profile' },
 ];
 
 export default function BottomTabs() {
     const pathname = usePathname();
+    const { setCaptureOpen } = useRuleSci();
 
     return (
         <nav
@@ -33,6 +35,21 @@ export default function BottomTabs() {
             {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.to;
+                
+                if (item.to === 'CAPTURE') {
+                    return (
+                        <button
+                            key="capture-btn"
+                            onClick={() => setCaptureOpen(true)}
+                            className="flex flex-col items-center justify-center -mt-8"
+                        >
+                            <div className="w-14 h-14 bg-[#1a1a2e] text-white rounded-full flex items-center justify-center shadow-xl shadow-gray-200 border-4 border-white active:scale-90 transition-all">
+                                <Plus size={28} strokeWidth={3} />
+                            </div>
+                        </button>
+                    );
+                }
+
                 return (
                     <Link
                         key={item.to}

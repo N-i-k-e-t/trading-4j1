@@ -5,7 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function PrivacyPage() {
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-[100dvh] bg-white">
             <div className="max-w-[700px] mx-auto px-6 py-12 md:py-24">
                 <Link href="/" className="inline-flex items-center gap-2 text-[#6b7280] hover:text-[#1a1a2e] transition-colors mb-12 font-medium">
                     <ArrowLeft size={20} />

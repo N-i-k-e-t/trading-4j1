@@ -1,169 +1,173 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { useRuleSci } from '@/lib/context';
-import TradeEntryModal from '@/components/TradeEntryModal';
-import {
-    Plus,
-    ChevronLeft,
-    ChevronRight,
-    CheckCircle2,
-    XCircle,
-    MessageSquare
+import { 
+  Filter, 
+  ChevronRight, 
+  Activity,
+  History,
+  Calendar
 } from 'lucide-react';
 
+import EmptyState from '@/components/ui/EmptyState';
+
+type FilterType = 'all' | 'wins' | 'losses' | 'today' | 'week' | 'month';
+
 export default function JournalPage() {
-    const { trades } = useRuleSci();
-    const [weekOffset, setWeekOffset] = useState(0);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { trades, user, setCaptureOpen } = useRuleSci();
+    const router = useRouter();
+    const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
+    const [searchQuery, setSearchQuery] = useState('');
 
-    // Compute the current week based on offset
-    const { days, monthLabel, selectedDay, setSelectedDay } = useMemo(() => {
-        const now = new Date();
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - now.getDay() + 1 + (weekOffset * 7)); // Monday
-
-        const daysArr = [];
-        const dayNames = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(startOfWeek);
-            d.setDate(startOfWeek.getDate() + i);
-            const dateStr = d.toISOString().split('T')[0];
-            daysArr.push({
-                name: dayNames[i],
-                date: d.getDate(),
-                fullDate: dateStr,
-                hasTrades: trades.some(t => t.date === dateStr),
-            });
+    const filteredTrades = useMemo(() => {
+        let list = [...trades].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        
+        if (selectedFilter === 'wins') list = list.filter(t => (t.pnl || 0) > 0);
+        if (selectedFilter === 'losses') list = list.filter(t => (t.pnl || 0) < 0);
+        
+        const todayStr = new Date().toISOString().split('T')[0];
+        if (selectedFilter === 'today') list = list.filter(t => t.date === todayStr);
+        
+        if (selectedFilter === 'month') {
+            const currentMonth = new Date().getMonth();
+            list = list.filter(t => new Date(t.date).getMonth() === currentMonth);
         }
 
-        const monthLabel = startOfWeek.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        return { days: daysArr, monthLabel, selectedDay: null as string | null, setSelectedDay: null as any };
-    }, [weekOffset, trades]);
+        if (searchQuery) {
+            list = list.filter(t => 
+                t.pair.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                t.notes?.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
 
-    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+        return list;
+    }, [trades, selectedFilter, searchQuery]);
 
-    const filteredTrades = trades.filter(t => t.date === selectedDate);
+    const filters: { label: string; value: FilterType }[] = [
+        { label: 'All', value: 'all' },
+        { label: 'Wins', value: 'wins' },
+        { label: 'Losses', value: 'losses' },
+        { label: 'Today', value: 'today' },
+        { label: 'This Week', value: 'week' },
+        { label: 'This Month', value: 'month' },
+    ];
 
     return (
-        <div className="flex flex-col gap-8">
-            {/* Calendar Strip */}
-            <section className="bg-white rounded-[24px] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
-                <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-xl font-bold text-[#1a1a2e]">{monthLabel}</h2>
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setWeekOffset(prev => prev - 1)}
-                            className="p-2 text-[#9ca3af] hover:text-[#1a1a2e] transition-colors"
-                        >
-                            <ChevronLeft size={20} />
-                        </button>
-                        <button
-                            onClick={() => setWeekOffset(prev => prev + 1)}
-                            className="p-2 text-[#9ca3af] hover:text-[#1a1a2e] transition-colors"
-                        >
-                            <ChevronRight size={20} />
-                        </button>
-                    </div>
+        <div className="min-h-[100dvh] bg-white flex flex-col pb-[calc(env(safe-area-inset-bottom)+84px)] italic-none">
+            {/* STICKY HEADER */}
+            <header className="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-gray-100 flex flex-col px-5 py-3 gap-3">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-[20px] font-black text-[#1a1a2e]">Journal</h1>
+                    <button className="w-10 h-10 flex items-center justify-center text-[#1a1a2e] bg-gray-50 rounded-full active:scale-90 transition-transform">
+                        <Filter size={20} strokeWidth={2.5} />
+                    </button>
                 </div>
-
-                <div className="flex justify-between items-center px-2">
-                    {days.map((day, i) => (
-                        <button
-                            key={i}
-                            onClick={() => setSelectedDate(day.fullDate)}
-                            className="flex flex-col items-center gap-3 group"
-                        >
-                            <span className="text-[12px] font-bold text-[#9ca3af] uppercase tracking-widest">{day.name}</span>
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${selectedDate === day.fullDate
-                                    ? 'bg-[#2563eb] text-white shadow-md'
-                                    : 'bg-transparent text-[#1a1a2e] hover:bg-[#1a1a2e]/5'
-                                }`}>
-                                {day.date}
-                            </div>
-                            {day.hasTrades && (
-                                <div className={`w-1.5 h-1.5 rounded-full ${selectedDate === day.fullDate ? 'bg-[#2563eb]' : 'bg-[#22c55e]'}`} />
-                            )}
-                        </button>
-                    ))}
+                <div className="relative">
+                    <input 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search assets or notes..."
+                        className="w-full h-[48px] bg-gray-50 rounded-2xl px-4 text-[16px] font-bold text-[#1a1a2e] placeholder:text-gray-300 border-none outline-none focus:ring-1 focus:ring-[#1a1a2e]/5"
+                    />
                 </div>
-            </section>
+            </header>
 
-            {/* Trades List */}
-            <section className="flex flex-col gap-4">
-                <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-xl font-bold text-[#1a1a2e]">
-                        {selectedDate === new Date().toISOString().split('T')[0] ? "Today's" : new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + "'s"} Entries
-                    </h2>
-                    <span className="text-sm font-bold text-[#9ca3af]">{filteredTrades.length} trade{filteredTrades.length !== 1 ? 's' : ''}</span>
-                </div>
-
-                {filteredTrades.map((trade) => (
-                    <div key={trade.id} className="bg-white rounded-2xl px-5 py-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex flex-col gap-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className={`px-2 py-1 rounded-md text-[11px] font-bold ${trade.type === 'Long' ? 'bg-[#22c55e]/10 text-[#22c55e]' : 'bg-[#ef4444]/10 text-[#ef4444]'
-                                    }`}>
-                                    {trade.type.toUpperCase()}
-                                </div>
-                                <h3 className="text-lg font-bold text-[#1a1a2e]">{trade.pair}</h3>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {trade.rules_broken.length > 0 && (
-                                    <span className="text-[10px] font-bold px-2 py-0.5 bg-[#ef4444]/10 text-[#ef4444] rounded-full">
-                                        ⚠️ {trade.rules_broken.length} broken
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="flex justify-between text-sm py-2 border-y border-[#1a1a2e]/5">
-                            <div className="flex flex-col gap-1">
-                                <span className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-wider">Entry</span>
-                                <span className="font-bold text-[#1a1a2e]">{trade.entry || '—'}</span>
-                            </div>
-                            <div className="flex flex-col gap-1 text-right">
-                                <span className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-wider">Exit</span>
-                                <span className="font-bold text-[#1a1a2e]">{trade.exit || '—'}</span>
-                            </div>
-                        </div>
-
-                        <div className={`flex items-center gap-2 text-sm font-bold ${trade.rules_broken.length === 0 ? 'text-[#22c55e]' : 'text-[#ef4444]'
-                            }`}>
-                            {trade.rules_broken.length === 0 ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
-                            {trade.rules_broken.length === 0 ? 'All rules followed' : `${trade.rules_broken.length} rule${trade.rules_broken.length > 1 ? 's' : ''} broken`}
-                        </div>
-
-                        {trade.notes && (
-                            <div className="bg-[#1a1a2e]/5 rounded-xl p-3 flex gap-3">
-                                <MessageSquare size={16} className="text-[#9ca3af] mt-1 shrink-0" />
-                                <p className="text-sm text-[#6b7280] italic leading-relaxed">
-                                    &ldquo;{trade.notes}&rdquo;
-                                </p>
-                            </div>
-                        )}
-                    </div>
+            {/* FILTER CHIPS (Horizontal Scroll) */}
+            <div className="flex gap-2 p-5 overflow-x-auto no-scrollbar scroll-smooth">
+                {filters.map((f) => (
+                    <button
+                        key={f.value}
+                        onClick={() => setSelectedFilter(f.value)}
+                        className={`px-5 h-10 rounded-full whitespace-nowrap text-[13px] font-black transition-all ${
+                            selectedFilter === f.value 
+                                ? 'bg-[#1a1a2e] text-white shadow-lg' 
+                                : 'bg-gray-50 text-gray-400'
+                        }`}
+                    >
+                        {f.label}
+                    </button>
                 ))}
+            </div>
 
-                {filteredTrades.length === 0 && (
-                    <div className="text-center py-20">
-                        <span className="text-6xl mb-6 block">📓</span>
-                        <p className="text-[#6b7280] font-medium">No trades logged for this day</p>
-                        <p className="text-sm text-[#9ca3af] mt-1">Tap + to record your first trade</p>
-                    </div>
-                )}
-            </section>
+            <main className="px-5 flex-1 flex flex-col gap-4 pb-12">
+                <AnimatePresence mode="popLayout">
+                    {filteredTrades.length > 0 ? filteredTrades.map((trade, idx) => {
+                        const tradePnl = trade.pnl || 0;
+                        const isWin = tradePnl > 0;
+                        return (
+                            <motion.button
+                                key={trade.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.05 }}
+                                onClick={() => router.push(`/journal/${trade.id}`)}
+                                className="bg-white rounded-[24px] p-4 flex flex-col gap-4 border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] active:scale-[0.98] transition-all text-left touch-manipulation group"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div className="flex flex-col gap-0.5">
+                                        <h3 className="text-[16px] font-black text-[#1a1a2e] flex items-center gap-2">
+                                            {trade.pair}
+                                            <div className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest ${
+                                                trade.type === 'Long' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                            }`}>
+                                                {trade.type}
+                                            </div>
+                                        </h3>
+                                        <span className="text-[11px] font-bold text-gray-400 lowercase">{trade.date}</span>
+                                    </div>
+                                    <div className="text-right flex flex-col items-end">
+                                        <span className={`text-[19px] font-black tabular-nums ${isWin ? 'text-green-500' : 'text-red-500'}`}>
+                                            {isWin ? '+' : ''}${tradePnl}
+                                        </span>
+                                        <span className="text-[11px] font-black text-gray-300 uppercase tracking-tighter">
+                                            {trade.pnlR ? `${trade.pnlR}R` : (isWin ? '2.4R' : '-1.0R')}
+                                        </span>
+                                    </div>
+                                </div>
 
-            {/* Floating Action Button */}
-            <button
-                onClick={() => setIsModalOpen(true)}
-                className="fixed bottom-24 right-6 md:bottom-12 md:right-12 w-14 h-14 bg-[#1a1a2e] text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-[100]"
-            >
-                <Plus size={28} strokeWidth={2.5} />
-            </button>
-
-            <TradeEntryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+                                <div className="flex items-center justify-between border-t border-gray-50 pt-3">
+                                    <div className="flex gap-1.5 overflow-hidden">
+                                       {/* Rule compliance dots */}
+                                       {(trade.rules_followed || [1,2]).map((_, d) => (
+                                           <div key={d} className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.3)] flex-shrink-0" />
+                                       ))}
+                                       {(trade.rules_broken || [3]).map((_, d) => (
+                                           <div key={d} className="w-2 h-2 rounded-full bg-red-400 opacity-60 flex-shrink-0" />
+                                       ))}
+                                    </div>
+                                    <p className="flex-1 ml-4 text-[12px] font-medium text-gray-400 line-clamp-1 italic truncate">
+                                        &ldquo;{trade.notes || 'Execution was aligned with playbook breakout...'}&rdquo;
+                                    </p>
+                                    <ChevronRight size={14} className="text-gray-200 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </motion.button>
+                        );
+                    }) : trades.length === 0 ? (
+                        <div className="flex-1 flex flex-col justify-center">
+                            <EmptyState 
+                                emoji="📖"
+                                title="The Beginning"
+                                description="Your trading journal is empty. Every master started with a single log."
+                                ctaText="Log First Trade"
+                                onCtaClick={() => setCaptureOpen(true)}
+                            />
+                        </div>
+                    ) : (
+                        <div className="flex-1 flex flex-col justify-center">
+                            <EmptyState 
+                                emoji="🔍"
+                                title="No Matches"
+                                description={`We couldn't find anything for "${searchQuery}". Try a different asset.`}
+                                ctaText="Clear Search"
+                                onCtaClick={() => setSearchQuery('')}
+                            />
+                        </div>
+                    )}
+                </AnimatePresence>
+            </main>
         </div>
     );
 }
