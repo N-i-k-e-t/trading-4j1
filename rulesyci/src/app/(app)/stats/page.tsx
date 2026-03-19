@@ -122,11 +122,23 @@ export default function StatsPage() {
 
     return (
         <div className="flex flex-col gap-4 px-5 pb-[calc(env(safe-area-inset-bottom)+84px)] italic-none">
-            {/* Header */}
-            <header className="pt-6">
-                <h1 className="text-[20px] font-black text-[#1a1a2e]">Performance</h1>
-                <p className="text-[13px] font-bold text-[#b1b1c1]">Analyze your discipline patterns and growth.</p>
-            </header>
+            {/* AI COACH — HERO INSIGHT */}
+            {aiOutput.coachMessages.length > 0 && (
+                <section className="bg-[#1a1a2e] rounded-[32px] p-6 text-white shadow-xl shadow-[#1a1a2e]/10">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-[#2563eb] text-white rounded-xl flex items-center justify-center">
+                            <Lightbulb size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-base font-black text-white">Elite AI Coach</h3>
+                            <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">{aiOutput.coachMessages[0].tone}</span>
+                        </div>
+                    </div>
+                    <p className="text-[15px] font-bold text-white/90 leading-relaxed italic border-l-2 border-blue-500 pl-4 py-1">
+                        &ldquo;{aiOutput.coachMessages[0].message}&rdquo;
+                    </p>
+                </section>
+            )}
 
             {/* Streak & Score Grid */}
             <div className="grid grid-cols-2 gap-3">
@@ -240,32 +252,8 @@ export default function StatsPage() {
                 </div>
             </section>
 
-            {/* AI Insights */}
+            {/* AI Insights & Alerts */}
             <section className="flex flex-col gap-4">
-                {/* Coach Message */}
-                {aiOutput.coachMessages.length > 0 && (
-                    <div className="bg-white rounded-2xl px-5 py-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border-2 border-[#2563eb]/10">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 bg-[#2563eb] text-white rounded-xl flex items-center justify-center">
-                                <Lightbulb size={20} />
-                            </div>
-                            <div>
-                                <h3 className="text-base font-bold text-[#1a1a2e]">AI Coach</h3>
-                                <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                                    aiOutput.coachMessages[0].tone === 'encouraging' ? 'text-[#22c55e]' :
-                                    aiOutput.coachMessages[0].tone === 'warning' ? 'text-[#f59e0b]' : 'text-[#9ca3af]'
-                                }`}>
-                                    {aiOutput.coachMessages[0].tone}
-                                </span>
-                            </div>
-                        </div>
-                        <p className="text-[15px] text-[#6b7280] leading-relaxed italic">
-                            &ldquo;{aiOutput.coachMessages[0].message}&rdquo;
-                        </p>
-                    </div>
-                )}
-
-                {/* Pattern Insights */}
                 {aiOutput.insights.map(insight => (
                     <div key={insight.id} className="bg-[#f59e0b]/5 rounded-2xl px-5 py-4 border border-[#f59e0b]/10">
                         <div className="flex items-center gap-2 mb-2">

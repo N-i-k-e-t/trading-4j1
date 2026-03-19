@@ -37,6 +37,25 @@ export default function DiaryHistoryPage() {
                         <Camera size={20} />
                     </button>
                 </div>
+                
+                {/* MOBILE STATS GRID (Stacked) */}
+                <div className="flex flex-col gap-2 mb-4">
+                    <div className="bg-gray-50 rounded-2xl p-4 flex items-center justify-between border border-gray-100">
+                        <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Pages Scanned</span>
+                        <span className="text-[18px] font-black text-[#1a1a2e] tabular-nums">{diaryEntries.length}</span>
+                    </div>
+                    <div className="flex gap-2">
+                        <div className="flex-1 bg-gray-50 rounded-2xl p-4 flex flex-col gap-1 border border-gray-100">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Rule Extracts</span>
+                            <span className="text-[16px] font-black text-[#1a1a2e] tabular-nums">12</span>
+                        </div>
+                        <div className="flex-1 bg-gray-50 rounded-2xl p-4 flex flex-col gap-1 border border-gray-100">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Efficiency</span>
+                            <span className="text-[16px] font-black text-green-600 tabular-nums">94%</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
                     <input 

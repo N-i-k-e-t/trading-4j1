@@ -72,6 +72,8 @@ export default function PnLCalendar() {
 
                 {daysInMonth.map((date) => {
                     const dateStr = date.toISOString().split('T')[0];
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    const isToday = dateStr === todayStr;
                     const log = dailyLogs.find(l => l.date === dateStr);
                     const events = marketEvents.filter(e => e.date === dateStr);
                     const grade = log?.grade || 'None';
@@ -80,9 +82,11 @@ export default function PnLCalendar() {
                         <motion.div
                             key={dateStr}
                             whileTap={{ scale: 0.95 }}
-                            className={`aspect-square rounded-2xl ${gradeColors[grade]} relative flex flex-col items-center justify-center cursor-pointer group shadow-sm`}
+                            className={`aspect-square rounded-2xl ${gradeColors[grade]} relative flex flex-col items-center justify-center cursor-pointer group shadow-sm ${
+                                isToday ? 'ring-4 ring-[#1a1a2e] ring-offset-2' : ''
+                            }`}
                         >
-                            <span className={`text-[13px] font-bold ${grade === 'None' ? 'text-[#1a1a2e]/40' : 'text-white'}`}>
+                            <span className={`text-[13px] font-black ${grade === 'None' ? 'text-[#1a1a2e]/40' : 'text-white'} ${isToday && grade === 'None' ? 'text-[#1a1a2e]' : ''}`}>
                                 {date.getDate()}
                             </span>
                             

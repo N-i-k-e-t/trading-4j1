@@ -3,20 +3,20 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-    Calendar,
-    BookOpen,
+    Zap,
     ScrollText,
-    Settings,
+    Target,
+    BarChart3,
     Plus
 } from 'lucide-react';
 import { useRuleSci } from '@/lib/context';
 
 const navItems = [
-    { to: '/dashboard', icon: Calendar, label: 'Today' },
-    { to: '/journal', icon: BookOpen, label: 'Journal' },
+    { to: '/dashboard', icon: Zap, label: 'Today' },
+    { to: '/journal', icon: ScrollText, label: 'Journal' },
     { to: 'CAPTURE', icon: Plus, label: '' },
-    { to: '/rules', icon: ScrollText, label: 'Rules' },
-    { to: '/settings', icon: Settings, label: 'Profile' },
+    { to: '/rules', icon: Target, label: 'Rules' },
+    { to: '/stats', icon: BarChart3, label: 'Stats' },
 ];
 
 export default function BottomTabs() {

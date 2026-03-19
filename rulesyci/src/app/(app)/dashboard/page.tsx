@@ -15,7 +15,8 @@ import {
     Camera, 
     FileText, 
     ListChecks, 
-    Calendar as CalendarIcon 
+    Calendar as CalendarIcon,
+    TrendingDown
 } from 'lucide-react';
 import EmptyState from '@/components/ui/EmptyState';
 
@@ -29,13 +30,29 @@ export default function DashboardPage() {
     const todayTrades = useMemo(() => trades.filter(t => t.date === today), [trades, today]);
     const todayPnL = useMemo(() => todayTrades.reduce((sum, t) => sum + (t.pnl || 0), 0), [todayTrades]);
 
+    const todayLog = dailyLogs.find(d => d.date === today);
+    const checkedIds = todayLog?.rulesChecked || [];
+
+    const handleToggleRule = (ruleId: string) => {
+        const isChecked = checkedIds.includes(ruleId);
+        const newChecked = isChecked 
+            ? checkedIds.filter(id => id !== ruleId) 
+            : [...checkedIds, ruleId];
+        
+        logDaily({ 
+            date: today, 
+            rulesChecked: newChecked,
+            tradesLogged: todayTrades.length,
+            mood: todayLog?.mood || 'Neutral',
+            rulesFollowed: newChecked.length,
+            rulesBroken: todayTrades.reduce((acc, t) => acc + (t.rules_broken?.length || 0), 0)
+        });
+    };
+
     // RESTORE SCORE LOGIC
     const { score, gradeInfo } = useMemo(() => {
         const activeRules = rules.filter(r => r.isActive !== false);
-        // We need a stable way to track today's checks. 
-        // For the UI, we'll check the daily log for today.
-        const todayLog = dailyLogs.find(d => d.date === today);
-        const checkedCount = todayLog ? todayLog.rulesChecked.length : 0;
+        const checkedCount = checkedIds.length;
         
         const ruleScore = activeRules.length > 0 ? (checkedCount / activeRules.length) * 50 : 50;
         const hasPrePlan = session.preSessionComplete || todayTrades.length > 0;
@@ -56,7 +73,7 @@ export default function DashboardPage() {
         };
 
         return { score: totalScore, gradeInfo: getGrade(totalScore) };
-    }, [rules, dailyLogs, today, session.preSessionComplete, todayTrades.length, activeNote]);
+    }, [rules, checkedIds, session.preSessionComplete, todayTrades.length, activeNote]);
 
     // RESTORE STREAK LOGIC
     const streak = useMemo(() => {
@@ -81,7 +98,7 @@ export default function DashboardPage() {
     }, [dailyLogs, score]);
     
     // SVG Progress logic
-    const radius = 54;
+    const radius = 70; // Matching the updated circle size
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (score / 100) * circumference;
 
@@ -89,9 +106,6 @@ export default function DashboardPage() {
         setIsSheetOpen(false);
         router.push(`/capture?type=${type}`);
     };
-
-    const todayLog = dailyLogs.find(d => d.date === today);
-    const checkedIds = todayLog?.rulesChecked || [];
 
     return (
         <div className="min-h-[100dvh] bg-white flex flex-col selection:bg-orange-100 italic-none pb-[calc(env(safe-area-inset-bottom)+84px)]">
@@ -115,12 +129,12 @@ export default function DashboardPage() {
 
                 {/* HERO METRIC CARD */}
                 <section className="bg-white rounded-[32px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] mb-4 flex flex-col items-center">
-                    <div className="relative w-[120px] h-[120px] flex items-center justify-center mb-4">
+                    <div className="relative w-[140px] h-[140px] flex items-center justify-center mb-4">
                         <svg className="w-full h-full -rotate-90">
-                            <circle cx="60" cy="60" r={radius} fill="transparent" stroke="#f3f4f6" strokeWidth="8" />
+                            <circle cx="70" cy="70" r={radius - 8} fill="transparent" stroke="#f3f4f6" strokeWidth="10" />
                             <motion.circle 
-                                cx="60" cy="60" r={radius} fill="transparent" 
-                                stroke={gradeInfo.color} strokeWidth="8" strokeDasharray={circumference}
+                                cx="70" cy="70" r={radius - 8} fill="transparent" 
+                                stroke={gradeInfo.color} strokeWidth="10" strokeDasharray={circumference}
                                 initial={{ strokeDashoffset: circumference }}
                                 animate={{ strokeDashoffset: offset }}
                                 transition={{ duration: 1.5, ease: "easeOut" }}
@@ -128,28 +142,29 @@ export default function DashboardPage() {
                             />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-[32px] font-black text-[#1a1a2e] leading-none mb-0.5 tabular-nums">{checkedIds.length}/{rules.filter(r=>r.isActive).length}</span>
+                            <span className="text-[36px] font-black text-[#1a1a2e] leading-none mb-0.5 tabular-nums">{checkedIds.length}/{rules.filter(r=>r.isActive).length}</span>
                             <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest">rules</span>
                         </div>
                     </div>
 
                     <div 
-                        className="px-4 py-1.5 rounded-full text-[12px] font-black uppercase tracking-widest mb-6"
+                        className="px-6 py-2 rounded-full text-[13px] font-black uppercase tracking-widest mb-6"
                         style={{ backgroundColor: `${gradeInfo.color}15`, color: gradeInfo.color }}
                     >
-                        Grade {gradeInfo.grade}
+                        Grade {gradeInfo.grade} — {gradeInfo.label}
                     </div>
 
                     <div className="w-full flex items-center justify-between border-t border-gray-50 pt-6">
                         <div className="flex flex-col items-center flex-1">
                             <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-1">Win Rate</span>
-                            <span className="text-[18px] font-black text-[#1a1a2e] tabular-nums">64%</span>
+                            <span className="text-[18px] font-black text-[#1a1a2e] tabular-nums">48%</span>
                         </div>
                         <div className="w-px h-8 bg-gray-100" />
                         <div className="flex flex-col items-center flex-1">
-                            <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-1">Today P&L</span>
-                            <div className="flex items-center gap-0.5 text-[18px] font-black tabular-nums text-green-500">
-                                <span>+$</span><span>{todayPnL}</span>
+                            <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-1">Impact</span>
+                            <div className="flex items-center gap-0.5 text-[18px] font-black tabular-nums text-red-500">
+                                <TrendingDown size={14} strokeWidth={3} />
+                                <span>₹{analytics.indisciplineCost.toLocaleString()}</span>
                             </div>
                         </div>
                         <div className="w-px h-8 bg-gray-100" />
@@ -160,52 +175,41 @@ export default function DashboardPage() {
                     </div>
                 </section>
 
-                {/* FINANCIAL IMPACT — COST OF INDISCIPLINE */}
-                <section className="bg-red-50/50 rounded-3xl p-5 border border-red-100/50 mb-4 flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer group" onClick={() => router.push('/stats')}>
-                    <div className="flex flex-col gap-1">
-                        <h3 className="text-[11px] font-black text-red-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <Target size={12} strokeWidth={3} />
-                            Cost of Indiscipline
-                        </h3>
-                        <p className="text-[20px] font-black text-red-600 tabular-nums">
-                            ₹{analytics.indisciplineCost.toLocaleString()}
-                        </p>
-                        <span className="text-[11px] font-bold text-red-400/60 leading-tight">
-                            Capital lost due to rule breaches.
-                        </span>
-                    </div>
-                    <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-red-500 shadow-sm border border-red-50 group-hover:bg-red-500 group-hover:text-white transition-colors">
-                        <ChevronRight size={18} strokeWidth={3} />
-                    </div>
-                </section>
-
-                {/* RULE CHECKLIST */}
+                {/* RULE CHECKLIST — EXPANDED BY DEFAULT */}
                 <section className="mb-4">
                     <header className="flex items-center justify-between mb-3 px-1">
-                        <h2 className="text-[13px] font-black text-gray-400 uppercase tracking-[0.15em]">Today&apos;s Rules</h2>
-                        <button onClick={() => router.push('/rules')} className="text-[13px] font-bold text-blue-600 flex items-center gap-0.5">Edit <ChevronRight size={14} /></button>
+                        <h2 className="text-[13px] font-black text-gray-400 uppercase tracking-[0.15em]">Priority Checklist</h2>
+                        <button onClick={() => router.push('/rules')} className="text-[13px] font-black text-blue-600">Review All</button>
                     </header>
                     <div className="flex flex-col gap-2">
-                        {rules.filter(r => r.isActive).slice(0, 3).map((rule, i) => {
+                        {rules.filter(r => r.isActive).map((rule, i) => {
                             const isChecked = checkedIds.includes(rule.id);
                             const isViolated = !isChecked && todayTrades.some(t => t.rules_broken.includes(rule.id));
                             return (
-                                <div key={rule.id} className="bg-gray-50/50 rounded-2xl h-[56px] flex items-center px-4 gap-4 active:scale-[0.98] transition-all touch-manipulation">
-                                    <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors ${
-                                        isChecked ? 'bg-green-500 border-green-500 text-white' : 
+                                <div key={rule.id} 
+                                    onClick={() => !isViolated && handleToggleRule(rule.id)}
+                                    className={`bg-white rounded-2xl h-[64px] flex items-center px-4 gap-4 border active:scale-[0.98] transition-all touch-manipulation cursor-pointer ${
+                                        isChecked ? 'border-green-100 shadow-sm shadow-green-50' : 
+                                        isViolated ? 'border-red-100 opacity-60' : 'border-gray-50'
+                                    }`}
+                                >
+                                    <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-colors ${
+                                        isChecked ? 'bg-green-500 border-green-500 text-white shadow-lg shadow-green-200' : 
                                         isViolated ? 'bg-red-500 border-red-500 text-white' : 
-                                        'border-gray-200'
+                                        'border-gray-100 bg-gray-50'
                                     }`}>
-                                        {isChecked ? <Check size={14} strokeWidth={4} /> : isViolated ? <X size={14} strokeWidth={4} /> : null}
+                                        {isChecked ? <Check size={18} strokeWidth={4} /> : isViolated ? <X size={18} strokeWidth={4} /> : null}
                                     </div>
-                                    <span className={`text-[14px] font-bold text-[#1a1a2e] line-clamp-1 ${isViolated ? 'line-through opacity-40' : ''}`}>
-                                        {rule.text}
-                                    </span>
-                                    <span className="ml-auto text-lg">{rule.emoji}</span>
+                                    <div className="flex flex-col">
+                                        <span className={`text-[15px] font-black text-[#1a1a2e] leading-tight line-clamp-1 ${isViolated ? 'line-through opacity-40 text-gray-400' : ''}`}>
+                                            {rule.text}
+                                        </span>
+                                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{rule.category}</span>
+                                    </div>
+                                    <span className="ml-auto text-xl">{rule.emoji}</span>
                                 </div>
                             );
                         })}
-                        <button onClick={() => router.push('/rules')} className="text-center py-2 text-[13px] font-bold text-blue-600">Edit Rules →</button>
                     </div>
                 </section>
 

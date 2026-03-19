@@ -74,25 +74,26 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <div className="flex min-h-[100dvh]">
+        <div className="flex min-h-[100dvh] bg-white overflow-x-hidden">
+            {/* Sidebar — Desktop Only */}
             <Sidebar />
+            
             <main
-                className={`flex-1 flex flex-col pt-5 px-4 md:px-8 md:ml-[240px] md:mr-12 transition-all duration-300 ${labMode ? 'focus-mode' : ''
-                    }`}
+                className={`flex-1 flex flex-col pt-0 md:pt-5 md:ml-[240px] transition-all duration-300 ${labMode ? 'focus-mode' : ''}`}
                 style={{
-                    paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 76px)',
+                    paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 84px)',
                 }}
             >
-                <div className="w-full max-w-[430px] mx-auto xl:max-w-[780px]">
+                <div className="w-full max-w-[430px] mx-auto xl:max-w-none xl:px-8">
                     {!user?.isPro && user?.trialStartDate && !labMode && (
-                        <div className="mb-6 p-4 bg-[#f59e0b]/10 border border-[#f59e0b]/20 text-[#1a1a2e] rounded-2xl flex items-center justify-between shadow-sm">
+                        <div className="mx-5 md:mx-0 mt-4 mb-4 p-4 bg-[#f59e0b]/10 border border-[#f59e0b]/20 text-[#1a1a2e] rounded-2xl flex items-center justify-between shadow-sm">
                             <span className="text-sm font-semibold">
                                 <span className="font-bold text-[#f59e0b]">Trial Active </span>
-                                — {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
+                                — {daysLeft} days left
                             </span>
                             <button 
                                 onClick={() => router.push('/pricing')}
-                                className="text-xs font-bold px-3 py-1.5 bg-[#f59e0b] text-white rounded-full leading-none shadow-sm hover:translate-y-[-1px] transition-transform"
+                                className="text-xs font-bold px-3 py-1.5 bg-[#f59e0b] text-white rounded-full"
                             >
                                 Upgrade
                             </button>
@@ -105,10 +106,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             {!labMode && <BottomTabs />}
             {labMode && <LabMode />}
             
-            {/* PWA Prompt Drivers */}
             <InstallPrompt />
-
-            {/* Core Interaction Hub */}
             <CaptureHub />
         </div>
     );
