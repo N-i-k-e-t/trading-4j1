@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-    { to: '/dashboard', icon: Zap, label: 'Today' },
+    { to: '/today', icon: Zap, label: 'Today' },
     { to: '/diary', icon: BookOpen, label: 'Diary' },
     { to: '/calendar', icon: Calendar, label: 'Calendar' },
     { to: '/journal', icon: ScrollText, label: 'Journal' },
@@ -26,7 +26,7 @@ const navItems = [
 ];
 
 export default function Sidebar() {
-    const { labMode, user } = useRuleSci();
+    const { labMode, user, logout } = useRuleSci();
     const pathname = usePathname();
 
     if (labMode) return null;
@@ -42,7 +42,7 @@ export default function Sidebar() {
             </Link>
 
             {/* Navigation */}
-            <nav className="flex flex-col gap-2 flex-1">
+            <nav className="flex flex-col gap-1 flex-1">
                 {navItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = pathname === item.to;
@@ -91,13 +91,13 @@ export default function Sidebar() {
             </nav>
 
             {/* Profile/Bottom section */}
-            <div className="pt-6 border-t border-[#1a1a2e]/5">
+            <div className="pt-6 border-t border-[#1a1a2e]/5 flex flex-col gap-4">
                 <div className="flex items-center gap-3 px-2">
                     <div className="w-8 h-8 rounded-full bg-[#1a1a2e] flex items-center justify-center text-[12px] font-bold text-white shadow-sm">
                         {user?.name?.substring(0, 2).toUpperCase() || 'GU'}
                     </div>
-                    <div className="flex flex-col">
-                        <span className="text-sm font-bold text-[#1a1a2e] truncate max-w-[120px]">
+                    <div className="flex flex-col flex-1 overflow-hidden">
+                        <span className="text-sm font-bold text-[#1a1a2e] truncate">
                             {user?.name || 'Guest User'}
                         </span>
                         <span className={`text-[10px] font-bold uppercase tracking-widest ${user?.isPro ? 'text-[#2563eb]' : 'text-[#9ca3af]'}`}>
@@ -105,6 +105,13 @@ export default function Sidebar() {
                         </span>
                     </div>
                 </div>
+                
+                <button 
+                    onClick={logout}
+                    className="w-full h-11 bg-red-50 text-red-600 rounded-xl text-[13px] font-black uppercase tracking-widest active:scale-95 transition-all"
+                >
+                    Sign Out
+                </button>
             </div>
         </aside>
     );

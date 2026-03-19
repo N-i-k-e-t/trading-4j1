@@ -2,67 +2,43 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-    Zap,
-    ScrollText,
-    Target,
-    BarChart3,
-    Plus
-} from 'lucide-react';
 import { useRuleSci } from '@/lib/context';
+import { 
+    Home, 
+    BookOpen, 
+    Calendar, 
+    Shield, 
+    Activity 
+} from 'lucide-react';
 
 const navItems = [
-    { to: '/dashboard', icon: Zap, label: 'Today' },
-    { to: '/journal', icon: ScrollText, label: 'Journal' },
-    { to: 'CAPTURE', icon: Plus, label: '' },
-    { to: '/rules', icon: Target, label: 'Rules' },
-    { to: '/stats', icon: BarChart3, label: 'Stats' },
+    { to: '/today', icon: Home, label: 'Today' },
+    { to: '/journal', icon: BookOpen, label: 'Journal' },
+    { to: '/calendar', icon: Calendar, label: 'Calendar' },
+    { to: '/rules', icon: Shield, label: 'Rules' },
+    { to: '/stats', icon: Activity, label: 'Stats' },
 ];
 
 export default function BottomTabs() {
     const pathname = usePathname();
-    const { setCaptureOpen } = useRuleSci();
 
     return (
-        <nav
-            className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#1a1a2e]/5 flex items-start justify-around px-2 z-[90]"
-            style={{
-                paddingTop: '10px',
-                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)',
-                minHeight: '60px',
-            }}
-        >
+        <nav className="md:hidden fixed bottom-1 left-4 right-4 bg-white/90 backdrop-blur-xl border border-gray-100 px-4 py-2 pb-[calc(env(safe-area-inset-bottom)+8px)] rounded-[32px] flex justify-between items-center z-[100] shadow-[0_12px_40px_rgba(0,0,0,0.12)]">
             {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.to;
-                
-                if (item.to === 'CAPTURE') {
-                    return (
-                        <button
-                            key="capture-btn"
-                            onClick={() => setCaptureOpen(true)}
-                            className="flex flex-col items-center justify-center -mt-8"
-                        >
-                            <div className="w-14 h-14 bg-[#1a1a2e] text-white rounded-full flex items-center justify-center shadow-xl shadow-gray-200 border-4 border-white active:scale-90 transition-all">
-                                <Plus size={28} strokeWidth={3} />
-                            </div>
-                        </button>
-                    );
-                }
-
                 return (
                     <Link
                         key={item.to}
                         href={item.to}
-                        className={`flex flex-col items-center gap-[3px] transition-colors ${
-                            isActive ? 'text-[#2563eb]' : 'text-[#9ca3af]'
+                        className={`flex flex-col items-center gap-1 transition-all flex-1 py-1.5 ${
+                            isActive ? 'text-[#f59e0b]' : 'text-gray-300'
                         }`}
-                        style={{ minWidth: '44px', minHeight: '44px', justifyContent: 'center' }}
                     >
-                        <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
-                        <span className={`text-[10px] font-bold uppercase tracking-wider leading-none ${
-                            isActive ? 'opacity-100' : 'opacity-50'
-                        }`}>
+                        <div className={`transition-all ${isActive ? 'scale-110' : ''}`}>
+                            <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                        </div>
+                        <span className={`text-[9px] font-black uppercase tracking-widest ${isActive ? 'opacity-100' : 'opacity-60'}`}>
                             {item.label}
                         </span>
                     </Link>

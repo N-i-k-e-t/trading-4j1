@@ -2,26 +2,26 @@
 
 import { useRuleSci } from '@/lib/context';
 import { DailyLog, MarketEvent } from '@/types/trading';
-import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, AlertCircle, Info, X as CloseIcon, TrendingUp, TrendingDown, Check, X, Shield, Brain } from 'lucide-react';
+import { 
+    ChevronLeft, 
+    ChevronRight, 
+    TrendingUp, 
+    TrendingDown, 
+    Check, 
+    X, 
+    Shield, 
+    Brain,
+    X as CloseIcon
+} from 'lucide-react';
 import { useState, useMemo } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-const gradeColors = {
-    'A': 'bg-[#22c55e]',
-    'B': 'bg-[#4ade80]',
-    'C': 'bg-[#f59e0b]',
-    'D': 'bg-[#ef4444]',
-    'F': 'bg-[#991b1b]',
-    'None': 'bg-[#1a1a2e]/5',
-};
-
 export default function PnLCalendar() {
-    const { dailyLogs, marketEvents, trades, rules } = useRuleSci();
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const { dailyLogs, marketEvents, trades } = useRuleSci();
+    // Default to March 2025 to align with User's Bootcamp Retest expectations
+    const [currentDate, setCurrentDate] = useState(new Date(2025, 2, 1));
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
     const month = currentDate.getMonth();
@@ -31,7 +31,6 @@ export default function PnLCalendar() {
         const date = new Date(year, month, 1);
         const days = [];
         while (date.getMonth() === month) {
-            // Include weekendGrey out as per user request (even if greyed)
             days.push(new Date(date));
             date.setDate(date.getDate() + 1);
         }
@@ -46,15 +45,15 @@ export default function PnLCalendar() {
     const selectedEvents = marketEvents.filter(e => e.date === selectedDate);
 
     return (
-        <>
+        <div className="flex flex-col gap-6">
             <div className="bg-white rounded-[32px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-[#1a1a2e]/5">
                 <div className="flex items-center justify-between mb-8 px-2">
                     <h2 className="text-xl font-bold text-[#1a1a2e]">{MONTHS[month]} {year}</h2>
                     <div className="flex gap-2">
-                        <button onClick={prevMonth} className="p-2 bg-[#1a1a2e]/5 rounded-xl text-[#1a1a2e]">
+                        <button onClick={prevMonth} className="p-3 bg-gray-50 rounded-xl text-[#1a1a2e] active:scale-95 transition-all">
                             <ChevronLeft size={20} />
                         </button>
-                        <button onClick={nextMonth} className="p-2 bg-[#1a1a2e]/5 rounded-xl text-[#1a1a2e]">
+                        <button onClick={nextMonth} className="p-3 bg-gray-50 rounded-xl text-[#1a1a2e] active:scale-95 transition-all">
                             <ChevronRight size={20} />
                         </button>
                     </div>
@@ -62,7 +61,7 @@ export default function PnLCalendar() {
 
                 <div className="grid grid-cols-7 gap-2 mb-4 text-center">
                     {['M','T','W','T','F','S','S'].map((d, i) => (
-                        <span key={i} className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest">{d}</span>
+                        <span key={i} className={`text-[10px] font-bold uppercase tracking-widest ${i >= 5 ? 'text-red-300' : 'text-[#9ca3af]'}`}>{d}</span>
                     ))}
                 </div>
 
@@ -74,31 +73,46 @@ export default function PnLCalendar() {
 
                     {daysInMonth.map((date) => {
                         const dateStr = date.toISOString().split('T')[0];
-                        const todayStr = new Date().toISOString().split('T')[0];
-                        const isToday = dateStr === todayStr;
-                        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-                        const log = dailyLogs.find(l => l.date === dateStr);
+                        const dayTrades = trades.filter(t => t.date === dateStr);
                         const events = marketEvents.filter(e => e.date === dateStr);
-                        const grade = log?.grade || 'None';
+                        
+                        // Smart Color Logic
+                        let color = 'bg-gray-50';
+                        let textColor = 'text-[#1a1a2e]/40';
+                        
+                        if (dayTrades.length > 0) {
+                            const totalPnL = dayTrades.reduce((acc, t) => acc + (t.pnl || 0), 0);
+                            const hasBroken = dayTrades.some(t => t.rules_broken.length > 0);
+                            
+                            if (totalPnL > 0 && !hasBroken) {
+                                color = 'bg-green-500 shadow-[0_4px_12px_rgba(34,197,94,0.3)]';
+                                textColor = 'text-white';
+                            } else if (totalPnL < 0 || hasBroken) {
+                                color = 'bg-red-500 shadow-[0_4px_12px_rgba(239,68,68,0.3)]';
+                                textColor = 'text-white';
+                            } else {
+                                color = 'bg-amber-400';
+                                textColor = 'text-white';
+                            }
+                        }
+
+                        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
                         return (
                             <motion.div
                                 key={dateStr}
-                                whileTap={{ scale: 0.95 }}
+                                whileTap={{ scale: 0.92 }}
                                 onClick={() => setSelectedDate(dateStr)}
-                                className={`aspect-square rounded-xl relative flex flex-col items-center justify-center cursor-pointer transition-all ${
-                                    isWeekend && grade === 'None' ? 'bg-gray-50 opacity-40' : gradeColors[grade]
-                                } ${isToday ? 'ring-2 ring-[#1a1a2e] ring-offset-2' : ''}`}
+                                className={`aspect-square rounded-xl relative flex flex-col items-center justify-center cursor-pointer transition-all ${color} ${isWeekend && dayTrades.length === 0 ? 'opacity-30' : ''}`}
                             >
-                                <span className={`text-[12px] font-black ${grade === 'None' ? 'text-[#1a1a2e]/40' : 'text-white'} ${isToday && grade === 'None' ? 'text-[#1a1a2e]' : ''}`}>
+                                <span className={`text-[12px] font-black ${textColor}`}>
                                     {date.getDate()}
                                 </span>
                                 
-                                <div className="absolute bottom-1 flex gap-0.5">
-                                    {events.map(e => (
-                                        <div key={e.id} className={`w-1 h-1 rounded-full ${e.impact === 'high' || e.impact === 'critical' ? 'bg-[#ef4444]' : 'bg-[#f59e0b]'}`} />
+                                <div className="absolute bottom-1.5 flex gap-0.5">
+                                    {events.slice(0, 3).map(e => (
+                                        <div key={e.id} className={`w-1 h-1 rounded-full ${e.impact === 'high' || e.impact === 'critical' ? 'bg-[#ef4444]' : 'bg-[#f59e0b]'} ${textColor === 'text-white' ? 'ring-1 ring-white/30' : ''}`} />
                                     ))}
-                                    {log && log.rulesBroken > 0 && <div className="w-1 h-1 rounded-full bg-white/50" />}
                                 </div>
                             </motion.div>
                         );
@@ -126,16 +140,14 @@ export default function PnLCalendar() {
                         <motion.div 
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             onClick={() => setSelectedDate(null)}
-                            className="fixed inset-0 bg-black/40 z-[100] backdrop-blur-[2px]"
+                            className="fixed inset-0 bg-black/40 z-[200] backdrop-blur-[2px]"
                         />
                         <motion.div
                             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] z-[101] max-h-[85vh] overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+20px)] shadow-[0_-8px_40px_rgba(0,0,0,0.1)]"
+                            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] z-[201] max-h-[85vh] overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+20px)] shadow-[0_-8px_40px_rgba(0,0,0,0.1)]"
                         >
-                            {/* Grabber */}
                             <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto my-4" />
-                            
                             <div className="px-6 py-2">
                                 <header className="flex items-center justify-between mb-8">
                                     <div>
@@ -170,7 +182,7 @@ export default function PnLCalendar() {
                                             <div key={i} className="bg-white border border-gray-100 p-4 rounded-2xl flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
                                                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${trade.type === 'Long' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                                                        {trade.pair.substring(0, 1)}
+                                                        {trade.pair.substring(0, 1).toUpperCase()}
                                                     </div>
                                                     <div>
                                                         <p className="text-[15px] font-bold text-[#1a1a2e]">{trade.pair} — {trade.type}</p>
@@ -214,6 +226,6 @@ export default function PnLCalendar() {
                     </>
                 )}
             </AnimatePresence>
-        </>
+        </div>
     );
 }

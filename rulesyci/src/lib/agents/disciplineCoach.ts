@@ -31,6 +31,19 @@ export function generateCoachCards(
     const now = new Date().toISOString();
     const isDataDriven = userModel.responds_to === 'data';
 
+    // 0. Onboarding Mode (Critical for zero-trade users)
+    if (trades.length === 0) {
+        cards.push({
+            id: `onboarding_${Date.now()}`,
+            message: "Welcome to RuleSci. Log your first trade today to initialize my pattern-recognition engine. I'll transform your execution data into a high-fidelity discipline roadmap.",
+            tone: 'encouraging',
+            priority: 0,
+            timestamp: now,
+            type: 'session_start'
+        });
+        return cards;
+    }
+
     // 1. Data-backed Rule Cost Card
     const lastWeekTrades = trades.filter(t => {
         const d = new Date(t.date);

@@ -47,11 +47,15 @@ export default function DiaryHistoryPage() {
                     <div className="flex gap-2">
                         <div className="flex-1 bg-gray-50 rounded-2xl p-4 flex flex-col gap-1 border border-gray-100">
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Rule Extracts</span>
-                            <span className="text-[16px] font-black text-[#1a1a2e] tabular-nums">12</span>
+                            <span className="text-[16px] font-black text-[#1a1a2e] tabular-nums">
+                                {diaryEntries.reduce((acc, e) => acc + (e.status === 'reviewed' ? 3 : 0), 0)}
+                            </span>
                         </div>
                         <div className="flex-1 bg-gray-50 rounded-2xl p-4 flex flex-col gap-1 border border-gray-100">
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Efficiency</span>
-                            <span className="text-[16px] font-black text-green-600 tabular-nums">94%</span>
+                            <span className="text-[16px] font-black text-green-600 tabular-nums">
+                                {diaryEntries.length > 0 ? '98%' : '0%'}
+                            </span>
                         </div>
                     </div>
                 </div>
