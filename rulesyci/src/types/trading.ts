@@ -22,6 +22,7 @@ export interface Playbook {
     id: string;
     name: string;
     description: string;
+    rules: string[]; // Rule IDs that belong to this playbook
     criteria: string[];
     avgR?: number;
     winRate?: number;
@@ -76,6 +77,7 @@ export interface Analytics {
     behavioralTrend: string;
     consistencyDays: number;
     primaryDeviation: string;
+    indisciplineCost: number; // The "Financial Impact" metric
 }
 
 // AI Agent Types

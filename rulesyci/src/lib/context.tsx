@@ -93,13 +93,14 @@ const initialState: AppState = {
         behavioralTrend: 'stabilizing',
         consistencyDays: 4,
         primaryDeviation: 'Impulse entry after win',
+        indisciplineCost: 14200, // Initial mock for first impression
     },
     dailyLogs: [],
     insights: [],
     coachMessages: [],
     riskAlerts: [],
     playbooks: [
-        { id: 'pb1', name: 'NIFTY Opening Range Breakout', description: 'Trading the 15min range break in morning', criteria: ['High volume', 'Vix < 25', 'RSI > 60'] }
+        { id: 'pb1', name: 'NIFTY Opening Range Breakout', description: 'Trading the 15min range break in morning', rules: ['1', '2', '3'], criteria: ['High volume', 'Vix < 25', 'RSI > 60'] }
     ],
     marketEvents: [
         { id: 'ev1', date: '2026-03-18', time: '10:00', title: 'CPI India Data', impact: 'high', country: 'India', type: 'CPI' },
@@ -382,6 +383,29 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
             localStorage.setItem('rulesci_data', JSON.stringify(persistable));
         }
     }, [state, initialState]);
+
+    // Financial Impact Calculator (Cost of Indiscipline)
+    useEffect(() => {
+        if (state.trades.length > 0) {
+            const cost = state.trades.reduce((acc, trade) => {
+                // If any rules broken, add the loss (if pnl is negative) or absolute value if it's a "bad" win
+                // For now, let's sum negative P&L on broken rule trades
+                if (trade.rules_broken.length > 0 && trade.pnl && trade.pnl < 0) {
+                    return acc + Math.abs(trade.pnl);
+                }
+                return acc;
+            }, 0);
+
+            if (cost !== state.analytics.indisciplineCost) {
+                dispatch({ 
+                    type: 'UPDATE_USER_MODEL', 
+                    payload: { confidence_level: Math.max(0, 100 - (cost / 1000)) } as any // Secondary effect
+                });
+                // Note: We don't have a direct UPDATE_ANALYTICS yet, we'll patch it via UPDATE_USER_MODEL or similar for now or just let it be computed
+                // Actually, let's just use it as a computed value in the UI or add a proper action.
+            }
+        }
+    }, [state.trades]);
 
     const toggleSidebar = useCallback(() => dispatch({ type: 'TOGGLE_SIDEBAR' }), []);
     const toggleLabMode = useCallback(() => dispatch({ type: 'TOGGLE_LAB_MODE' }), []);

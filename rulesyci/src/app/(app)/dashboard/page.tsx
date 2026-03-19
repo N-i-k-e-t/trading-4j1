@@ -20,7 +20,7 @@ import {
 import EmptyState from '@/components/ui/EmptyState';
 
 export default function DashboardPage() {
-    const { user, rules, trades, dailyLogs, session, logDaily, setCaptureOpen } = useRuleSci();
+    const { user, rules, trades, dailyLogs, session, logDaily, setCaptureOpen, analytics } = useRuleSci();
     const router = useRouter();
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [activeNote, setActiveNote] = useState('');
@@ -157,6 +157,25 @@ export default function DashboardPage() {
                             <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest mb-1">Trades</span>
                             <span className="text-[18px] font-black text-[#1a1a2e] tabular-nums">{todayTrades.length}</span>
                         </div>
+                    </div>
+                </section>
+
+                {/* FINANCIAL IMPACT — COST OF INDISCIPLINE */}
+                <section className="bg-red-50/50 rounded-3xl p-5 border border-red-100/50 mb-4 flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer group" onClick={() => router.push('/stats')}>
+                    <div className="flex flex-col gap-1">
+                        <h3 className="text-[11px] font-black text-red-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <Target size={12} strokeWidth={3} />
+                            Cost of Indiscipline
+                        </h3>
+                        <p className="text-[20px] font-black text-red-600 tabular-nums">
+                            ₹{analytics.indisciplineCost.toLocaleString()}
+                        </p>
+                        <span className="text-[11px] font-bold text-red-400/60 leading-tight">
+                            Capital lost due to rule breaches.
+                        </span>
+                    </div>
+                    <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-red-500 shadow-sm border border-red-50 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                        <ChevronRight size={18} strokeWidth={3} />
                     </div>
                 </section>
 

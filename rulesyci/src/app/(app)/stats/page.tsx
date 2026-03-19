@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export default function StatsPage() {
-    const { trades, rules, dailyLogs, userModel, setCaptureOpen } = useRuleSci();
+    const { trades, rules, dailyLogs, userModel, setCaptureOpen, analytics } = useRuleSci();
     const [period, setPeriod] = useState('All');
 
     // Filter trades by period
@@ -128,27 +128,32 @@ export default function StatsPage() {
                 <p className="text-[13px] font-bold text-[#b1b1c1]">Analyze your discipline patterns and growth.</p>
             </header>
 
-            {/* Streak & Score */}
-            <section className="bg-white rounded-[32px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col items-center">
-                <div className="relative w-40 h-40 flex items-center justify-center">
-                    <svg className="w-full h-full transform -rotate-90">
-                        <circle cx="80" cy="80" r="70" stroke="rgba(37, 99, 235, 0.05)" strokeWidth="12" fill="transparent" />
-                        <motion.circle cx="80" cy="80" r="70" stroke="#2563eb" strokeWidth="12"
-                            strokeDasharray={440}
-                            strokeDashoffset={440 - (440 * streakPercent / 100)}
-                            strokeLinecap="round" fill="transparent"
-                            className="transition-all duration-1000"
-                        />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-5xl font-black text-[#1a1a2e] tabular-nums">{streak}</span>
-                        <span className="text-[11px] font-black text-[#9ca3af] uppercase tracking-widest mt-1">Day Streak</span>
+            {/* Streak & Score Grid */}
+            <div className="grid grid-cols-2 gap-3">
+                <section className="bg-white rounded-[32px] p-5 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col items-center">
+                    <div className="relative w-24 h-24 flex items-center justify-center">
+                        <svg className="w-full h-full transform -rotate-90">
+                            <circle cx="48" cy="48" r="42" stroke="rgba(37, 99, 235, 0.05)" strokeWidth="8" fill="transparent" />
+                            <motion.circle cx="48" cy="48" r="42" stroke="#2563eb" strokeWidth="8"
+                                strokeDasharray={264}
+                                strokeDashoffset={264 - (264 * streakPercent / 100)}
+                                strokeLinecap="round" fill="transparent"
+                                className="transition-all duration-1000"
+                            />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span className="text-2xl font-black text-[#1a1a2e] tabular-nums">{streak}</span>
+                            <span className="text-[9px] font-black text-[#9ca3af] uppercase tracking-wider">Streak</span>
+                        </div>
                     </div>
-                </div>
-                <p className="mt-8 text-[11px] font-black text-[#9ca3af] uppercase tracking-widest">
-                    Best streak: <span className="tabular-nums">{bestStreak} day{bestStreak !== 1 ? 's' : ''}</span>
-                </p>
-            </section>
+                </section>
+
+                <section className="bg-red-50/50 rounded-[32px] p-5 border border-red-100/50 flex flex-col items-center justify-center gap-1">
+                    <span className="text-[10px] font-black text-red-400 uppercase tracking-widest text-center">Indiscipline Cost</span>
+                    <span className="text-[20px] font-black text-red-600 tabular-nums">₹{analytics.indisciplineCost.toLocaleString()}</span>
+                    <span className="text-[9px] font-bold text-red-400/60 uppercase tracking-wide">Financial Leak</span>
+                </section>
+            </div>
 
             {/* Rule Compliance Chart */}
             <section>

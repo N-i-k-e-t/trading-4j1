@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import EmptyState from '@/components/ui/EmptyState';
 
-type Tab = 'active' | 'library';
+type Tab = 'active' | 'playbooks' | 'library';
 type Category = 'All' | 'Psychology' | 'Risk' | 'Entry' | 'Exit' | 'Sizing';
 
 const LIBRARY_SECTIONS = [
@@ -39,7 +39,7 @@ const LIBRARY_SECTIONS = [
         ]
     },
     {
-        title: "📐 Van Tharp",
+        title: "📐 Tharp",
         category: "Sizing",
         rules: [
             { text: "Focus on R-multiples", emoji: "🔢", category: "Sizing" },
@@ -60,6 +60,7 @@ const LIBRARY_SECTIONS = [
 export default function RulesPage() {
     const { 
         rules, 
+        playbooks,
         addRule, 
         removeRule, 
         toggleRuleActive, 
@@ -126,16 +127,22 @@ export default function RulesPage() {
                 </div>
                 
                 {/* TABS */}
-                <div className="flex w-full">
+                <div className="flex w-full -mx-5 px-5 overflow-x-auto no-scrollbar gap-6">
                     <button 
                         onClick={() => setActiveTab('active')}
-                        className={`flex-1 py-3 text-[14px] font-black transition-all border-b-2 ${activeTab === 'active' ? 'border-[#1a1a2e] text-[#1a1a2e]' : 'border-transparent text-gray-300'}`}
+                        className={`py-3 text-[14px] font-black shrink-0 transition-all border-b-2 ${activeTab === 'active' ? 'border-[#1a1a2e] text-[#1a1a2e]' : 'border-transparent text-gray-300'}`}
                     >
                         Active Rules
                     </button>
                     <button 
+                        onClick={() => setActiveTab('playbooks')}
+                        className={`py-3 text-[14px] font-black shrink-0 transition-all border-b-2 ${activeTab === 'playbooks' ? 'border-[#1a1a2e] text-[#1a1a2e]' : 'border-transparent text-gray-300'}`}
+                    >
+                        Playbooks
+                    </button>
+                    <button 
                         onClick={() => setActiveTab('library')}
-                        className={`flex-1 py-3 text-[14px] font-black transition-all border-b-2 ${activeTab === 'library' ? 'border-[#1a1a2e] text-[#1a1a2e]' : 'border-transparent text-gray-300'}`}
+                        className={`py-3 text-[14px] font-black shrink-0 transition-all border-b-2 ${activeTab === 'library' ? 'border-[#1a1a2e] text-[#1a1a2e]' : 'border-transparent text-gray-300'}`}
                     >
                         Rule Library
                     </button>
@@ -187,6 +194,60 @@ export default function RulesPage() {
                                         description="You haven't defined any trading rules yet. Systemization is the key to profit."
                                         ctaText="Browse Library"
                                         onCtaClick={() => setActiveTab('library')}
+                                    />
+                                </div>
+                            )}
+                        </motion.div>
+                    ) : activeTab === 'playbooks' ? (
+                        <motion.div 
+                            key="playbooks"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="flex flex-col gap-4"
+                        >
+                            {playbooks.length > 0 ? playbooks.map((pb) => (
+                                <div key={pb.id} className="bg-[#1a1a2e] rounded-3xl p-6 text-white shadow-xl shadow-[#1a1a2e]/10">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-[18px] font-black">{pb.name}</h3>
+                                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                                            <BookOpen size={16} />
+                                        </div>
+                                    </div>
+                                    <p className="text-[13px] font-medium text-white/60 mb-6 leading-relaxed">
+                                        {pb.description}
+                                    </p>
+                                    <div className="flex flex-col gap-3">
+                                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Mandatory Rules</span>
+                                        <div className="flex flex-col gap-2">
+                                            {pb.rules.map(ruleId => {
+                                                const rule = rules.find(r => r.id === ruleId);
+                                                return rule ? (
+                                                    <div key={ruleId} className="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3 border border-white/5">
+                                                        <span>{rule.emoji}</span>
+                                                        <span className="text-[13px] font-bold text-white/90">{rule.text}</span>
+                                                    </div>
+                                                ) : null;
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between">
+                                        <div className="flex gap-2">
+                                            {pb.criteria.slice(0, 2).map((c, i) => (
+                                                <span key={i} className="px-2 py-1 bg-white/5 rounded-lg text-[10px] font-black text-white/40 uppercase tracking-widest">{c}</span>
+                                            ))}
+                                        </div>
+                                        <button className="text-[12px] font-black text-blue-400">Edit Strategy</button>
+                                    </div>
+                                </div>
+                            )) : (
+                                <div className="py-12">
+                                    <EmptyState 
+                                        emoji="🏆"
+                                        title="Create Your Playbook"
+                                        description="A playbook is a collection of rules for a specific strategy (e.g. Trend Following)."
+                                        ctaText="+ Create Playbook"
+                                        onCtaClick={() => showToast('Playbook creator coming soon!', 'info')}
                                     />
                                 </div>
                             )}
