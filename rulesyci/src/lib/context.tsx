@@ -60,6 +60,7 @@ type Action =
     | { type: 'DISMISS_TOAST'; payload: string }
     | { type: 'SET_CHECKING_AUTH'; payload: boolean }
     | { type: 'SET_CAPTURE_OPEN'; payload: boolean }
+    | { type: 'LOCK_RULES' }
     | { type: 'LOGOUT' };
 
 const initialState: AppState = {
@@ -70,7 +71,7 @@ const initialState: AppState = {
     session: {
         date: new Date().toISOString().split('T')[0],
         emotionalBaseline: 'neutral',
-        rulesLocked: true,
+        rulesLocked: false, // Start unlocked so user can prep
         tradesTaken: 0,
         tradesAllowed: 3,
         stabilityScore: 85,
@@ -260,8 +261,14 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
         case 'DISMISS_TOAST':
             return { ...state, toasts: state.toasts.filter(t => t.id !== action.payload) };
         
-        case 'SET_CHECKING_AUTH':
-            return { ...state, isCheckingAuth: action.payload };
+        case 'SET_CAPTURE_OPEN':
+            return { ...state, isCaptureOpen: action.payload };
+
+        case 'LOCK_RULES':
+            return { 
+                ...state, 
+                session: { ...state.session, rulesLocked: true } 
+            };
 
         case 'LOGOUT':
             return { ...initialState, isCheckingAuth: false, isCaptureOpen: false };
@@ -306,6 +313,7 @@ interface RuleSciContextType extends AppState {
     dismissToast: (id: string) => void;
     isCheckingAuth: boolean;
     setCaptureOpen: (open: boolean) => void;
+    lockRules: () => void;
 }
 
 const RuleSciContext = createContext<RuleSciContextType | null>(null);
@@ -504,6 +512,7 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         showToast,
         dismissToast,
         setCaptureOpen,
+        lockRules: () => dispatch({ type: 'LOCK_RULES' }),
     };
 
     return <RuleSciContext.Provider value={value}>{children}</RuleSciContext.Provider>;

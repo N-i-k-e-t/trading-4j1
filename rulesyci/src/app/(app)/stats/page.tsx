@@ -161,11 +161,56 @@ export default function StatsPage() {
                 </section>
 
                 <section className="bg-red-50/50 rounded-[32px] p-5 border border-red-100/50 flex flex-col items-center justify-center gap-1">
-                    <span className="text-[10px] font-black text-red-400 uppercase tracking-widest text-center">Indiscipline Cost</span>
-                    <span className="text-[20px] font-black text-red-600 tabular-nums">₹{analytics.indisciplineCost.toLocaleString()}</span>
-                    <span className="text-[9px] font-bold text-red-400/60 uppercase tracking-wide">Financial Leak</span>
+                    <span className="text-[10px] font-black text-red-400 uppercase tracking-widest text-center">Indiscipline Leak</span>
+                    <span className={`text-[20px] font-black tabular-nums ${analytics.indisciplineCost > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                        ₹{analytics.indisciplineCost.toLocaleString()}
+                    </span>
+                    <span className="text-[9px] font-bold text-red-400/60 uppercase tracking-wide">
+                        {analytics.indisciplineCost > 0 ? 'Total Penalties' : 'Zero Leakage'}
+                    </span>
                 </section>
             </div>
+
+            {/* CAPITAL SCALING TRACKER — PHILOSOPHICAL CORE */}
+            <section className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[32px] p-6 text-white shadow-xl shadow-blue-200">
+                <header className="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 className="text-base font-black">Capital Scaling</h3>
+                        <p className="text-[10px] font-bold text-blue-200 uppercase tracking-widest">Bootcamp Phase 1</p>
+                    </div>
+                    <div className="bg-white/10 px-3 py-1 rounded-full border border-white/20">
+                        <span className="text-[12px] font-black">₹1L Cap</span>
+                    </div>
+                </header>
+
+                <div className="flex flex-col gap-3 mb-6">
+                    <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-blue-100">
+                        <span>Current Tier</span>
+                        <span>Unlock 2L</span>
+                    </div>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden border border-white/5">
+                        <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(streak * 2, 100)}%` }}
+                            className="h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+                        />
+                    </div>
+                    <p className="text-[11px] font-bold text-blue-100/70">
+                        {streak >= 30 ? 'Elite Status: Scalable to 2L+' : `${30 - streak} more days of discipline to scale.`}
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+                        <p className="text-[9px] font-black text-blue-100/50 uppercase mb-1">Status</p>
+                        <p className="text-[14px] font-black">{streak >= 10 ? 'Green Light' : 'Bootcamp'}</p>
+                    </div>
+                    <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+                        <p className="text-[9px] font-black text-blue-100/50 uppercase mb-1">Max Lot Size</p>
+                        <p className="text-[14px] font-black">{streak >= 10 ? 'Standard' : 'Reduced'}</p>
+                    </div>
+                </div>
+            </section>
 
             {/* Rule Compliance Chart */}
             <section>

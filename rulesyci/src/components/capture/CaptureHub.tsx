@@ -14,12 +14,13 @@ import {
     CheckCircle2,
     ChevronDown,
     ClipboardList,
-    AlertCircle
+    AlertCircle,
+    Shield
 } from 'lucide-react';
 import { useRuleSci } from '@/lib/context';
 import { getSupportedAudioMimeType } from '@/lib/utils/media';
 
-type CaptureMode = 'none' | 'initial' | 'note' | 'voice' | 'photo' | 'checklist' | 'preview';
+type CaptureMode = 'none' | 'initial' | 'note' | 'voice' | 'photo' | 'checklist' | 'validation' | 'preview';
 
 export default function CaptureHub() {
     const { rules, addTrade, showToast, isCaptureOpen, setCaptureOpen } = useRuleSci();
@@ -48,7 +49,8 @@ export default function CaptureHub() {
         pair: '',
         type: 'long' as 'long' | 'short',
         entry: '',
-        checkedRules: [] as string[]
+        checkedRules: [] as string[],
+        isSystematic: true
     });
 
     // Preview / Structured Data
@@ -83,7 +85,7 @@ export default function CaptureHub() {
         setRecordingTime(0);
         setCapturedImage(null);
         setStructuredTrade(null);
-        setChecklistData({ pair: '', type: 'long', entry: '', checkedRules: [] });
+        setChecklistData({ pair: '', type: 'long', entry: '', checkedRules: [], isSystematic: true });
     };
 
     const handleParse = async (source: string) => {
@@ -100,9 +102,10 @@ export default function CaptureHub() {
                 pnl: 2.1,
                 emotion: 'calm',
                 rules_followed: ['1', '2'],
-                rules_broken: []
+                rules_broken: [],
+                isSystematic: checklistData.isSystematic
             });
-            setMode('preview');
+            setMode('validation');
         }, 2000);
     };
 
@@ -322,12 +325,70 @@ export default function CaptureHub() {
                                                 </div>
 
                                                 <button 
-                                                    onClick={() => setMode('preview')}
-                                                    className="w-full h-14 bg-[#1a1a2e] text-white rounded-full font-black text-[16px] mt-4"
+                                                    onClick={() => {
+                                                        const mockTrade = {
+                                                            id: Date.now().toString(),
+                                                            pair: checklistData.pair || 'NIFTY',
+                                                            type: checklistData.type,
+                                                            entry: parseFloat(checklistData.entry) || 0,
+                                                            exit: 0,
+                                                            pnl: 0,
+                                                            emotion: 'neutral',
+                                                            rules_followed: checklistData.checkedRules,
+                                                            rules_broken: rules.filter(r => r.isActive && !checklistData.checkedRules.includes(r.id)).map(r => r.id),
+                                                            isSystematic: checklistData.isSystematic
+                                                        };
+                                                        setStructuredTrade(mockTrade);
+                                                        setMode('validation');
+                                                    }}
+                                                    className="w-full h-14 bg-[#1a1a2e] text-white rounded-full font-black text-[16px] mt-4 shadow-lg shadow-gray-200 active:scale-95 transition-all"
                                                 >
-                                                    Lock & Enter
+                                                    Lock & Enter Trade
                                                 </button>
                                             </div>
+                                        </motion.div>
+                                    )}
+
+                                    {/* VALIDATION MODE — PHILOSOPHICAL CORE */}
+                                    {mode === 'validation' && (
+                                        <motion.div key="validation" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-6">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <button onClick={() => setMode('checklist')} className="text-gray-400"><ArrowRight className="rotate-180" size={20}/></button>
+                                                <h2 className="text-[18px] font-black text-[#1a1a2e]">Execution Check</h2>
+                                            </div>
+                                            
+                                            <div className="bg-gray-50/50 rounded-3xl p-6 border border-gray-100 mb-2">
+                                                <h3 className="text-[15px] font-black text-[#1a1a2e] mb-4">Execution Intent</h3>
+                                                <div className="flex gap-3">
+                                                    <button 
+                                                        onClick={() => setChecklistData({...checklistData, isSystematic: true})}
+                                                        className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${checklistData.isSystematic ? 'bg-white border-blue-500 shadow-xl shadow-blue-50' : 'bg-transparent border-gray-100 opacity-40 grayscale'}`}
+                                                    >
+                                                        <Shield size={24} className="text-blue-500" />
+                                                        <span className="text-[12px] font-black text-blue-600">SYSTEMATIC</span>
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => setChecklistData({...checklistData, isSystematic: false})}
+                                                        className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${!checklistData.isSystematic ? 'bg-white border-red-500 shadow-xl shadow-red-50' : 'bg-transparent border-gray-100 opacity-40 grayscale'}`}
+                                                    >
+                                                        <AlertCircle size={24} className="text-red-500" />
+                                                        <span className="text-[12px] font-black text-red-600">EMOTIONAL</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-4 bg-orange-50/50 rounded-2xl border border-orange-100">
+                                                <p className="text-[12px] font-bold text-orange-800 leading-relaxed italic">
+                                                    "A trade taken against rules, even if profitable, is a long-term loss to the system." — RuleSci Principle
+                                                </p>
+                                            </div>
+
+                                            <button 
+                                                onClick={() => setMode('preview')}
+                                                className="w-full h-16 bg-[#1a1a2e] text-white rounded-[24px] font-black text-[16px] shadow-xl group flex items-center justify-center gap-3"
+                                            >
+                                                Proceed to Confirmation <ArrowRight size={18} className="group-active:translate-x-1 transition-transform" />
+                                            </button>
                                         </motion.div>
                                     )}
 

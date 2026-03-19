@@ -8,6 +8,7 @@ import { useRuleSci } from '@/lib/context';
 import LabMode from './LabMode';
 import InstallPrompt from './InstallPrompt';
 import CaptureHub from './capture/CaptureHub';
+import DailyStateCheck from './DailyStateCheck';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
     const { labMode, user, isCheckingAuth } = useRuleSci();
@@ -108,6 +109,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             
             <InstallPrompt />
             <CaptureHub />
+            <DailyStateCheck />
         </div>
     );
 }

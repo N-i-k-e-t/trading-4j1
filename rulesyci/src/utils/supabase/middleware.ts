@@ -33,7 +33,26 @@ export async function updateSession(request: NextRequest) {
     )
 
     // refreshing the auth token
-    await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    // Protected routes logic
+    const isAppPage = request.nextUrl.pathname.startsWith('/dashboard') || 
+                      request.nextUrl.pathname.startsWith('/diary') ||
+                      request.nextUrl.pathname.startsWith('/calendar') ||
+                      request.nextUrl.pathname.startsWith('/journal') ||
+                      request.nextUrl.pathname.startsWith('/rules') ||
+                      request.nextUrl.pathname.startsWith('/stats') ||
+                      request.nextUrl.pathname.startsWith('/api-keys') ||
+                      request.nextUrl.pathname.startsWith('/onboarding');
+
+    if (!user && isAppPage) {
+        // no user, potentially respond by redirecting the user to the login page
+        const url = request.nextUrl.clone()
+        url.pathname = '/login'
+        return NextResponse.redirect(url)
+    }
 
     return supabaseResponse
 }
