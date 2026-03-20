@@ -82,6 +82,32 @@ export default function SettingsSheet({ isOpen, onClose }: { isOpen: boolean; on
                                         <SettingItem icon={<HelpCircle size={18}/>} label="Help Center" />
                                     </div>
                                 </section>
+
+                                <section>
+                                    <h5 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 ml-2">System Diagnostics</h5>
+                                    <div className="flex flex-col gap-2">
+                                        <SettingItem 
+                                            icon={<ShieldCheck size={18} className="text-blue-500" />} 
+                                            label="Architecture Version" 
+                                            value="v1.1.0" 
+                                        />
+                                        <button 
+                                            onClick={() => {
+                                                localStorage.clear();
+                                                window.location.href = '/login';
+                                            }}
+                                            className="w-full h-14 bg-blue-50/30 border border-blue-100/50 flex items-center justify-between px-5 rounded-2xl active:bg-blue-100/50 transition-colors text-left"
+                                        >
+                                            <div className="flex items-center gap-4 text-blue-600">
+                                                <div className="w-6 h-6 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                                                    <X size={14} strokeWidth={3} />
+                                                </div>
+                                                <span className="text-[14px] font-black">Flush System Cache</span>
+                                            </div>
+                                            <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Hard Reset</span>
+                                        </button>
+                                    </div>
+                                </section>
                             </div>
 
                             <button 
