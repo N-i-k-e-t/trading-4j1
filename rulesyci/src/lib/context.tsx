@@ -27,6 +27,7 @@ interface AppState {
     toasts: { id: string; message: string; type: 'success' | 'error' | 'info' }[];
     isCheckingAuth: boolean;
     isCaptureOpen: boolean;
+    captureMode: 'initial' | 'note' | 'voice' | 'photo' | 'checklist' | 'none';
 }
 
 type Action =
@@ -60,6 +61,7 @@ type Action =
     | { type: 'DISMISS_TOAST'; payload: string }
     | { type: 'SET_CHECKING_AUTH'; payload: boolean }
     | { type: 'SET_CAPTURE_OPEN'; payload: boolean }
+    | { type: 'SET_CAPTURE_MODE'; payload: 'initial' | 'note' | 'voice' | 'photo' | 'checklist' | 'none' }
     | { type: 'LOCK_RULES' }
     | { type: 'LOGOUT' };
 
@@ -143,6 +145,7 @@ const initialState: AppState = {
     toasts: [],
     isCheckingAuth: true,
     isCaptureOpen: false,
+    captureMode: 'none',
 };
 
 function ruleSciReducer(state: AppState, action: Action): AppState {
@@ -263,6 +266,9 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
         
         case 'SET_CAPTURE_OPEN':
             return { ...state, isCaptureOpen: action.payload };
+        
+        case 'SET_CAPTURE_MODE':
+            return { ...state, captureMode: action.payload };
 
         case 'LOCK_RULES':
             return { 
@@ -271,11 +277,8 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
             };
 
         case 'LOGOUT':
-            return { ...initialState, isCheckingAuth: false, isCaptureOpen: false };
+            return { ...initialState, isCheckingAuth: false, isCaptureOpen: false, captureMode: 'none' };
         
-        case 'SET_CAPTURE_OPEN':
-            return { ...state, isCaptureOpen: action.payload };
-
         default:
             return state;
     }
@@ -313,6 +316,7 @@ interface RuleSciContextType extends AppState {
     dismissToast: (id: string) => void;
     isCheckingAuth: boolean;
     setCaptureOpen: (open: boolean) => void;
+    setCaptureMode: (mode: 'initial' | 'note' | 'voice' | 'photo' | 'checklist' | 'none') => void;
     lockRules: () => void;
 }
 
@@ -471,6 +475,7 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
     const addDiaryEntry = useCallback((entry: DiaryEntry) => dispatch({ type: 'ADD_DIARY_ENTRY', payload: entry }), []);
     const updateDiaryEntry = useCallback((entry: Partial<DiaryEntry> & { id: string }) => dispatch({ type: 'UPDATE_DIARY_ENTRY', payload: entry }), []);
     const setCaptureOpen = useCallback((open: boolean) => dispatch({ type: 'SET_CAPTURE_OPEN', payload: open }), []);
+    const setCaptureMode = useCallback((mode: 'initial' | 'note' | 'voice' | 'photo' | 'checklist' | 'none') => dispatch({ type: 'SET_CAPTURE_MODE', payload: mode }), []);
 
     const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
         const id = `toast_${Date.now()}`;
@@ -512,6 +517,7 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         showToast,
         dismissToast,
         setCaptureOpen,
+        setCaptureMode,
         lockRules: () => dispatch({ type: 'LOCK_RULES' }),
     };
 

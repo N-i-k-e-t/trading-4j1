@@ -78,124 +78,89 @@ export default function DiaryScannerModal({ isOpen, onClose }: { isOpen: boolean
                         initial={{ scale: 0.95, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                        className="relative w-full max-w-4xl bg-white rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                        className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
                     >
-                        <header className="p-6 md:p-8 border-b border-[#1a1a2e]/5 flex items-center justify-between bg-white relative z-10">
+                        <header className="p-6 border-b border-gray-100 flex items-center justify-between bg-white relative z-10">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-blue-600 text-white rounded-[20px] flex items-center justify-center shadow-lg shadow-blue-200">
+                                <div className="w-12 h-12 bg-[#eab308] text-white rounded-xl flex items-center justify-center shadow-lg shadow-yellow-100">
                                     <Camera size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold text-[#1a1a2e]">Vision Intelligence</h3>
+                                    <h3 className="text-[20px] font-black text-[#1a1a2e]">Vision Engine</h3>
                                     <div className="flex items-center gap-2">
                                         <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                                        <p className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-widest">Digitizing physical memories</p>
+                                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Digitizing Edge Architecture</p>
                                     </div>
                                 </div>
                             </div>
-                            <button onClick={onClose} className="p-3 hover:bg-[#1a1a2e]/5 rounded-full transition-all">
-                                <X size={20} className="text-[#9ca3af]" />
+                            <button onClick={onClose} className="p-3 bg-gray-50 rounded-full transition-all active:scale-95">
+                                <X size={20} className="text-gray-400" />
                             </button>
                         </header>
 
-                        <div className="flex-1 overflow-y-auto p-6 md:p-8 bg-gray-50/30">
+                        <div className="flex-1 overflow-y-auto p-6 bg-gray-50/30">
                             {!uploadedImage ? (
-                                <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-[#1a1a2e]/10 rounded-[40px] bg-white group hover:border-blue-500 transition-all cursor-pointer relative shadow-sm">
+                                <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-100 rounded-2xl bg-white group hover:border-[#eab308] transition-all cursor-pointer relative shadow-sm">
                                     <input 
                                         type="file" accept="image/*" 
                                         className="absolute inset-0 opacity-0 cursor-pointer"
                                         onChange={handleUpload}
                                     />
-                                    <div className="w-24 h-24 bg-blue-50 text-blue-600 rounded-[32px] flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-inner">
-                                        <Upload size={40} />
+                                    <div className="w-20 h-20 bg-yellow-50 text-[#eab308] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                        <Upload size={32} />
                                     </div>
-                                    <h4 className="text-xl font-black text-[#1a1a2e] mb-3">Snapshot to Digital Intelligence</h4>
-                                    <p className="text-[#6b7280] text-sm text-center max-w-[320px] font-medium leading-relaxed">Snaps physical diary notes, handwritten charts, and P&L tallies into your searchable library.</p>
+                                    <h4 className="text-[18px] font-black text-[#1a1a2e] mb-2">Snapshot Architecture</h4>
+                                    <p className="text-gray-400 text-[14px] text-center max-w-[280px] font-bold leading-relaxed">Snaps physical journals, charts, and handwritten logs into your secure library.</p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full min-h-[500px]">
-                                    {/* Panel 1: Original Image with AI Highlights */}
-                                    <div className="relative rounded-[32px] overflow-hidden bg-[#1a1a2e] border border-[#1a1a2e]/10 shadow-2xl aspect-[4/5] lg:aspect-auto">
-                                        <img src={uploadedImage} alt="Diary Scan" className={`w-full h-full object-cover transition-opacity duration-700 ${isScanning ? 'opacity-40' : 'opacity-80'}`} />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full min-h-[500px]">
+                                    {/* Panel 1: Original Image */}
+                                    <div className="relative rounded-2xl overflow-hidden bg-[#1a1a2e] border border-gray-100 shadow-xl aspect-[4/5] lg:aspect-auto">
+                                        <img src={uploadedImage} alt="Diary Scan" className={`w-full h-full object-cover transition-opacity duration-700 ${isScanning ? 'opacity-30' : 'opacity-80'}`} />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                                         
                                         {isScanning && (
                                             <div className="absolute inset-0 flex flex-col items-center justify-center">
                                                 <div className="relative">
-                                                    <Loader2 size={64} className="text-blue-400 animate-spin" />
-                                                    <motion.div 
-                                                        animate={{ opacity: [0.3, 1, 0.3] }}
-                                                        transition={{ repeat: Infinity, duration: 2 }}
-                                                        className="absolute -inset-6 border-2 border-blue-400/30 rounded-full"
-                                                    />
+                                                    <Loader2 size={48} className="text-[#eab308] animate-spin" />
                                                 </div>
-                                                <p className="mt-8 text-xs font-black text-white uppercase tracking-[0.3em] animate-pulse">Scanning Handwriting...</p>
-                                            </div>
-                                        )}
-
-                                        {scanResult && !isScanning && (
-                                            <div className="absolute inset-0 p-6 pointer-events-none">
-                                                <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="absolute top-[15%] left-[10%] px-4 py-2 bg-blue-600/90 text-white text-[10px] font-bold rounded-xl backdrop-blur-md shadow-xl border border-white/20">
-                                                    DETECTED: TRADE NOTES
-                                                </motion.div>
-                                                <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="absolute top-[40%] left-[20%] px-4 py-2 bg-purple-600/90 text-white text-[10px] font-bold rounded-xl backdrop-blur-md shadow-xl border border-white/20">
-                                                    EXTRACTED: ENTRY @ {scanResult?.extractedData?.entry || '----'}
-                                                </motion.div>
+                                                <p className="mt-6 text-[10px] font-black text-white uppercase tracking-[0.3em] animate-pulse">Scanning Handwriting...</p>
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* Panel 2: Extracted Data Review */}
-                                    <div className="flex flex-col gap-6">
+                                    {/* Panel 2: Review Content */}
+                                    <div className="flex flex-col gap-4">
                                         {scanResult && !isScanning && (
-                                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                                                <div className="flex items-center justify-between mb-8 bg-white p-4 rounded-2xl border border-[#1a1a2e]/5 shadow-sm">
+                                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-4">
+                                                <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center font-bold">
+                                                        <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center font-black">
                                                             {Math.round((scanResult.confidence || 0) * 100)}%
                                                         </div>
                                                         <div>
-                                                            <p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest">Confidence Score</p>
-                                                            <p className="text-[13px] font-bold text-[#1a1a2e]">AI Extraction High Fidelity</p>
+                                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Confidence Score</p>
+                                                            <p className="text-[13px] font-black text-[#1a1a2e]">High Fidelity Scan</p>
                                                         </div>
                                                     </div>
-                                                    <span className="px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg">
-                                                        {scanResult.type?.replace('_', ' ')}
-                                                    </span>
                                                 </div>
 
-                                                <div className="space-y-6">
+                                                <div className="space-y-4">
                                                     {scanResult.type === 'trade_note' && (
-                                                        <div className="grid grid-cols-2 gap-4">
+                                                        <div className="grid grid-cols-2 gap-3">
                                                             <DataField label="Asset" value={scanResult.extractedData.asset} onChange={(v) => updateField('asset', v)} />
                                                             <DataField label="Direction" value={scanResult.extractedData.direction} onChange={(v) => updateField('direction', v)} color="text-red-500" />
-                                                            <DataField label="Entry Price" value={scanResult.extractedData.entry} onChange={(v) => updateField('entry', v)} />
-                                                            <DataField label="Exit Price" value={scanResult.extractedData.exit} onChange={(v) => updateField('exit', v)} />
-                                                            <DataField label="PnL Est." value={scanResult.extractedData.pnl_est} onChange={(v) => updateField('pnl_est', v)} color="text-green-500" />
-                                                            <DataField label="Final Mood" value={scanResult.extractedData.emotion} onChange={(v) => updateField('emotion', v)} />
+                                                            <DataField label="Entry" value={scanResult.extractedData.entry} onChange={(v) => updateField('entry', v)} />
+                                                            <DataField label="Exit" value={scanResult.extractedData.exit} onChange={(v) => updateField('exit', v)} />
                                                         </div>
                                                     )}
 
-                                                    {scanResult.type === 'rule_list' && (
-                                                        <div className="bg-white p-6 rounded-[32px] shadow-sm border border-[#1a1a2e]/5 space-y-4">
-                                                            <h4 className="text-[11px] font-black text-[#9ca3af] uppercase tracking-widest">Detected Playbook Rules</h4>
-                                                            <div className="space-y-3">
-                                                                {scanResult.extractedData.rules.map((r: string, i: number) => (
-                                                                    <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl text-sm font-bold text-[#1a1a2e]">
-                                                                        <CheckCircle2 size={16} className="text-green-500" />
-                                                                        {r}
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    <div className="p-6 border border-[#1a1a2e]/5 rounded-[32px] bg-white shadow-sm">
+                                                    <div className="p-5 border border-gray-100 rounded-2xl bg-white shadow-sm">
                                                         <div className="flex items-center gap-2 mb-3">
-                                                            <ClipboardList size={14} className="text-blue-600" />
-                                                            <p className="text-[10px] font-black text-[#9ca3af] uppercase tracking-widest">Raw AI Transcription</p>
+                                                            <ClipboardList size={14} className="text-[#eab308]" />
+                                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">AI Transcription</p>
                                                         </div>
-                                                        <p className="text-[13px] text-[#1a1a2e] font-medium leading-relaxed bg-[#1a1a2e]/5 p-4 rounded-xl italic">"{scanResult.rawText}"</p>
+                                                        <p className="text-[14px] text-[#1a1a2e] font-bold leading-relaxed bg-gray-50 p-4 rounded-xl italic">"{scanResult.rawText}"</p>
                                                     </div>
                                                 </div>
                                             </motion.div>
@@ -206,18 +171,18 @@ export default function DiaryScannerModal({ isOpen, onClose }: { isOpen: boolean
                         </div>
 
                         {scanResult && !isScanning && (
-                            <footer className="p-8 border-t border-[#1a1a2e]/5 bg-white flex items-center justify-between relative z-10 shadow-[0_-8px_30px_rgba(0,0,0,0.02)]">
+                            <footer className="p-6 border-t border-gray-100 bg-white flex items-center justify-between relative z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
                                 <button 
                                     onClick={() => {setUploadedImage(null); setScanResult(null);}}
-                                    className="px-6 py-3 text-sm font-bold text-[#6b7280] hover:text-[#1a1a2e] transition-all hover:bg-gray-50 rounded-2xl"
+                                    className="px-6 h-12 text-[13px] font-black text-gray-400 hover:text-[#1a1a2e] transition-all hover:bg-gray-50 rounded-xl"
                                 >
-                                    Cancel & Re-scan
+                                    Re-scan
                                 </button>
                                 <button 
                                     onClick={handleSave}
-                                    className="h-14 px-10 bg-[#1a1a2e] text-white rounded-[22px] text-sm font-black shadow-2xl shadow-[#1a1a2e]/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-3 border border-white/10"
+                                    className="h-14 px-8 bg-[#1a1a2e] text-white rounded-full text-[14px] font-black shadow-lg shadow-gray-200 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-3"
                                 >
-                                    Final Review: Commit Note
+                                    Commit Record
                                     <ChevronRight size={18} />
                                 </button>
                             </footer>

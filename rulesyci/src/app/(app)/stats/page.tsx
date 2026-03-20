@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRuleSci } from '@/lib/context';
 import { runOrchestrator } from '@/lib/agents/orchestrator';
-import EmptyState from '@/components/ui/EmptyState';
+import { EmptyState } from '@/components/ui/EmptyState';
 import {
     Flame,
     Lightbulb,
@@ -121,32 +121,32 @@ export default function StatsPage() {
     const streakPercent = bestStreak > 0 ? Math.min((streak / Math.max(bestStreak, 1)) * 100, 100) : (streak > 0 ? 100 : 0);
 
     return (
-        <div className="flex flex-col gap-4 px-5 pb-[calc(env(safe-area-inset-bottom)+84px)] italic-none">
+        <div className="flex flex-col gap-6 px-5 pt-8 pb-[calc(env(safe-area-inset-bottom)+84px)] italic-none">
             {/* AI COACH — HERO INSIGHT */}
             {aiOutput.coachMessages.length > 0 && (
-                <section className="bg-[#1a1a2e] rounded-[32px] p-6 text-white shadow-xl shadow-[#1a1a2e]/10">
+                <section className="bg-[#1a1a2e] rounded-2xl p-6 text-white shadow-xl">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-[#2563eb] text-white rounded-xl flex items-center justify-center">
-                            <Lightbulb size={20} />
+                        <div className="w-12 h-12 bg-[#eab308] text-[#1a1a2e] rounded-xl flex items-center justify-center">
+                            <Lightbulb size={24} />
                         </div>
                         <div>
-                            <h3 className="text-base font-black text-white">Elite AI Coach</h3>
-                            <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">{aiOutput.coachMessages[0].tone}</span>
+                            <h3 className="text-[17px] font-black text-white leading-tight">Elite AI Coach</h3>
+                            <span className="text-[10px] font-black text-[#eab308] uppercase tracking-widest">{aiOutput.coachMessages[0].tone} Architecture</span>
                         </div>
                     </div>
-                    <p className="text-[15px] font-bold text-white/90 leading-relaxed italic border-l-2 border-blue-500 pl-4 py-1">
+                    <p className="text-[15px] font-bold text-white/90 leading-relaxed italic border-l-2 border-[#eab308] pl-4 py-1">
                         &ldquo;{aiOutput.coachMessages[0].message}&rdquo;
                     </p>
                 </section>
             )}
 
-            {/* Streak & Score Grid */}
-            <div className="grid grid-cols-2 gap-3">
-                <section className="bg-white rounded-[32px] p-5 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col items-center">
+            {/* Streak & Leak Grid */}
+            <div className="grid grid-cols-2 gap-4">
+                <section className="card-premium flex flex-col items-center">
                     <div className="relative w-24 h-24 flex items-center justify-center">
                         <svg className="w-full h-full transform -rotate-90">
-                            <circle cx="48" cy="48" r="42" stroke="rgba(37, 99, 235, 0.05)" strokeWidth="8" fill="transparent" />
-                            <motion.circle cx="48" cy="48" r="42" stroke="#2563eb" strokeWidth="8"
+                            <circle cx="48" cy="48" r="42" stroke="#f1f5f9" strokeWidth="8" fill="transparent" />
+                            <motion.circle cx="48" cy="48" r="42" stroke="#eab308" strokeWidth="8"
                                 strokeDasharray={264}
                                 strokeDashoffset={264 - (264 * streakPercent / 100)}
                                 strokeLinecap="round" fill="transparent"
@@ -155,73 +155,60 @@ export default function StatsPage() {
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
                             <span className="text-2xl font-black text-[#1a1a2e] tabular-nums">{streak}</span>
-                            <span className="text-[9px] font-black text-[#9ca3af] uppercase tracking-wider">Streak</span>
+                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider">Streak</span>
                         </div>
                     </div>
                 </section>
 
-                <section className="bg-red-50/50 rounded-[32px] p-5 border border-red-100/50 flex flex-col items-center justify-center gap-1">
-                    <span className="text-[10px] font-black text-red-400 uppercase tracking-widest text-center">Indiscipline Leak</span>
-                    <span className={`text-[20px] font-black tabular-nums ${analytics.indisciplineCost > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                <section className="card-premium !bg-red-50 !border-red-100 flex flex-col items-center justify-center gap-1">
+                    <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">System Leak</span>
+                    <span className="text-[20px] font-black text-red-600 tabular-nums">
                         ₹{analytics.indisciplineCost.toLocaleString()}
                     </span>
-                    <span className="text-[9px] font-bold text-red-400/60 uppercase tracking-wide">
-                        {analytics.indisciplineCost > 0 ? 'Total Penalties' : 'Zero Leakage'}
-                    </span>
+                    <span className="text-[9px] font-bold text-red-400/60 uppercase">Indiscipline Cost</span>
                 </section>
             </div>
 
-            {/* CAPITAL SCALING TRACKER — PHILOSOPHICAL CORE */}
-            <section className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[32px] p-6 text-white shadow-xl shadow-blue-200">
+            {/* CAPITAL SCALING TRACKER */}
+            <section className="bg-gradient-to-br from-[#1a1a2e] to-[#2a2a4a] rounded-2xl p-6 text-white shadow-xl">
                 <header className="flex justify-between items-center mb-6">
                     <div>
-                        <h3 className="text-base font-black">Capital Scaling</h3>
-                        <p className="text-[10px] font-bold text-blue-200 uppercase tracking-widest">Bootcamp Phase 1</p>
+                        <h3 className="text-[17px] font-black">Capital Scaling</h3>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Phase 1: Validation</p>
                     </div>
-                    <div className="bg-white/10 px-3 py-1 rounded-full border border-white/20">
-                        <span className="text-[12px] font-black">₹1L Cap</span>
+                    <div className="bg-[#eab308] px-3 py-1 rounded-lg">
+                        <span className="text-[11px] font-black text-[#1a1a2e]">₹1L CAP</span>
                     </div>
                 </header>
 
                 <div className="flex flex-col gap-3 mb-6">
-                    <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-blue-100">
-                        <span>Current Tier</span>
-                        <span>Unlock 2L</span>
+                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
+                        <span>Current Stage</span>
+                        <span>Unlock 2L+</span>
                     </div>
                     <div className="h-3 bg-white/10 rounded-full overflow-hidden border border-white/5">
                         <motion.div 
                             initial={{ width: 0 }}
-                            animate={{ width: `${Math.min(streak * 2, 100)}%` }}
-                            className="h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+                            animate={{ width: `${Math.min(streak * 3.33, 100)}%` }}
+                            className="h-full bg-[#eab308] shadow-[0_0_15px_rgba(234,179,8,0.3)]"
                         />
                     </div>
-                    <p className="text-[11px] font-bold text-blue-100/70">
-                        {streak >= 30 ? 'Elite Status: Scalable to 2L+' : `${30 - streak} more days of discipline to scale.`}
+                    <p className="text-[11px] font-bold text-gray-400">
+                        {streak >= 30 ? 'Architecture Stable: Scaling Authorized.' : `${30 - streak} more days of compliance to scale.`}
                     </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
-                        <p className="text-[9px] font-black text-blue-100/50 uppercase mb-1">Status</p>
-                        <p className="text-[14px] font-black">{streak >= 10 ? 'Green Light' : 'Bootcamp'}</p>
-                    </div>
-                    <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
-                        <p className="text-[9px] font-black text-blue-100/50 uppercase mb-1">Max Lot Size</p>
-                        <p className="text-[14px] font-black">{streak >= 10 ? 'Standard' : 'Reduced'}</p>
-                    </div>
                 </div>
             </section>
 
             {/* Rule Compliance Chart */}
             <section>
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-[13px] font-black text-gray-400 uppercase tracking-widest">Rule Compliance</h3>
-                    <div className="flex gap-1.5 bg-gray-50 p-1 rounded-full">
+                <div className="flex items-center justify-between mb-6 px-1">
+                    <h3 className="text-[14px] font-black text-[#1a1a2e] uppercase tracking-widest">Compliance</h3>
+                    <div className="flex gap-2 bg-gray-50 p-1 rounded-xl">
                         {['Week', 'Month', 'All'].map(p => (
                             <button
                                 key={p}
                                 onClick={() => setPeriod(p)}
-                                className={`px-3 h-7 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${period === p ? 'bg-white text-[#1a1a2e] shadow-sm' : 'text-gray-300'}`}
+                                className={`px-4 h-8 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${period ===p ? 'bg-white text-[#1a1a2e] shadow-sm' : 'text-gray-400'}`}
                             >
                                 {p}
                             </button>
@@ -230,12 +217,12 @@ export default function StatsPage() {
                 </div>
 
                 {compliance.length > 0 ? (
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-5">
                         {compliance.map((item, i) => (
-                            <div key={i} className="flex flex-col gap-1.5">
+                            <div key={i} className="flex flex-col gap-2">
                                 <div className="flex justify-between items-center px-1">
-                                    <span className="text-[14px] font-bold text-[#1a1a2e]">{item.rule}</span>
-                                    <span className={`text-[13px] font-black tabular-nums ${item.value > 80 ? 'text-[#22c55e]' : item.value > 60 ? 'text-[#f59e0b]' : 'text-[#ef4444]'}`}>
+                                    <span className="text-[15px] font-bold text-[#1a1a2e]">{item.rule}</span>
+                                    <span className={`text-[13px] font-black tabular-nums ${item.value > 80 ? 'text-green-500' : item.value > 60 ? 'text-yellow-500' : 'text-red-500'}`}>
                                         {item.value}%
                                     </span>
                                 </div>
@@ -244,83 +231,63 @@ export default function StatsPage() {
                                         initial={{ width: 0 }}
                                         animate={{ width: `${item.value}%` }}
                                         transition={{ duration: 1, delay: i * 0.1 }}
-                                        className={`h-full ${item.value > 80 ? 'bg-[#22c55e]' : item.value > 60 ? 'bg-[#f59e0b]' : 'bg-[#ef4444]'}`}
+                                        className={`h-full ${item.value > 80 ? 'bg-green-500' : item.value > 60 ? 'bg-yellow-500' : 'bg-red-500'}`}
                                     />
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <div className="py-2 flex flex-col items-center">
-                        <EmptyState 
-                            emoji="📈"
-                            title="Growth Ahead"
-                            description="Log trades and mark rule compliance to see your performance stats here."
-                            ctaText="Log First Trade"
-                            onCtaClick={() => setCaptureOpen(true)}
-                        />
-                    </div>
+                    <EmptyState 
+                        emoji="📈"
+                        title="Architecture Growth"
+                        description="Log trades and maintain discipline to see your performance stats here."
+                        action={{ label: "Log First Trade", onClick: () => setCaptureOpen(true) }}
+                    />
                 )}
             </section>
 
             {/* Trading Pattern Insights */}
-            <section className="grid grid-cols-2 gap-3">
-                <div className="bg-white rounded-[24px] px-4 py-4 shadow-sm flex flex-col gap-1 border border-gray-100">
-                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Rules Followed</span>
+            <section className="grid grid-cols-2 gap-4">
+                <div className="card-premium">
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Rules Kept</span>
                     <div className="flex items-baseline gap-1">
-                        <span className="text-[24px] font-black text-[#1a1a2e] tabular-nums">{followedWinRate}%</span>
+                        <span className="text-[24px] font-black text-green-600 tabular-nums">{followedWinRate}%</span>
                         <span className="text-[10px] font-black text-green-500 uppercase">Win</span>
                     </div>
                 </div>
-                <div className="bg-white rounded-[24px] px-4 py-4 shadow-sm flex flex-col gap-1 border border-gray-100">
-                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Broke Rules</span>
+                <div className="card-premium">
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Rules Broken</span>
                     <div className="flex items-baseline gap-1">
-                        <span className="text-[24px] font-black text-[#1a1a2e] tabular-nums">{brokenWinRate}%</span>
+                        <span className="text-[24px] font-black text-red-600 tabular-nums">{brokenWinRate}%</span>
                         <span className="text-[10px] font-black text-red-500 uppercase">Win</span>
                     </div>
-                </div>
-            </section>
-
-            {/* Heatmap */}
-            <section className="bg-gray-50/50 rounded-[28px] px-5 py-5 border border-gray-100">
-                <div className="flex items-center justify-between mb-4 px-1">
-                    <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Weekly Discipline</h3>
-                    <Info size={14} className="text-gray-200" />
-                </div>
-                <div className="flex justify-between gap-1">
-                    {heatmap.map((item, i) => (
-                        <div key={i} className="flex flex-col items-center gap-2">
-                            <div className={`w-9 h-9 rounded-xl ${item.color} border border-gray-100/50`} />
-                            <span className="text-[10px] font-black text-gray-300">{item.day}</span>
-                        </div>
-                    ))}
                 </div>
             </section>
 
             {/* AI Insights & Alerts */}
             <section className="flex flex-col gap-4">
                 {aiOutput.insights.map(insight => (
-                    <div key={insight.id} className="bg-[#f59e0b]/5 rounded-2xl px-5 py-4 border border-[#f59e0b]/10">
+                    <div key={insight.id} className="card-premium !bg-yellow-50/30 !border-yellow-100">
                         <div className="flex items-center gap-2 mb-2">
-                            <span className="text-[10px] font-bold text-[#f59e0b] uppercase tracking-wider">Pattern Detected</span>
-                            <span className="text-[10px] font-bold text-[#9ca3af]">({Math.round(insight.confidence * 100)}% confidence)</span>
+                            <span className="text-[10px] font-black text-yellow-600 uppercase tracking-widest">Pattern Architecture</span>
+                            <span className="text-[10px] font-bold text-gray-400">({Math.round(insight.confidence * 100)}% Conf.)</span>
                         </div>
-                        <p className="text-[14px] font-semibold text-[#1a1a2e] mb-1">{insight.pattern}</p>
-                        <p className="text-[13px] text-[#6b7280]">{insight.suggestion}</p>
+                        <p className="text-[15px] font-black text-[#1a1a2e] mb-1">{insight.pattern}</p>
+                        <p className="text-[13px] font-bold text-gray-400">{insight.suggestion}</p>
                     </div>
                 ))}
 
-                {/* Risk Alerts */}
                 {aiOutput.riskAlerts.map((alert, i) => (
-                    <div key={i} className={`rounded-2xl px-5 py-4 flex items-start gap-3 ${
-                        alert.severity === 'critical' ? 'bg-[#ef4444]/10 border border-[#ef4444]/20' : 'bg-[#f59e0b]/10 border border-[#f59e0b]/20'
+                    <div key={i} className={`card-premium flex items-start gap-4 ${
+                        alert.severity === 'critical' ? '!bg-red-50 !border-red-100' : '!bg-yellow-50 !border-yellow-100'
                     }`}>
-                        <ShieldAlert size={18} className={alert.severity === 'critical' ? 'text-[#ef4444] mt-0.5' : 'text-[#f59e0b] mt-0.5'} />
+                        <ShieldAlert size={20} className={alert.severity === 'critical' ? 'text-red-500' : 'text-yellow-600'} />
                         <div>
-                            <p className="text-[14px] font-semibold text-[#1a1a2e]">{alert.alert}</p>
+                            <p className="text-[15px] font-black text-[#1a1a2e]">{alert.alert}</p>
                             {alert.action && (
-                                <span className={`text-[11px] font-bold uppercase mt-1 inline-block ${
-                                    alert.severity === 'critical' ? 'text-[#ef4444]' : 'text-[#f59e0b]'
+                                <span className={`text-[11px] font-black uppercase mt-1 inline-block ${
+                                    alert.severity === 'critical' ? 'text-red-500' : 'text-yellow-600'
                                 }`}>
                                     Suggested: {alert.action}
                                 </span>
@@ -329,16 +296,13 @@ export default function StatsPage() {
                     </div>
                 ))}
 
-                {aiOutput.insights.length === 0 && (
-                    <div className="py-4">
-                        <EmptyState 
-                            emoji="🧠"
-                            title="Brain Power Pending"
-                            description={`Log at least ${Math.max(0, 3 - trades.length)} more trades to unlock AI pattern analysis.`}
-                            ctaText="Log a Trade"
-                            onCtaClick={() => setCaptureOpen(true)}
-                        />
-                    </div>
+                {aiOutput.insights.length === 0 && trades.length < 3 && (
+                    <EmptyState 
+                        emoji="🧠"
+                        title="AI Analysis Pending"
+                        description={`Log at least ${3 - trades.length} more trades to unlock architectural pattern analysis.`}
+                        action={{ label: "Log Trade", onClick: () => setCaptureOpen(true) }}
+                    />
                 )}
             </section>
         </div>

@@ -1,12 +1,18 @@
 @import "tailwindcss";
 
 @theme {
+  --color-primary: #eab308;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-neutral: #6b7280;
+  
   --color-text-primary: #1a1a2e;
-  --color-text-secondary: #6b7280;
-  --color-accent-primary: #2563eb;
-  --color-accent-success: #22c55e;
-  --color-accent-warning: #f59e0b;
-  --color-accent-danger: #ef4444;
+  --color-text-secondary: #94a3b8;
+  
+  --radius-xl: 16px;
+  --radius-2xl: 16px;
+  --radius-3xl: 16px;
 }
 
 :root {
@@ -29,7 +35,7 @@ html {
 }
 
 body {
-  background: white;
+  background: #ffffff;
   color: #1a1a2e;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
@@ -37,98 +43,79 @@ body {
   min-height: 100dvh;
   margin: 0;
   overscroll-behavior: none; 
-  font-variant-numeric: tabular-nums; /* GLOBAL TABULAR NUMS */
+  font-variant-numeric: tabular-nums;
 }
 
-/* INPUTS: iOS Usability Standard */
+/* INPUTS */
 input, textarea, select { 
-  font-size: 16px !important; /* Prevent iOS Zoom */
-  min-height: 50px;
-  background: #f9fafb;
-  border: 1px solid rgba(0,0,0,0.05);
-  border-radius: 12px;
-  padding: 12px 16px;
+  font-size: 16px !important;
+  min-height: 52px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 16px;
+  padding: 12px 20px;
   outline: none;
   width: 100%;
   color: #1a1a2e;
-  appearance: none;
+  font-weight: 500;
+  transition: all 200ms ease;
 }
 
-textarea {
-  min-height: 100px;
+input:focus {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-color: #eab308;
 }
 
-/* BUTTONS: Thumb Reach & Target Size */
+/* BUTTONS */
 button, a, [role="button"] { 
-  min-height: 50px; 
+  min-height: 52px; 
   touch-action: manipulation; 
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 200ms ease;
-  border-radius: 14px;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
   font-weight: 700;
   text-decoration: none;
 }
 
-/* iOS-Native Scale Feedback (No Hover on Mobile) */
 button:active, a:active, [role="button"]:active { 
-  transform: scale(0.96); 
-  opacity: 0.7;
-}
-
-/* Hover Guard for Desktop Only */
-@media (hover: hover) {
-  button:hover, a:hover {
-    filter: brightness(1.1);
-  }
+  transform: scale(0.97); 
+  opacity: 0.9;
 }
 
 /* Safe Area Utility Classes */
 .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
 .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
 
-/* Spacing Rhythm (16px base) */
-.section-gap { margin-bottom: 16px; }
-.content-padding { padding: 0 20px; }
+h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; color: #1a1a2e; }
+h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; color: #1a1a2e; }
+h3 { font-size: 18px; font-weight: 700; color: #1a1a2e; }
 
-h1 { font-size: 24px; font-weight: 900; letter-spacing: -0.04em; }
-h2 { font-size: 20px; font-weight: 900; letter-spacing: -0.03em; }
-h3 { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
-
-/* Scrollbar — iOS Style Hidden */
+/* Scrollbar */
 ::-webkit-scrollbar {
   display: none;
 }
 
-.tabular {
-    font-variant-numeric: tabular-nums;
+.shadow-premium {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+.card-premium {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #f1f5f9;
 }
 
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
 }
 
-/* Custom Checkbox Placeholder for Process Rules */
-.rule-checkbox {
-  width: 32px;
-  height: 32px;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.05);
   border-radius: 10px;
-  border: 2px solid rgba(0,0,0,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 200ms ease;
-}
-
-.rule-checkbox.active {
-  background: #22c55e;
-  border-color: #22c55e;
-  color: white;
 }
