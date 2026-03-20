@@ -11,18 +11,22 @@ import {
     X, 
     Shield, 
     Brain,
-    X as CloseIcon
+    X as CloseIcon,
+    CalendarDays,
+    Info,
+    ArrowRight
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll } from 'framer-motion';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const YEARS = [2024, 2025, 2026];
 
 export default function PnLCalendar() {
     const { dailyLogs, marketEvents, trades } = useRuleSci();
-    // Default to March 2025 to align with User's Bootcamp Retest expectations
-    const [currentDate, setCurrentDate] = useState(new Date(2025, 2, 1));
+    const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
 
     const month = currentDate.getMonth();
     const year = currentDate.getFullYear();
@@ -39,10 +43,19 @@ export default function PnLCalendar() {
 
     const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
     const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+    const jumpToToday = () => setCurrentDate(new Date());
+
+    const selectYearMonth = (newYear: number, newMonth: number) => {
+        setCurrentDate(new Date(newYear, newMonth, 1));
+        setIsYearPickerOpen(false);
+    };
 
     // Calculate Monthly Summary
     const stats = useMemo(() => {
-        const monthTrades = trades.filter(t => new Date(t.date).getMonth() === month);
+        const monthTrades = trades.filter(t => {
+            const d = new Date(t.date);
+            return d.getMonth() === month && d.getFullYear() === year;
+        });
         const uniqueDays = new Set(monthTrades.map(t => t.date)).size;
         
         const dayStats = Array.from(new Set(monthTrades.map(t => t.date))).map(d => {
@@ -55,45 +68,108 @@ export default function PnLCalendar() {
         const aDays = dayStats.filter(s => s.pnl > 0 && s.perfect).length;
         let grade = 'N/A';
         let gradeColor = 'text-gray-400';
+        let gradeBg = 'bg-gray-50';
 
         if (uniqueDays > 0) {
             const ratio = aDays / uniqueDays;
-            if (ratio >= 0.8) { grade = 'A'; gradeColor = 'text-green-600'; }
-            else if (ratio >= 0.6) { grade = 'B'; gradeColor = 'text-blue-600'; }
-            else if (ratio >= 0.4) { grade = 'C'; gradeColor = 'text-amber-600'; }
-            else { grade = 'D'; gradeColor = 'text-red-600'; }
+            if (ratio >= 0.8) { grade = 'A'; gradeColor = 'text-green-600'; gradeBg = 'bg-green-100'; }
+            else if (ratio >= 0.6) { grade = 'B'; gradeColor = 'text-blue-600'; gradeBg = 'bg-blue-100'; }
+            else if (ratio >= 0.4) { grade = 'C'; gradeColor = 'text-amber-600'; gradeBg = 'bg-amber-100'; }
+            else { grade = 'D'; gradeColor = 'text-red-600'; gradeBg = 'bg-red-100'; }
         }
 
-        return { uniqueDays, grade, gradeColor };
-    }, [trades, month]);
+        const totalPnL = monthTrades.reduce((acc, t) => acc + (t.pnl || 0), 0);
+
+        return { uniqueDays, grade, gradeColor, gradeBg, totalPnL };
+    }, [trades, month, year]);
 
     const selectedLog = dailyLogs.find(l => l.date === selectedDate);
     const selectedTrades = trades.filter(t => t.date === selectedDate);
     const selectedEvents = marketEvents.filter(e => e.date === selectedDate);
 
+    const todayStr = new Date().toISOString().split('T')[0];
+
     return (
         <div className="flex flex-col gap-6">
-            <div className="bg-white rounded-[32px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-[#1a1a2e]/5">
-                <div className="flex items-center justify-between mb-8 px-2">
-                    <h2 className="text-xl font-bold text-[#1a1a2e]">{MONTHS[month]} {year}</h2>
+            <div className="bg-white/70 backdrop-blur-3xl rounded-[32px] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-white relative overflow-hidden">
+                {/* Year/Month Picker Overlay */}
+                <AnimatePresence>
+                    {isYearPickerOpen && (
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="absolute inset-0 bg-white/95 backdrop-blur-md z-50 p-6 flex flex-col"
+                        >
+                            <div className="flex items-center justify-between mb-8">
+                                <h3 className="text-[18px] font-black text-[#1a1a2e] uppercase tracking-widest">Jump to Date</h3>
+                                <button onClick={() => setIsYearPickerOpen(false)} className="p-2 bg-gray-100 rounded-full">
+                                    <CloseIcon size={20} />
+                                </button>
+                            </div>
+                            
+                            <div className="flex-1 overflow-y-auto custom-scrollbar">
+                                {YEARS.map(y => (
+                                    <div key={y} className="mb-8">
+                                        <h4 className="text-[14px] font-black text-gray-300 mb-4 ml-1">{y}</h4>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {MONTHS.map((m, idx) => (
+                                                <button 
+                                                    key={m}
+                                                    onClick={() => selectYearMonth(y, idx)}
+                                                    className={`h-12 rounded-[16px] text-[12px] font-black uppercase tracking-wider transition-all ${
+                                                        y === year && idx === month 
+                                                        ? 'bg-[#1a1a2e] text-white' 
+                                                        : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
+                                                    }`}
+                                                >
+                                                    {m.substring(0, 3)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <div className="flex items-center justify-between mb-10 px-2">
+                    <button 
+                        onClick={() => setIsYearPickerOpen(true)}
+                        className="flex items-center gap-3 active:scale-95 transition-all text-left"
+                    >
+                        <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-[#1a1a2e] shadow-sm">
+                            <CalendarDays size={24} />
+                        </div>
+                        <div>
+                            <h2 className="text-[24px] font-black text-[#1a1a2e] leading-tight">{MONTHS[month]}</h2>
+                            <p className="text-[14px] font-bold text-gray-300 tracking-widest uppercase">{year}</p>
+                        </div>
+                    </button>
                     <div className="flex gap-2">
-                        <button onClick={prevMonth} className="p-3 bg-gray-50 rounded-xl text-[#1a1a2e] active:scale-95 transition-all">
+                        <button onClick={jumpToToday} className="px-4 h-12 bg-gray-50 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 active:scale-95 transition-all">
+                            Today
+                        </button>
+                        <button onClick={prevMonth} className="w-12 h-12 bg-gray-50 rounded-2xl text-[#1a1a2e] flex items-center justify-center active:scale-95 transition-all shadow-sm">
                             <ChevronLeft size={20} />
                         </button>
-                        <button onClick={nextMonth} className="p-3 bg-gray-50 rounded-xl text-[#1a1a2e] active:scale-95 transition-all">
+                        <button onClick={nextMonth} className="w-12 h-12 bg-gray-50 rounded-2xl text-[#1a1a2e] flex items-center justify-center active:scale-95 transition-all shadow-sm">
                             <ChevronRight size={20} />
                         </button>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-7 gap-2 mb-4 text-center">
+                <div className="grid grid-cols-7 gap-3 mb-6">
                     {['M','T','W','T','F','S','S'].map((d, i) => (
-                        <span key={i} className={`text-[10px] font-bold uppercase tracking-widest ${i >= 5 ? 'text-red-300' : 'text-[#9ca3af]'}`}>{d}</span>
+                        <div key={i} className="text-center">
+                            <span className={`text-[10px] font-black uppercase tracking-[0.25em] ${i >= 5 ? 'text-red-300' : 'text-[#9ca3af]'}`}>{d}</span>
+                        </div>
                     ))}
                 </div>
 
-                <div className="grid grid-cols-7 gap-2">
-                    {/* Pad start of month */}
+                <div className="grid grid-cols-7 gap-3">
+                    {/* Padding cells */}
                     {Array.from({ length: (new Date(year, month, 1).getDay() || 7) - 1 }).map((_, i) => (
                         <div key={`pad-${i}`} className="aspect-square" />
                     ))}
@@ -102,25 +178,30 @@ export default function PnLCalendar() {
                         const dateStr = date.toISOString().split('T')[0];
                         const dayTrades = trades.filter(t => t.date === dateStr);
                         const events = marketEvents.filter(e => e.date === dateStr);
+                        const isToday = dateStr === todayStr;
                         
-                        // Smart Color Logic
-                        let color = 'bg-gray-50';
-                        let textColor = 'text-[#1a1a2e]/40';
+                        let colorClass = 'bg-[#fcfcfc]';
+                        let textColorClass = 'text-[#1a1a2e]/30';
+                        let borderClass = 'border-transparent';
                         
                         if (dayTrades.length > 0) {
                             const totalPnL = dayTrades.reduce((acc, t) => acc + (t.pnl || 0), 0);
                             const hasBroken = dayTrades.some(t => t.rules_broken.length > 0);
                             
                             if (totalPnL > 0 && !hasBroken) {
-                                color = 'bg-green-500 shadow-[0_4px_12px_rgba(34,197,94,0.3)]';
-                                textColor = 'text-white';
+                                colorClass = 'bg-[#10b981] shadow-xl shadow-green-100/50';
+                                textColorClass = 'text-white';
                             } else if (totalPnL < 0 || hasBroken) {
-                                color = 'bg-red-500 shadow-[0_4px_12px_rgba(239,68,68,0.3)]';
-                                textColor = 'text-white';
+                                colorClass = 'bg-[#ef4444] shadow-xl shadow-red-100/50';
+                                textColorClass = 'text-white';
                             } else {
-                                color = 'bg-amber-400';
-                                textColor = 'text-white';
+                                colorClass = 'bg-[#f59e0b] shadow-xl shadow-amber-100/50';
+                                textColorClass = 'text-white';
                             }
+                        }
+
+                        if (isToday) {
+                            borderClass = 'border-2 border-[#1a1a2e] ring-4 ring-[#1a1a2e]/5';
                         }
 
                         const isWeekend = date.getDay() === 0 || date.getDay() === 6;
@@ -128,43 +209,52 @@ export default function PnLCalendar() {
                         return (
                             <motion.div
                                 key={dateStr}
-                                whileTap={{ scale: 0.92 }}
+                                whileTap={{ scale: 0.9 }}
                                 onClick={() => setSelectedDate(dateStr)}
-                                className={`aspect-square rounded-xl relative flex flex-col items-center justify-center cursor-pointer transition-all ${color} ${isWeekend && dayTrades.length === 0 ? 'opacity-30' : ''}`}
+                                className={`aspect-square rounded-[20px] relative flex flex-col items-center justify-center cursor-pointer transition-all border-2 ${colorClass} ${borderClass} ${isWeekend && dayTrades.length === 0 ? 'opacity-20' : ''}`}
                             >
-                                <span className={`text-[12px] font-black ${textColor}`}>
+                                <span className={`text-[14px] font-black ${textColorClass}`}>
                                     {date.getDate()}
                                 </span>
                                 
-                                <div className="absolute bottom-1.5 flex gap-0.5">
-                                    {events.slice(0, 3).map(e => (
-                                        <div key={e.id} className={`w-1 h-1 rounded-full ${e.impact === 'high' || e.impact === 'critical' ? 'bg-[#ef4444]' : 'bg-[#f59e0b]'} ${textColor === 'text-white' ? 'ring-1 ring-white/30' : ''}`} />
-                                    ))}
-                                </div>
+                                {events.length > 0 && (
+                                    <div className="absolute top-2 right-2">
+                                        <div className={`w-1.5 h-1.5 rounded-full ${events.some(e => e.impact === 'high' || e.impact === 'critical') ? 'bg-red-400' : 'bg-yellow-400'} ring-1 ring-white`} />
+                                    </div>
+                                )}
+                                
+                                {dayTrades.length > 0 && (
+                                    <div className="absolute bottom-2 flex gap-0.5">
+                                        <div className={`w-3 h-0.5 rounded-full ${textColorClass === 'text-white' ? 'bg-white/40' : 'bg-[#1a1a2e]/10'}`} />
+                                    </div>
+                                )}
                             </motion.div>
                         );
                     })}
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-[#1a1a2e]/5 grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50/50 p-4 rounded-2xl">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Discipline Grade</p>
-                        <p className={`text-2xl font-black ${stats.gradeColor}`}>{stats.grade}</p>
-                    </div>
-                    <div className="bg-gray-50/50 p-4 rounded-2xl">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Trading Days</p>
-                        <p className="text-2xl font-black text-[#1a1a2e]">{stats.uniqueDays}</p>
-                    </div>
-                </div>
-
-                <div className="mt-6 flex flex-col gap-3">
-                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Upcoming High Impact</h4>
-                    {marketEvents.filter(e => e.impact === 'high' || e.impact === 'critical').slice(0, 3).map(e => (
-                        <div key={e.id} className="flex items-center justify-between bg-red-50/30 p-3 rounded-xl border border-red-50/50">
-                            <span className="text-[13px] font-bold text-red-900">{e.title}</span>
-                            <span className="text-[11px] font-black text-red-400">{new Date(e.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
+                {/* Monthly Sync Status */}
+                <div className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-2 gap-6">
+                    <div className="flex flex-col gap-1">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Monthly Architecture</span>
+                        <div className="flex items-center gap-3 mt-1">
+                            <div className={`px-4 py-2 rounded-2xl ${stats.gradeBg} ${stats.gradeColor} text-[18px] font-black`}>
+                                {stats.grade}
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[16px] font-black text-[#1a1a2e]">{stats.uniqueDays} Days Active</span>
+                                <span className="text-[11px] font-bold text-gray-300">Compliance Factor</span>
+                            </div>
                         </div>
-                    ))}
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Net Revenue</span>
+                        <div className="flex items-center gap-3 mt-1">
+                            <div className={`text-[24px] font-black tabular-nums ${stats.totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                {stats.totalPnL >= 0 ? '+' : ''}₹{Math.abs(stats.totalPnL).toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -175,87 +265,123 @@ export default function PnLCalendar() {
                         <motion.div 
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             onClick={() => setSelectedDate(null)}
-                            className="fixed inset-0 bg-black/40 z-[200] backdrop-blur-[2px]"
+                            className="fixed inset-0 bg-black/50 z-[200] backdrop-blur-md"
                         />
                         <motion.div
                             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] z-[201] max-h-[85vh] overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+20px)] shadow-[0_-8px_40px_rgba(0,0,0,0.1)]"
+                            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] z-[201] max-h-[90vh] overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+32px)] shadow-[0_-20px_60px_rgba(0,0,0,0.15)]"
                         >
-                            <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto my-4" />
-                            <div className="px-6 py-2">
-                                <header className="flex items-center justify-between mb-8">
+                            <div className="w-12 h-1.5 bg-gray-100 rounded-full mx-auto my-6" />
+                            <div className="px-8 flex flex-col gap-10">
+                                <header className="flex items-center justify-between">
                                     <div>
-                                        <h3 className="text-[20px] font-black text-[#1a1a2e] leading-tight">
-                                            {new Date(selectedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                        <h3 className="text-[28px] font-black text-[#1a1a2e] leading-tight mb-1">
+                                            {new Date(selectedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}.
                                         </h3>
-                                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">{selectedLog?.grade ? `Discipline Grade ${selectedLog.grade}` : 'No Session Logged'}</p>
+                                        <div className="flex items-center gap-3 mt-2">
+                                            <div className="px-3 py-1 bg-[#1a1a2e] text-white rounded-full text-[10px] font-black uppercase tracking-widest">{year}</div>
+                                            <span className="text-[13px] font-bold text-gray-400 uppercase tracking-widest">
+                                                {selectedLog?.grade ? `Grade ${selectedLog.grade}` : 'Zero Day'}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <button onClick={() => setSelectedDate(null)} className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
-                                        <CloseIcon size={20} />
+                                    <button onClick={() => setSelectedDate(null)} className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 active:scale-90 transition-all">
+                                        <CloseIcon size={24} />
                                     </button>
                                 </header>
 
-                                <div className="grid grid-cols-2 gap-4 mb-8">
-                                    <div className="bg-gray-50 p-5 rounded-[24px]">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Net P&L</p>
-                                        <div className={`text-xl font-black tabular-nums flex items-center gap-1.5 ${selectedLog?.pnl && selectedLog.pnl > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                            {selectedLog?.pnl && selectedLog.pnl > 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-[#fafafa] p-6 rounded-[32px] border border-gray-100">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Performance</span>
+                                        <div className={`text-[24px] font-black tabular-nums flex items-center gap-2 ${selectedLog?.pnl && selectedLog.pnl > 0 ? 'text-green-500' : 'text-red-500'}`}>
                                             ₹{Math.abs(selectedLog?.pnl || 0).toLocaleString()}
+                                            {selectedLog?.pnl && selectedLog.pnl > 0 ? <TrendingUp size={24} /> : <TrendingDown size={24} />}
                                         </div>
                                     </div>
-                                    <div className="bg-gray-50 p-5 rounded-[24px]">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Trades</p>
-                                        <div className="text-xl font-black text-[#1a1a2e] tabular-nums">{selectedTrades.length}</div>
+                                    <div className="bg-[#fafafa] p-6 rounded-[32px] border border-gray-100">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Tactical</span>
+                                        <div className="text-[24px] font-black text-[#1a1a2e] tabular-nums">{selectedTrades.length} Trades</div>
                                     </div>
                                 </div>
 
-                                <section className="mb-8">
-                                    <h4 className="text-[13px] font-black text-gray-400 uppercase tracking-widest mb-4">Daily Performance</h4>
-                                    <div className="flex flex-col gap-3">
-                                        {selectedTrades.map((trade, i) => (
-                                            <div key={i} className="bg-white border border-gray-100 p-4 rounded-2xl flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${trade.type === 'Long' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                                                        {trade.pair.substring(0, 1).toUpperCase()}
+                                {selectedTrades.length > 0 && (
+                                    <section>
+                                        <div className="flex items-center gap-3 mb-6">
+                                            <div className="px-3 py-1 bg-gray-50 rounded-full border border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">Trade Architecture</div>
+                                            <div className="h-[1px] flex-1 bg-gray-50" />
+                                        </div>
+                                        <div className="flex flex-col gap-4">
+                                            {selectedTrades.map((trade, i) => (
+                                                <div key={i} className="bg-white border-2 border-gray-50 p-5 rounded-[24px] flex items-center justify-between shadow-sm">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={`w-12 h-12 rounded-[16px] flex items-center justify-center font-black text-[16px] ${trade.type === 'Long' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                                            {trade.pair.substring(0, 1).toUpperCase()}
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[16px] font-black text-[#1a1a2e]">{trade.pair} — {trade.type}</p>
+                                                            <p className="text-[12px] font-bold text-gray-300 uppercase tracking-widest">{trade.setupId || 'Neural Edge'}</p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p className="text-[15px] font-bold text-[#1a1a2e]">{trade.pair} — {trade.type}</p>
-                                                        <p className="text-[12px] font-bold text-gray-400 tracking-wide">{trade.setupId || 'Price Action'}</p>
+                                                    <div className={`text-[17px] font-black tabular-nums ${(trade.pnl || 0) > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                                        {(trade.pnl || 0) > 0 ? '+' : ''}₹{(trade.pnl || 0).toLocaleString()}
                                                     </div>
                                                 </div>
-                                                <div className={`text-[15px] font-black tabular-nums ${(trade.pnl || 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                    {(trade.pnl || 0) > 0 ? '+' : ''}₹{(trade.pnl || 0).toLocaleString()}
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {selectedTrades.length === 0 && (
-                                            <div className="py-4 text-center border-2 border-dashed border-gray-100 rounded-3xl">
-                                                <p className="text-sm font-bold text-gray-300">No trades recorded</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </section>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
 
-                                <section className="mb-4">
-                                    <h4 className="text-[13px] font-black text-gray-400 uppercase tracking-widest mb-4">Discipline & Context</h4>
-                                    <div className="flex flex-col gap-3">
-                                        <div className="bg-blue-50/50 p-4 rounded-2xl flex items-center gap-4">
-                                            <Shield className="text-blue-600" size={20} />
+                                <section>
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="px-3 py-1 bg-gray-50 rounded-full border border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">Neural Sync</div>
+                                        <div className="h-[1px] flex-1 bg-gray-50" />
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div className="bg-blue-50/20 p-6 rounded-[32px] border border-blue-50 flex items-center gap-5">
+                                            <div className="w-12 h-12 bg-blue-500 text-white rounded-[20px] flex items-center justify-center shadow-lg shadow-blue-200/50">
+                                                <Shield size={22} />
+                                            </div>
                                             <div>
-                                                <p className="text-[14px] font-bold text-blue-900">Rule Compliance</p>
-                                                <p className="text-[12px] font-bold text-blue-600/70">{selectedLog?.rulesChecked?.length || 0} followed · {selectedLog?.rulesBroken || 0} broken</p>
+                                                <p className="text-[15px] font-black text-blue-900 leading-tight">System Compliance</p>
+                                                <p className="text-[13px] font-bold text-blue-400 uppercase tracking-widest mt-1">
+                                                    {selectedLog?.rulesChecked?.length || 0} followed · {selectedLog?.rulesBroken || 0} Broken
+                                                </p>
                                             </div>
                                         </div>
-                                        <div className="bg-purple-50/50 p-4 rounded-2xl flex items-center gap-4">
-                                            <Brain className="text-purple-600" size={20} />
+                                        <div className="bg-purple-50/20 p-6 rounded-[32px] border border-purple-50 flex items-center gap-5">
+                                            <div className="w-12 h-12 bg-purple-500 text-white rounded-[20px] flex items-center justify-center shadow-lg shadow-purple-200/50">
+                                                <Brain size={22} />
+                                            </div>
                                             <div>
-                                                <p className="text-[14px] font-bold text-purple-900">Emotional Baseline</p>
-                                                <p className="text-[12px] font-bold text-purple-600/70 capitalize">{selectedLog?.mood || 'Neutral'}</p>
+                                                <p className="text-[15px] font-black text-purple-900 leading-tight">Emotional Architecture</p>
+                                                <p className="text-[13px] font-bold text-purple-400 uppercase tracking-widest mt-1">
+                                                    Baseline: {selectedLog?.mood || 'Equanimity'}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
                                 </section>
+                                
+                                {selectedEvents.length > 0 && (
+                                    <section>
+                                        <div className="flex items-center gap-3 mb-6">
+                                            <div className="px-3 py-1 bg-gray-50 rounded-full border border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">Market Context</div>
+                                            <div className="h-[1px] flex-1 bg-gray-50" />
+                                        </div>
+                                        <div className="flex flex-col gap-3">
+                                            {selectedEvents.map(e => (
+                                                <div key={e.id} className="flex items-center justify-between p-4 bg-red-50/20 border border-red-50 rounded-2xl">
+                                                    <div className="flex items-center gap-3">
+                                                        <Info size={16} className="text-red-400" />
+                                                        <span className="text-[14px] font-bold text-red-900">{e.title}</span>
+                                                    </div>
+                                                    <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">{e.impact} impact</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
                             </div>
                         </motion.div>
                     </>
