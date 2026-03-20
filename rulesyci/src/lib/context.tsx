@@ -71,7 +71,7 @@ const initialState: AppState = {
     user: null, // Start as null to prevent auth hydration loops
 
     session: {
-        date: new Date().toISOString().split('T')[0],
+        date: '2026-03-21', // Static placeholder for hydration safety
         emotionalBaseline: 'neutral',
         rulesLocked: false, // Start unlocked so user can prep
         tradesTaken: 0,
@@ -138,7 +138,7 @@ const initialState: AppState = {
         streak_sensitivity: 'high',
         goal: 'consistency',
         confidence_level: 3.2,
-        model_updated_at: new Date().toISOString(),
+        model_updated_at: '2026-03-21T00:00:00Z',
         model_confidence: 0.82
     },
     diaryEntries: [],
