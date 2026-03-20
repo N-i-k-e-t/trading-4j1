@@ -327,49 +327,67 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
 
     const supabase = createClient();
 
+    const isPlaceholderAuth = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('your-project-id') || !process.env.NEXT_PUBLIC_SUPABASE_URL;
+
     // Sync with Supabase Auth (PWA Persistent)
     useEffect(() => {
         const syncUser = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-                const email = session.user.email || '';
-                const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
-                dispatch({ 
-                    type: 'SET_USER', 
-                    payload: { 
-                        email, 
-                        name: session.user.user_metadata?.full_name || 'Trader',
-                        isPro,
-                        isAdmin: isPro && email === 'niketpatil1624@gmail.com'
-                    } 
-                });
+            // Only try real auth if keys exist
+            if (!isPlaceholderAuth) {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.user) {
+                    const email = session.user.email || '';
+                    const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
+                    dispatch({ 
+                        type: 'SET_USER', 
+                        payload: { 
+                            email, 
+                            name: session.user.user_metadata?.full_name || 'Trader',
+                            isPro,
+                            isAdmin: isPro && email === 'niketpatil1624@gmail.com'
+                        } 
+                    });
+                }
+            } else {
+                // Check if we have a saved mock user in localstorage
+                const savedData = localStorage.getItem('rulesci_data');
+                if (savedData) {
+                    try {
+                        const parsed = JSON.parse(savedData);
+                        if (parsed.user) {
+                            dispatch({ type: 'SET_USER', payload: parsed.user });
+                        }
+                    } catch (e) {}
+                }
             }
             dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
         };
 
         syncUser();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (session?.user) {
-                const email = session.user.email || '';
-                const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
-                dispatch({ 
-                    type: 'SET_USER', 
-                    payload: { 
-                        email, 
-                        name: session.user.user_metadata?.full_name || 'Trader',
-                        isPro,
-                        isAdmin: isPro && email === 'niketpatil1624@gmail.com'
-                    } 
-                });
-            } else {
-                dispatch({ type: 'SET_USER', payload: null });
-            }
-            dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
-        });
+        if (!isPlaceholderAuth) {
+            const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+                if (session?.user) {
+                    const email = session.user.email || '';
+                    const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
+                    dispatch({ 
+                        type: 'SET_USER', 
+                        payload: { 
+                            email, 
+                            name: session.user.user_metadata?.full_name || 'Trader',
+                            isPro,
+                            isAdmin: isPro && email === 'niketpatil1624@gmail.com'
+                        } 
+                    });
+                } else {
+                    dispatch({ type: 'SET_USER', payload: null });
+                }
+                dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
+            });
 
-        return () => subscription.unsubscribe();
-    }, []);
+            return () => subscription.unsubscribe();
+        }
+    }, [isPlaceholderAuth]);
 
     // Load from LocalStorage (Fallback / Non-Auth data)
     useEffect(() => {
