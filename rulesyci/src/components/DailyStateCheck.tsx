@@ -19,12 +19,26 @@ export default function DailyStateCheck() {
 
     return (
         <div className="fixed inset-0 z-[200] bg-white flex flex-col p-6 pb-[calc(env(safe-area-inset-bottom)+20px)] overflow-y-auto">
-            <header className="mb-12 pt-8">
-                <div className="w-12 h-12 bg-[#1a1a2e] text-white rounded-2xl flex items-center justify-center mb-6">
-                    <Shield size={24} />
+            {/* SEGMENTED PROGRESS BAR - CAL AI STYLE */}
+            <div className="absolute top-0 left-0 right-0 px-6 pt-4 flex gap-1 z-[210]">
+                {[1, 2].map((i) => (
+                    <div key={i} className="h-1.5 flex-1 bg-gray-100 rounded-full overflow-hidden">
+                        <motion.div 
+                            className="h-full bg-[#1a1a2e]"
+                            initial={{ width: '0%' }}
+                            animate={{ width: i <= step ? '100%' : '0%' }}
+                            transition={{ duration: 0.4 }}
+                        />
+                    </div>
+                ))}
+            </div>
+
+            <header className="mb-12 pt-12">
+                <div className="w-16 h-16 bg-[#1a1a2e] text-white rounded-full flex items-center justify-center mb-8 shadow-xl">
+                    <Shield size={28} strokeWidth={2.5} />
                 </div>
-                <h1 className="text-[28px] font-black text-[#1a1a2e] leading-tight mb-2">Daily Readiness</h1>
-                <p className="text-base text-gray-400 font-bold uppercase tracking-wider">Before you enter the arena</p>
+                <h1 className="text-[36px] font-black text-[#1a1a2e] leading-[0.9] tracking-tighter mb-4">Daily <br/> Readiness.</h1>
+                <p className="text-[14px] font-bold text-gray-400 uppercase tracking-widest pl-1">Baseline Neutralization</p>
             </header>
 
             <div className="flex-1 flex flex-col gap-10">
@@ -40,12 +54,12 @@ export default function DailyStateCheck() {
                                     <Moon size={20} className="text-blue-500" />
                                     <h3 className="text-lg font-black text-[#1a1a2e]">Sleep Quality</h3>
                                 </div>
-                                <div className="flex justify-between gap-2">
+                                <div className="flex justify-between gap-3">
                                     {[1, 2, 3, 4, 5].map(val => (
                                         <button 
                                             key={val}
                                             onClick={() => setSleepScore(val)}
-                                            className={`flex-1 h-14 rounded-2xl font-black transition-all ${sleepScore === val ? 'bg-blue-600 text-white scale-105 shadow-lg shadow-blue-100' : 'bg-gray-50 text-gray-300'}`}
+                                            className={`flex-1 h-16 rounded-full font-black text-[18px] transition-all ${sleepScore === val ? 'bg-[#1a1a2e] text-white scale-105 shadow-2xl' : 'bg-gray-50 text-gray-300'}`}
                                         >
                                             {val}
                                         </button>
@@ -62,12 +76,12 @@ export default function DailyStateCheck() {
                                     <Battery size={20} className="text-orange-500" />
                                     <h3 className="text-lg font-black text-[#1a1a2e]">Energy Levels</h3>
                                 </div>
-                                <div className="flex justify-between gap-2">
+                                <div className="flex justify-between gap-3">
                                     {[1, 2, 3, 4, 5].map(val => (
                                         <button 
                                             key={val}
                                             onClick={() => setEnergyLevel(val)}
-                                            className={`flex-1 h-14 rounded-2xl font-black transition-all ${energyLevel === val ? 'bg-orange-500 text-white scale-105 shadow-lg shadow-orange-100' : 'bg-gray-50 text-gray-300'}`}
+                                            className={`flex-1 h-16 rounded-full font-black text-[18px] transition-all ${energyLevel === val ? 'bg-[#1a1a2e] text-white scale-105 shadow-2xl' : 'bg-gray-50 text-gray-300'}`}
                                         >
                                             {val}
                                         </button>
@@ -92,12 +106,12 @@ export default function DailyStateCheck() {
                                     <Smile size={20} className="text-purple-500" />
                                     <h3 className="text-lg font-black text-[#1a1a2e]">Emotional Baseline</h3>
                                 </div>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-2 gap-4">
                                     {['neutral', 'anxious', 'greedy', 'fearful', 'calm', 'distracted'].map(mood => (
                                         <button 
                                             key={mood}
                                             onClick={() => setEmotionalBaseline(mood as any)}
-                                            className={`h-14 rounded-2xl font-black capitalize transition-all border-2 ${session.emotionalBaseline === mood ? 'bg-purple-600 border-purple-600 text-white shadow-lg shadow-purple-100' : 'bg-white border-gray-100 text-gray-400'}`}
+                                            className={`h-16 rounded-[32px] font-black capitalize transition-all border-2 ${session.emotionalBaseline === mood ? 'bg-[#1a1a2e] border-[#1a1a2e] text-white shadow-xl' : 'bg-white border-gray-50 text-gray-300'}`}
                                         >
                                             {mood}
                                         </button>
@@ -109,20 +123,20 @@ export default function DailyStateCheck() {
                 </AnimatePresence>
             </div>
 
-            <footer className="pt-8">
+            <footer className="pt-8 mb-4">
                 {step < 2 ? (
                     <button 
                         onClick={() => setStep(step + 1)}
-                        className="w-full h-16 bg-[#1a1a2e] text-white rounded-[24px] font-black text-lg flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all"
+                        className="w-full h-20 bg-[#1a1a2e] text-white rounded-full font-black text-xl flex items-center justify-center gap-3 shadow-2xl active:scale-95 transition-all"
                     >
-                        Next Step <ArrowRight size={20} />
+                        Review Protocol <ArrowRight size={20} strokeWidth={3} />
                     </button>
                 ) : (
                     <button 
                         onClick={handleComplete}
-                        className="w-full h-16 bg-green-600 text-white rounded-[24px] font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-green-100 active:scale-95 transition-all"
+                        className="w-full h-20 bg-[#1a1a2e] text-white rounded-full font-black text-xl flex items-center justify-center gap-3 shadow-2xl active:scale-95 transition-all"
                     >
-                        Lock In & Sync <Check size={20} />
+                        Sync Architecture <Check size={24} strokeWidth={4} />
                     </button>
                 )}
                 <p className="text-[11px] font-bold text-gray-300 text-center mt-6 uppercase tracking-[0.2em]">RuleSci Discipline Shield Active</p>

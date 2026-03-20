@@ -61,28 +61,31 @@ export default function JournalPage() {
     return (
         <div className="min-h-[100dvh] bg-white flex flex-col pb-[calc(env(safe-area-inset-bottom)+84px)] italic-none">
             {/* HEADER */}
-            <header className="px-5 pt-8 mb-6">
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-[32px] font-black text-[#1a1a2e]">Trading Log</h1>
+            <header className="px-5 pt-12 mb-8">
+                <div className="flex items-center justify-between mb-10">
+                    <div className="flex flex-col">
+                        <h1 className="text-[38px] font-black text-[#1a1a2e] leading-none mb-1 tracking-tighter">Execution <br/> History.</h1>
+                        <p className="text-[14px] font-bold text-gray-400 uppercase tracking-widest pl-1">Neural Records</p>
+                    </div>
                     <button 
                         onClick={() => mode === 'trades' ? setCaptureOpen(true) : setIsScannerOpen(true)}
-                        className="w-12 h-12 bg-[#eab308] text-white rounded-2xl flex items-center justify-center shadow-lg active:scale-95 transition-all"
+                        className="w-16 h-16 bg-[#1a1a2e] text-white rounded-full flex items-center justify-center shadow-2xl active:scale-95 transition-all"
                     >
-                        {mode === 'trades' ? <Activity size={24} /> : <Camera size={24} />}
+                        {mode === 'trades' ? <Activity size={28} strokeWidth={2.5} /> : <Camera size={28} strokeWidth={2.5} />}
                     </button>
                 </div>
 
-                {/* MODE TOGGLE */}
-                <div className="flex bg-gray-50 p-1.5 rounded-2xl mb-6">
+                {/* MODE TOGGLE - PREMIUM STYLE */}
+                <div className="flex bg-gray-50 p-2 rounded-[32px] mb-8 border border-gray-100/50 shadow-inner">
                     <button 
                         onClick={() => setMode('trades')}
-                        className={`flex-1 h-12 rounded-xl text-[14px] font-black transition-all ${mode === 'trades' ? 'bg-white shadow-sm text-[#1a1a2e]' : 'text-gray-400'}`}
+                        className={`flex-1 h-14 rounded-[24px] text-[15px] font-black transition-all ${mode === 'trades' ? 'bg-[#1a1a2e] shadow-xl text-white' : 'text-gray-300'}`}
                     >
                         Trade Log
                     </button>
                     <button 
                         onClick={() => setMode('scans')}
-                        className={`flex-1 h-12 rounded-xl text-[14px] font-black transition-all ${mode === 'scans' ? 'bg-white shadow-sm text-[#1a1a2e]' : 'text-gray-400'}`}
+                        className={`flex-1 h-14 rounded-[24px] text-[15px] font-black transition-all ${mode === 'scans' ? 'bg-[#1a1a2e] shadow-xl text-white' : 'text-gray-300'}`}
                     >
                         Scan Library
                     </button>
@@ -99,15 +102,14 @@ export default function JournalPage() {
                 </div>
             </header>
 
-            {mode === 'trades' && (
-                <div className="flex gap-2 px-5 mb-6 overflow-x-auto no-scrollbar">
+                <div className="flex gap-3 px-5 mb-8 overflow-x-auto no-scrollbar">
                     {filters.map((f) => (
                         <button
                             key={f.value}
                             onClick={() => setSelectedFilter(f.value)}
-                            className={`px-5 h-10 rounded-full whitespace-nowrap text-[12px] font-black transition-all ${
+                            className={`px-7 h-11 rounded-full whitespace-nowrap text-[13px] font-black transition-all ${
                                 selectedFilter === f.value 
-                                    ? 'bg-[#1a1a2e] text-white' 
+                                    ? 'bg-[#1a1a2e] text-white shadow-lg' 
                                     : 'bg-gray-100 text-gray-400'
                             }`}
                         >
@@ -115,7 +117,6 @@ export default function JournalPage() {
                         </button>
                     ))}
                 </div>
-            )}
 
             <main className="px-5 flex-1 flex flex-col gap-4">
                 <AnimatePresence mode="popLayout">
@@ -127,26 +128,29 @@ export default function JournalPage() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 onClick={() => router.push(`/journal/${trade.id}`)}
-                                className="card-premium flex flex-col gap-4 text-left group"
+                                className="p-6 bg-white rounded-[40px] border border-gray-50 shadow-sm flex flex-col gap-5 text-left group active:scale-[0.98] transition-all"
                             >
                                 <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="text-[17px] font-black text-[#1a1a2e] mb-1">{trade.pair}</h3>
-                                        <p className="text-[12px] font-bold text-gray-400">{trade.date} • {trade.type}</p>
+                                    <div className="flex-1">
+                                        <h3 className="text-[18px] font-black text-[#1a1a2e] mb-1 leading-tight">{trade.pair}</h3>
+                                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{trade.date} • {trade.type}</p>
                                     </div>
-                                    <div className="text-right">
-                                        <span className={`text-[20px] font-black tabular-nums ${(trade.pnl || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                    <div className="text-right flex flex-col items-end">
+                                        <span className={`text-[22px] font-black tabular-nums leading-none mb-1 ${(trade.pnl || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                                             {(trade.pnl || 0) >= 0 ? '+' : ''}{(trade.pnl || 0).toFixed(1)}R
                                         </span>
+                                        <div className={`w-8 h-1 bg-current opacity-20 rounded-full ${(trade.pnl || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`} />
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between pt-3 border-t border-gray-50">
-                                    <div className="flex gap-1">
+                                <div className="flex items-center justify-between pt-4 border-t border-gray-50/50">
+                                    <div className="flex gap-1.5">
                                         {trade.rules_followed?.slice(0, 5).map((_, i) => (
-                                            <div key={i} className="w-2 h-2 rounded-full bg-green-400" />
+                                            <div key={i} className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
                                         ))}
                                     </div>
-                                    <ChevronRight size={16} className="text-gray-300" />
+                                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300">
+                                        <ChevronRight size={16} strokeWidth={3} />
+                                    </div>
                                 </div>
                             </motion.button>
                         )) : (

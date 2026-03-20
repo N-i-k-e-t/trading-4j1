@@ -124,17 +124,20 @@ export default function StatsPage() {
         <div className="flex flex-col gap-6 px-5 pt-8 pb-[calc(env(safe-area-inset-bottom)+84px)] italic-none">
             {/* AI COACH — HERO INSIGHT */}
             {aiOutput.coachMessages.length > 0 && (
-                <section className="bg-[#1a1a2e] rounded-2xl p-6 text-white shadow-xl">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 bg-[#eab308] text-[#1a1a2e] rounded-xl flex items-center justify-center">
-                            <Lightbulb size={24} />
+                <section className="bg-[#1a1a2e] rounded-[40px] p-8 text-white shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <Lightbulb size={120} />
+                    </div>
+                    <div className="flex items-center gap-5 mb-6 relative z-10">
+                        <div className="w-16 h-16 bg-white text-[#1a1a2e] rounded-full flex items-center justify-center shadow-xl">
+                            <Lightbulb size={32} strokeWidth={2.5} />
                         </div>
                         <div>
-                            <h3 className="text-[17px] font-black text-white leading-tight">Elite AI Coach</h3>
-                            <span className="text-[10px] font-black text-[#eab308] uppercase tracking-widest">{aiOutput.coachMessages[0].tone} Architecture</span>
+                            <h3 className="text-[20px] font-black text-white leading-tight">Neural Coach</h3>
+                            <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">{aiOutput.coachMessages[0].tone} Sync</span>
                         </div>
                     </div>
-                    <p className="text-[15px] font-bold text-white/90 leading-relaxed italic border-l-2 border-[#eab308] pl-4 py-1">
+                    <p className="text-[17px] font-bold text-white leading-relaxed italic border-l-4 border-white/20 pl-6 py-2 relative z-10">
                         &ldquo;{aiOutput.coachMessages[0].message}&rdquo;
                     </p>
                 </section>
@@ -142,73 +145,73 @@ export default function StatsPage() {
 
             {/* Streak & Leak Grid */}
             <div className="grid grid-cols-2 gap-4">
-                <section className="card-premium flex flex-col items-center">
-                    <div className="relative w-24 h-24 flex items-center justify-center">
+                <section className="bg-white rounded-[32px] p-6 border border-gray-100 shadow-sm flex flex-col items-center">
+                    <div className="relative w-28 h-28 flex items-center justify-center">
                         <svg className="w-full h-full transform -rotate-90">
-                            <circle cx="48" cy="48" r="42" stroke="#f1f5f9" strokeWidth="8" fill="transparent" />
-                            <motion.circle cx="48" cy="48" r="42" stroke="#eab308" strokeWidth="8"
-                                strokeDasharray={264}
-                                strokeDashoffset={264 - (264 * streakPercent / 100)}
+                            <circle cx="56" cy="56" r="50" stroke="#f8fafc" strokeWidth="10" fill="transparent" />
+                            <motion.circle cx="56" cy="56" r="50" stroke="#1a1a2e" strokeWidth="10"
+                                strokeDasharray={314}
+                                strokeDashoffset={314 - (314 * streakPercent / 100)}
                                 strokeLinecap="round" fill="transparent"
                                 className="transition-all duration-1000"
                             />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-2xl font-black text-[#1a1a2e] tabular-nums">{streak}</span>
-                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider">Streak</span>
+                            <span className="text-3xl font-black text-[#1a1a2e] tabular-nums leading-none mb-1">{streak}</span>
+                            <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Days</span>
                         </div>
                     </div>
                 </section>
 
-                <section className="card-premium !bg-red-50 !border-red-100 flex flex-col items-center justify-center gap-1">
-                    <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">System Leak</span>
-                    <span className="text-[20px] font-black text-red-600 tabular-nums">
+                <section className="bg-red-50/50 rounded-[32px] p-6 border border-red-100 flex flex-col items-center justify-center gap-2">
+                    <span className="text-[11px] font-black text-red-500 uppercase tracking-widest">Protocol Leak</span>
+                    <span className="text-[24px] font-black text-red-600 tabular-nums leading-none">
                         ₹{analytics.indisciplineCost.toLocaleString()}
                     </span>
-                    <span className="text-[9px] font-bold text-red-400/60 uppercase">Indiscipline Cost</span>
+                    <p className="text-[10px] font-bold text-red-400/60 uppercase text-center px-2">Cost of Indiscipline</p>
                 </section>
             </div>
 
             {/* CAPITAL SCALING TRACKER */}
-            <section className="bg-gradient-to-br from-[#1a1a2e] to-[#2a2a4a] rounded-2xl p-6 text-white shadow-xl">
-                <header className="flex justify-between items-center mb-6">
+            <section className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm overflow-hidden relative">
+                <header className="flex justify-between items-start mb-8">
                     <div>
-                        <h3 className="text-[17px] font-black">Capital Scaling</h3>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Phase 1: Validation</p>
+                        <h3 className="text-[22px] font-black text-[#1a1a2e] tracking-tight">Capital Scaling</h3>
+                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest pl-0.5">Stage 1: Structural Proof</p>
                     </div>
-                    <div className="bg-[#eab308] px-3 py-1 rounded-lg">
-                        <span className="text-[11px] font-black text-[#1a1a2e]">₹1L CAP</span>
+                    <div className="bg-green-50 px-4 py-2 rounded-2xl border border-green-100">
+                        <span className="text-[12px] font-black text-green-600">₹1L CAP Active</span>
                     </div>
                 </header>
 
-                <div className="flex flex-col gap-3 mb-6">
-                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
-                        <span>Current Stage</span>
-                        <span>Unlock 2L+</span>
+                <div className="flex flex-col gap-4 mb-2">
+                    <div className="flex justify-between text-[11px] font-black uppercase tracking-[0.2em] text-[#1a1a2e]">
+                        <span>Baseline</span>
+                        <span className="opacity-30">Unlock 2L+</span>
                     </div>
-                    <div className="h-3 bg-white/10 rounded-full overflow-hidden border border-white/5">
+                    <div className="h-4 bg-gray-50 rounded-full overflow-hidden border border-gray-100 p-0.5">
                         <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(streak * 3.33, 100)}%` }}
-                            className="h-full bg-[#eab308] shadow-[0_0_15px_rgba(234,179,8,0.3)]"
+                            className="h-full bg-[#1a1a2e] rounded-full shadow-lg"
                         />
                     </div>
-                    <p className="text-[11px] font-bold text-gray-400">
-                        {streak >= 30 ? 'Architecture Stable: Scaling Authorized.' : `${30 - streak} more days of compliance to scale.`}
+                    <p className="text-[14px] font-bold text-gray-400 pl-1">
+                        {streak >= 30 ? 'Architecture Stable: Scaling Authorized.' : `${30 - streak} days of compliance until phase expansion.`}
                     </p>
                 </div>
             </section>
 
             {/* Rule Compliance Chart */}
-            <section>
-                <div className="flex items-center justify-between mb-6 px-1">
-                    <h3 className="text-[14px] font-black text-[#1a1a2e] uppercase tracking-widest">Compliance</h3>
-                    <div className="flex gap-2 bg-gray-50 p-1 rounded-xl">
+            <section className="px-1">
+                <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-[16px] font-black text-[#1a1a2e] uppercase tracking-[0.2em]">Compliance</h3>
+                    <div className="flex gap-2 bg-gray-50 p-1.5 rounded-[20px] border border-gray-100 shadow-inner">
                         {['Week', 'Month', 'All'].map(p => (
                             <button
                                 key={p}
                                 onClick={() => setPeriod(p)}
-                                className={`px-4 h-8 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${period ===p ? 'bg-white text-[#1a1a2e] shadow-sm' : 'text-gray-400'}`}
+                                className={`px-5 h-10 rounded-[15px] text-[11px] font-black uppercase tracking-widest transition-all ${period ===p ? 'bg-white text-[#1a1a2e] shadow-sm' : 'text-gray-400'}`}
                             >
                                 {p}
                             </button>
