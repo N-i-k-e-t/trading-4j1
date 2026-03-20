@@ -34,6 +34,16 @@ export default function OnboardingPage() {
         setIsHydrated(true);
     }, []);
 
+    // Auto-advance Step 9 (Architecture Generation)
+    useEffect(() => {
+        if (currentStep === 9) {
+            const timer = setTimeout(() => {
+                nextStep();
+            }, 4500);
+            return () => clearTimeout(timer);
+        }
+    }, [currentStep]);
+
     const nextStep = () => setCurrentStep(prev => prev + 1);
     const prevStep = () => setCurrentStep(prev => prev - 1);
 
@@ -337,8 +347,6 @@ export default function OnboardingPage() {
                                     ))}
                                 </div>
                             </div>
-                            {/* Auto-advance logic */}
-                            <div className="hidden">{setTimeout(() => nextStep(), 4500)}</div>
                         </motion.div>
                     )}
 
