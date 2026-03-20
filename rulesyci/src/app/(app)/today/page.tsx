@@ -26,11 +26,14 @@ export default function DashboardPage() {
     const router = useRouter();
     const [mounted, setMounted] = useState(false);
     const [isResetOpen, setIsResetOpen] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [weekOffset, setWeekOffset] = useState(0);
 
     const today = new Date().toISOString().split('T')[0];
-    const todayTrades = useMemo(() => trades.filter(t => t.date === today), [trades, today]);
-    const todayLog = dailyLogs.find(d => d.date === today);
-    const checkedIds = todayLog?.rulesChecked || [];
+    const selectedDateStr = selectedDate.toISOString().split('T')[0];
+    const targetTrades = useMemo(() => trades.filter(t => t.date === selectedDateStr), [trades, selectedDateStr]);
+    const targetLog = dailyLogs.find(d => d.date === selectedDateStr);
+    const checkedIds = targetLog?.rulesChecked || [];
 
     useEffect(() => {
         setMounted(true);
@@ -65,25 +68,25 @@ export default function DashboardPage() {
         const newScore = Math.round((newChecked.length / activeRules.length) * 100);
         
         logDaily({ 
-            date: today, 
+            date: selectedDateStr, 
             rulesChecked: newChecked,
             complianceScore: newScore,
-            mood: todayLog?.mood || 'neutral',
-            tradesLogged: todayTrades.length,
+            mood: targetLog?.mood || 'neutral',
+            tradesLogged: targetTrades.length,
             rulesFollowed: newChecked.length,
-            rulesBroken: todayTrades.reduce((acc, t) => acc + (t.rules_broken?.length || 0), 0)
+            rulesBroken: targetTrades.reduce((acc, t) => acc + (t.rules_broken?.length || 0), 0)
         });
     };
 
     const handleSetMood = (mood: string) => {
         logDaily({
-            date: today,
+            date: selectedDateStr,
             rulesChecked: checkedIds,
             complianceScore: score,
             mood,
-            tradesLogged: todayTrades.length,
+            tradesLogged: targetTrades.length,
             rulesFollowed: checkedIds.length,
-            rulesBroken: todayTrades.reduce((acc, t) => acc + (t.rules_broken?.length || 0), 0)
+            rulesBroken: targetTrades.reduce((acc, t) => acc + (t.rules_broken?.length || 0), 0)
         });
         showToast('System state updated', 'success');
     };
@@ -110,35 +113,53 @@ export default function DashboardPage() {
                 <header className="w-full mb-12 flex flex-col items-center">
                     <Link 
                         href="/calendar"
-                        className="flex items-center gap-2 mb-8 cursor-pointer active:scale-95 transition-all hover:opacity-70 group"
+                        className="flex flex-col items-center gap-2 mb-8 cursor-pointer active:scale-95 transition-all hover:opacity-70 group"
                     >
                         <span className="text-[22px] font-black text-[#1a1a2e] tracking-tight group-hover:text-blue-600 transition-colors">
-                            {new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+                            {selectedDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                         </span>
-                        <ChevronRight size={20} className="rotate-90 text-[#1a1a2e] group-hover:text-blue-500 transition-colors" strokeWidth={3} />
+                        <div className="flex items-center gap-2">
+                             <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Protocol Architecture</span>
+                             <ChevronRight size={16} className="rotate-90 text-blue-500" strokeWidth={3} />
+                        </div>
                     </Link>
 
-                    <div className="w-full flex justify-between px-2">
-                        {[-3, -2, -1, 0, 1, 2, 3].map((offset) => {
-                            const date = new Date();
-                            date.setDate(date.getDate() + offset);
-                            const isToday = offset === 0;
-                            return (
-                                <motion.div 
-                                    key={offset}
-                                    whileTap={{ scale: 0.9 }}
-                                    className="flex flex-col items-center gap-2"
-                                >
-                                    <span className={`text-[12px] font-bold uppercase tracking-widest ${isToday ? 'text-[#1a1a2e]' : 'text-gray-300'}`}>
-                                        {date.toLocaleDateString('en-US', { weekday: 'short' })}
-                                    </span>
-                                    <div className={`w-11 h-11 rounded-full flex flex-col items-center justify-center transition-all ${isToday ? 'bg-[#1a1a2e] text-white shadow-xl' : 'text-gray-400'}`}>
-                                        <span className="text-[15px] font-black leading-none">{date.getDate()}</span>
-                                        <div className={`w-1.5 h-1.5 rounded-full mt-1 ${isToday ? 'bg-white' : 'bg-gray-100'}`} />
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
+                    <div className="w-full flex flex-col gap-6">
+                        <div className="flex items-center justify-between px-2">
+                            <button onClick={() => setWeekOffset(weekOffset - 1)} className="p-2 bg-gray-50 border border-gray-100 rounded-full text-gray-400 active:scale-90 transition-all">
+                                <ChevronRight size={18} className="rotate-180" />
+                            </button>
+                            <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest">Temporal Navigation</span>
+                            <button onClick={() => setWeekOffset(weekOffset + 1)} className="p-2 bg-gray-50 border border-gray-100 rounded-full text-gray-400 active:scale-90 transition-all">
+                                <ChevronRight size={18} />
+                            </button>
+                        </div>
+                        
+                        <div className="w-full flex justify-between px-2">
+                            {[-3, -2, -1, 0, 1, 2, 3].map((offset) => {
+                                const date = new Date();
+                                date.setDate(date.getDate() + (weekOffset * 7) + offset);
+                                const isCurrentInStrip = selectedDate.toDateString() === date.toDateString();
+                                const isRealToday = new Date().toDateString() === date.toDateString();
+                                
+                                return (
+                                    <motion.button 
+                                        key={offset}
+                                        onClick={() => setSelectedDate(date)}
+                                        whileTap={{ scale: 0.9 }}
+                                        className="flex flex-col items-center gap-2"
+                                    >
+                                        <span className={`text-[12px] font-bold uppercase tracking-widest ${isCurrentInStrip ? 'text-[#1a1a2e]' : 'text-gray-300'}`}>
+                                            {date.toLocaleDateString('en-US', { weekday: 'narrow' })}
+                                        </span>
+                                        <div className={`w-11 h-11 rounded-full flex flex-col items-center justify-center transition-all ${isCurrentInStrip ? 'bg-[#1a1a2e] text-white shadow-xl scale-110' : 'text-gray-400'} ${isRealToday && !isCurrentInStrip ? 'border border-blue-200' : ''}`}>
+                                            <span className="text-[15px] font-black leading-none">{date.getDate()}</span>
+                                            {isRealToday && <div className={`w-1 h-1 rounded-full mt-1 ${isCurrentInStrip ? 'bg-white' : 'bg-blue-500'}`} />}
+                                        </div>
+                                    </motion.button>
+                                );
+                            })}
+                        </div>
                     </div>
                 </header>
 
@@ -224,7 +245,7 @@ export default function DashboardPage() {
                                 key={item.m}
                                 onClick={() => handleSetMood(item.m)}
                                 className={`flex flex-col items-center justify-center gap-2 h-28 rounded-[40px] transition-all border-2 ${
-                                    todayLog?.mood === item.m
+                                    targetLog?.mood === item.m
                                     ? 'bg-[#1a1a2e] border-[#1a1a2e] text-white shadow-2xl scale-[1.05] z-10' 
                                     : 'bg-white border-transparent text-gray-300 hover:border-gray-100'
                                 }`}

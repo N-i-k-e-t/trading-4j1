@@ -112,9 +112,13 @@ export default function PnLCalendar() {
                                 <span className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">System Epoch Selection</span>
                                 <button onClick={() => setIsYearPickerOpen(false)} className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-[#1a1a2e] font-black active:scale-90 transition-all">✕</button>
                             </div>
-                            <div className="grid grid-cols-3 gap-3">
-                                {[2024, 2025, 2026].map(y => (
-                                    <button key={y} onClick={() => { setCurrentDate(new Date(y, currentDate.getMonth(), 1)); setIsYearPickerOpen(false); }} className={`h-16 rounded-2xl flex items-center justify-center text-lg font-black transition-all ${currentDate.getFullYear() === y ? 'bg-[#1a1a2e] text-white shadow-lg' : 'bg-gray-50 text-gray-400'}`}>
+                            <div className="grid grid-cols-4 gap-2">
+                                {[2022, 2023, 2024, 2025, 2026, 2027, 2028].map(y => (
+                                    <button 
+                                        key={y} 
+                                        onClick={() => { setCurrentDate(new Date(y, currentDate.getMonth(), 1)); setIsYearPickerOpen(false); }} 
+                                        className={`h-12 rounded-xl flex items-center justify-center text-sm font-black transition-all ${currentDate.getFullYear() === y ? 'bg-[#1a1a2e] text-white shadow-lg' : 'bg-gray-50 text-gray-400'}`}
+                                    >
                                         {y}
                                     </button>
                                 ))}
