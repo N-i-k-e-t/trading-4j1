@@ -276,6 +276,9 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
                 session: { ...state.session, rulesLocked: true } 
             };
 
+        case 'SET_CHECKING_AUTH':
+            return { ...state, isCheckingAuth: action.payload };
+        
         case 'LOGOUT':
             return { ...initialState, isCheckingAuth: false, isCaptureOpen: false, captureMode: 'none' };
         
