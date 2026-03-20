@@ -104,24 +104,37 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-[#fafafa] pb-48 selection:bg-blue-100">
-            <main className="px-6 pt-16 flex flex-col items-center">
-                {/* HERO HEADER - CAL AI STYLE */}
-                <header className="w-full text-center mb-12">
-                    <motion.h1 
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="text-[42px] font-black text-[#1a1a2e] leading-tight mb-3 tracking-tighter"
-                    >
-                        Good {greeting}.
-                    </motion.h1>
-                    <div className="flex items-center justify-center gap-2">
-                        <motion.div 
-                            whileTap={{ scale: 0.95 }}
-                            className="px-5 py-2 bg-orange-50 rounded-full border border-orange-100 flex items-center gap-2 shadow-sm"
-                        >
-                            <Flame size={18} className="text-orange-500 fill-orange-500" />
-                            <span className="text-[13px] font-black text-orange-600 uppercase tracking-widest">{streak} Day Sequence</span>
-                        </motion.div>
+            <main className="px-5 pt-20 flex flex-col items-center">
+                {/* HORIZONTAL CALENDAR - PERFECT DAY STYLE */}
+                <header className="w-full mb-12 flex flex-col items-center">
+                    <div className="flex items-center gap-2 mb-8 cursor-pointer active:scale-95 transition-all">
+                        <span className="text-[22px] font-black text-[#1a1a2e] tracking-tight">
+                            {new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        </span>
+                        <ChevronRight size={20} className="rotate-90 text-[#1a1a2e]" strokeWidth={3} />
+                    </div>
+
+                    <div className="w-full flex justify-between px-2">
+                        {[-3, -2, -1, 0, 1, 2, 3].map((offset) => {
+                            const date = new Date();
+                            date.setDate(date.getDate() + offset);
+                            const isToday = offset === 0;
+                            return (
+                                <motion.div 
+                                    key={offset}
+                                    whileTap={{ scale: 0.9 }}
+                                    className="flex flex-col items-center gap-2"
+                                >
+                                    <span className={`text-[12px] font-bold uppercase tracking-widest ${isToday ? 'text-[#1a1a2e]' : 'text-gray-300'}`}>
+                                        {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                                    </span>
+                                    <div className={`w-11 h-11 rounded-full flex flex-col items-center justify-center transition-all ${isToday ? 'bg-[#1a1a2e] text-white shadow-xl' : 'text-gray-400'}`}>
+                                        <span className="text-[15px] font-black leading-none">{date.getDate()}</span>
+                                        <div className={`w-1.5 h-1.5 rounded-full mt-1 ${isToday ? 'bg-white' : 'bg-gray-100'}`} />
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
                     </div>
                 </header>
 
@@ -235,56 +248,75 @@ export default function DashboardPage() {
                                     <div className="h-[1px] flex-1 bg-gray-100" />
                                 </div>
 
-                                <div className="flex flex-col gap-3">
-                                    {phaseRules.map((rule) => (
-                                        <motion.button
-                                            key={rule.id}
-                                            onClick={() => handleToggleRule(rule.id)}
-                                            whileTap={{ scale: 0.98 }}
-                                            className={`p-6 rounded-[36px] border transition-all text-left flex items-center justify-between group bg-white shadow-sm hover:shadow-md ${
-                                                checkedIds.includes(rule.id) ? 'border-green-50 shadow-inner' : 'border-transparent'
-                                            }`}
-                                        >
-                                            <div className="flex flex-col gap-1 pr-6 flex-1 text-left">
-                                                <h3 className={`text-[17px] font-black text-[#1a1a2e] transition-all ${checkedIds.includes(rule.id) ? 'opacity-30 line-through' : ''}`}>
-                                                    {rule.text}
-                                                </h3>
+                                <div className="flex flex-col gap-4">
+                                    {phaseRules.map((rule, idx) => {
+                                        const gradients = [
+                                            'from-pink-100/60 to-transparent',
+                                            'from-green-100/60 to-transparent',
+                                            'from-blue-100/60 to-transparent',
+                                            'from-orange-100/60 to-transparent'
+                                        ];
+                                        const grad = gradients[idx % gradients.length];
+                                        
+                                        return (
+                                            <div key={rule.id} className="flex flex-col items-center gap-4">
+                                                {idx > 0 && (
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <span className="text-3xl grayscale opacity-40">😎</span>
+                                                        <span className="text-[10px] font-bold text-gray-200 uppercase tracking-widest">Buffer Zone</span>
+                                                    </div>
+                                                )}
+                                                <motion.button
+                                                    onClick={() => handleToggleRule(rule.id)}
+                                                    whileTap={{ scale: 0.98 }}
+                                                    className={`relative w-full p-5 rounded-[45px] border-2 transition-all flex items-center justify-between group bg-white shadow-sm hover:shadow-md overflow-hidden ${
+                                                        checkedIds.includes(rule.id) ? 'border-gray-50' : 'border-transparent'
+                                                    }`}
+                                                >
+                                                    {/* Perfect Day Gradient Hint */}
+                                                    <div className={`absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r ${grad} opacity-80`} />
+                                                    
+                                                    <div className="flex items-center gap-4 relative z-10 flex-1">
+                                                        <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-xl flex-none">
+                                                            {rule.emoji || '🛡️'}
+                                                        </div>
+                                                        <div className="flex flex-col text-left">
+                                                            <span className={`text-[17px] font-black text-[#1a1a2e] leading-tight ${checkedIds.includes(rule.id) ? 'opacity-30 line-through' : ''}`}>
+                                                                {rule.text}
+                                                            </span>
+                                                            <span className="text-[11px] font-bold text-gray-300 mt-1 uppercase tracking-widest">
+                                                                {rule.category} • {checkedIds.includes(rule.id) ? 'Compliant' : 'Awaiting Entry'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className={`w-10 h-10 rounded-full border-2 flex-none flex items-center justify-center transition-all relative z-10 ${
+                                                        checkedIds.includes(rule.id)
+                                                        ? 'bg-[#1a1a2e] border-[#1a1a2e] text-white shadow-xl'
+                                                        : 'border-gray-100 bg-white'
+                                                    }`}>
+                                                        {checkedIds.includes(rule.id) && <Check size={20} strokeWidth={4} />}
+                                                    </div>
+                                                </motion.button>
                                             </div>
-                                            <div className={`w-11 h-11 rounded-full border-2 flex-none flex items-center justify-center transition-all ${
-                                                checkedIds.includes(rule.id)
-                                                ? 'bg-green-500 border-green-500 text-white shadow-xl shadow-green-100'
-                                                : 'border-gray-50 bg-gray-50/50'
-                                            }`}>
-                                                {checkedIds.includes(rule.id) && <Check size={24} strokeWidth={4} />}
-                                            </div>
-                                        </motion.button>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         );
                     })}
                 </section>
 
-                {/* ACTION HUD */}
-                <div className="w-full fixed bottom-28 left-0 right-0 px-6 flex flex-col gap-4 z-50">
+                {/* PERFECT DAY FAB - CENTERED BOTTOM */}
+                <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200]">
                     <motion.button 
-                        whileTap={{ scale: 0.96 }}
+                        whileTap={{ scale: 0.9 }}
+                        whileHover={{ y: -5 }}
                         onClick={() => setCaptureOpen(true)}
-                        className="w-full h-20 bg-blue-600 text-white rounded-[40px] font-black text-[18px] shadow-2xl shadow-blue-200 flex items-center justify-center gap-4 transition-all"
+                        className="w-20 h-20 bg-[#1a1a2e] text-white rounded-full flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-4 border-white active:scale-95 transition-all"
                     >
-                        <Plus size={28} strokeWidth={3} />
-                        Capture Execution
+                        <Plus size={36} strokeWidth={4} />
                     </motion.button>
-                    {!session.rulesLocked && (
-                        <motion.button 
-                            whileTap={{ scale: 0.96 }}
-                            onClick={lockRules}
-                            className="w-full h-14 bg-[#1a1a2e] text-white rounded-[28px] font-black text-[13px] flex items-center justify-center gap-3 transition-all uppercase tracking-widest shadow-xl"
-                        >
-                            <Shield size={18} />
-                            Deploy System Lock
-                        </motion.button>
-                    )}
                 </div>
             </main>
             <MentalReset isOpen={isResetOpen} onClose={() => setIsResetOpen(false)} />

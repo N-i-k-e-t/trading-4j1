@@ -78,17 +78,17 @@ export default function BottomTabs() {
             </AnimatePresence>
 
             {/* Bottom Tab Bar */}
-            <div className="px-6 pb-[calc(env(safe-area-inset-bottom)+12px)]">
-                <nav className="bg-white/70 backdrop-blur-3xl border border-white/40 rounded-[32px] px-4 h-[72px] flex justify-between items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] relative">
+            <div className="px-6 pb-[calc(env(safe-area-inset-bottom)+16px)]">
+                <nav className="bg-white/80 backdrop-blur-3xl border border-white/40 rounded-[40px] px-2 h-[80px] flex justify-between items-center shadow-[0_25px_60px_rgba(0,0,0,0.15)] relative">
                     {navItems.map((item, i) => {
                         if (item.type === 'fab') {
                             return (
-                                <div key="fab-container" className="flex-1 flex justify-center scale-110">
+                                <div key="fab-container" className="flex-1 flex justify-center -mt-12">
                                     <button
                                         onClick={toggleMenu}
-                                        className={`w-14 h-14 bg-[#eab308] rounded-2xl flex items-center justify-center text-white shadow-2xl shadow-yellow-200 active:scale-90 transition-all z-[210] ${isMenuOpen ? 'rotate-45' : ''}`}
+                                        className={`w-18 h-18 bg-[#1a1a2e] rounded-full flex items-center justify-center text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-4 border-white active:scale-90 transition-all z-[210] p-4 ${isMenuOpen ? 'rotate-45' : ''}`}
                                     >
-                                        <Plus size={32} strokeWidth={3} />
+                                        <Plus size={36} strokeWidth={4} />
                                     </button>
                                 </div>
                             );
@@ -100,25 +100,22 @@ export default function BottomTabs() {
                             <Link
                                 key={item.to}
                                 href={item.to!}
-                                className={`flex flex-col items-center gap-1 transition-all flex-1 py-1 ${
-                                    isActive ? 'text-[#1a1a2e]' : 'text-gray-400'
+                                className={`flex flex-col items-center justify-center transition-all flex-1 h-full ${
+                                    isActive ? 'text-[#1a1a2e]' : 'text-gray-300'
                                 }`}
                             >
                                 <motion.div 
                                     whileTap={{ scale: 0.9 }}
-                                    className={`relative flex items-center justify-center h-10 w-10 rounded-2xl transition-all ${isActive ? 'bg-gray-100/50' : ''}`}
+                                    className={`relative flex items-center justify-center h-12 w-12 rounded-full transition-all ${isActive ? 'bg-gray-50' : ''}`}
                                 >
-                                    <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                                    <Icon size={24} strokeWidth={isActive ? 3 : 2} />
                                     {isActive && (
                                         <motion.div 
-                                            layoutId="activeTab"
-                                            className="absolute -bottom-1 w-1 h-1 bg-[#eab308] rounded-full"
+                                            layoutId="activeTabDot"
+                                            className="absolute -bottom-2 w-1.5 h-1.5 bg-[#1a1a2e] rounded-full"
                                         />
                                     )}
                                 </motion.div>
-                                <span className={`text-[8px] font-black uppercase tracking-[0.2em] mt-0.5 ${isActive ? 'opacity-100' : 'opacity-40'}`}>
-                                    {item.label}
-                                </span>
                             </Link>
                         );
                     })}

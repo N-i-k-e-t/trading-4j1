@@ -93,20 +93,20 @@ export default function OnboardingPage() {
         <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={onClick}
-            className={`card-premium w-full group flex items-center gap-4 transition-all !p-5 ${
-                selected ? 'ring-2 ring-blue-500 bg-blue-50/20' : ''
+            className={`w-full group flex items-center gap-5 transition-all p-5 rounded-[40px] border-2 ${
+                selected ? 'border-[#1a1a2e] bg-[#1a1a2e]/5' : 'border-gray-50 bg-gray-50/30'
             }`}
         >
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl transition-all ${selected ? 'bg-blue-500 text-white shadow-lg' : 'bg-gray-50'}`}>
+            <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl transition-all flex-none ${selected ? 'bg-[#1a1a2e] text-white shadow-lg' : 'bg-white shadow-sm'}`}>
                 {emoji}
             </div>
-            <div className="flex flex-col items-start text-left">
-                <span className="text-[17px] font-black text-[#1a1a2e]">{title}</span>
-                {subtitle && <span className="text-[12px] font-bold text-gray-400">{subtitle}</span>}
+            <div className="flex flex-col items-start text-left flex-1">
+                <span className="text-[17px] font-black text-[#1a1a2e] leading-tight mb-0.5">{title}</span>
+                {subtitle && <span className="text-[12px] font-bold text-gray-400 leading-tight">{subtitle}</span>}
             </div>
             {selected && (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="ml-auto w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                    <Check size={14} className="text-white" strokeWidth={4} />
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-8 h-8 bg-[#1a1a2e] rounded-full flex items-center justify-center flex-none">
+                    <Check size={16} strokeWidth={4} className="text-white" />
                 </motion.div>
             )}
         </motion.button>
@@ -114,60 +114,62 @@ export default function OnboardingPage() {
 
     return (
         <div className="min-h-[100dvh] bg-white flex flex-col pb-[calc(env(safe-area-inset-bottom)+20px)]">
-            {/* SEGMENTED PROGRESS BAR (Cal AI Style) */}
-            <div className="fixed top-0 left-0 right-0 px-5 pt-3 flex gap-1.5 z-[110]" style={{ top: 'env(safe-area-inset-top, 0px)' }}>
+            {/* SEGMENTED PROGRESS BAR - CAL AI STYLE */}
+            <div className="fixed top-0 left-0 right-0 px-5 pt-4 flex gap-1 z-[110]" style={{ top: 'env(safe-area-inset-top, 0px)' }}>
                 {Array.from({ length: totalSteps }).map((_, i) => (
-                    <div key={i} className="h-1.5 flex-1 bg-gray-50 rounded-full overflow-hidden">
+                    <div key={i} className="h-1.5 flex-1 bg-gray-100 rounded-full overflow-hidden">
                         <motion.div 
-                            className="h-full bg-blue-500"
-                            initial={{ x: '-100%' }}
-                            animate={{ x: i < currentStep ? '0%' : (i === currentStep ? '0%' : '-100%') }}
-                            transition={{ duration: 0.4 }}
+                            className="h-full bg-[#1a1a2e]"
+                            initial={{ width: '0%' }}
+                            animate={{ width: i <= currentStep ? '100%' : '0%' }}
+                            transition={{ duration: 0.4, ease: "circOut" }}
                         />
                     </div>
                 ))}
             </div>
 
             {/* NAV BAR */}
-            <nav className="h-14 flex items-center justify-between px-5 z-[100] mt-6">
+            <nav className="h-14 flex items-center justify-between px-5 z-[100] mt-8">
                 <button 
                     onClick={prevStep}
                     disabled={currentStep === 0}
-                    className="w-10 h-10 flex items-center justify-center text-[#1a1a2e] bg-gray-50 rounded-full disabled:opacity-0 active:scale-90 transition-all"
+                    className="w-12 h-12 flex items-center justify-center text-[#1a1a2e] bg-gray-50 rounded-full disabled:opacity-0 active:scale-90 transition-all shadow-sm"
                 >
                     <ArrowLeft size={20} strokeWidth={3} />
                 </button>
-                <div className="flex flex-col items-center">
-                    <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest tabular-nums">Step {currentStep + 1} of {totalSteps}</span>
-                </div>
-                <div className="w-10 h-10" />
+                <div className="w-12 h-12" />
             </nav>
 
             <main className="flex-1 px-5 flex flex-col pt-4 overflow-x-hidden">
                 <AnimatePresence mode="wait">
-                    {/* STEP 0: THE SPLASH */}
+                    {/* STEP 0: THE SPLASH - PREMIUM CAL AI STYLE */}
                     {currentStep === 0 && (
-                        <motion.div key="s0" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -50 }} className="flex-1 flex flex-col items-center justify-center text-center gap-10">
-                            <div className="relative w-full max-w-[280px] aspect-[4/5] rounded-[40px] overflow-hidden shadow-2xl border-4 border-gray-50 bg-[#1a1a2e]">
+                        <motion.div key="s0" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }} className="flex-1 flex flex-col items-center justify-center text-center px-4">
+                            <div className="relative w-full max-w-[320px] aspect-[4/5] rounded-[60px] overflow-hidden shadow-[0_40px_80px_rgba(0,0,0,0.25)] border-4 border-white bg-black mb-12">
                                 <Image 
                                     src="/brain/54a113ee-baac-4c15-b0e6-cd80b556d9d1/rulesci_dashboard_preview_onboarding_1774010392149.png" 
                                     alt="RuleSci Preview" 
                                     fill 
-                                    className="object-cover opacity-90"
+                                    className="object-cover opacity-80"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] to-transparent" />
-                                <div className="absolute bottom-6 left-6 right-6 text-left">
-                                    <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Architecture Preview</p>
-                                    <p className="text-white font-black text-lg">Elite Discipline System</p>
+                                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black to-transparent" />
+                                <div className="absolute bottom-10 left-10 right-10 text-left">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Neural Architecture v1.1.0</span>
+                                    </div>
+                                    <h3 className="text-white font-black text-2xl leading-tight">Master Your <br/> Discipline Hub.</h3>
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-3">
-                                <h1 className="text-[36px] font-black text-[#1a1a2e] leading-tight">Master Your <br/> Execution.</h1>
-                                <p className="text-[16px] font-bold text-gray-400 px-10">
+                            
+                            <div className="flex flex-col gap-4 mb-12">
+                                <h1 className="text-[42px] font-black text-[#1a1a2e] leading-[0.9] tracking-tighter">Your Mind.<br/>Hardwired.</h1>
+                                <p className="text-[16px] font-bold text-gray-400 max-w-[280px]">
                                     Build a custom trading architecture based on your psychology profile.
                                 </p>
                             </div>
-                            <button onClick={nextStep} className="h-[68px] w-full max-w-[320px] bg-blue-600 text-white rounded-[28px] font-black text-[20px] shadow-2xl shadow-blue-100 active:scale-95 transition-all">
+                            
+                            <button onClick={nextStep} className="h-[74px] w-full bg-[#1a1a2e] text-white rounded-[35px] font-black text-[20px] active:scale-95 transition-all shadow-2xl">
                                 Setup My Protocol
                             </button>
                         </motion.div>

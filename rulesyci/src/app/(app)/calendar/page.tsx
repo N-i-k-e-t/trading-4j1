@@ -1,6 +1,6 @@
 'use client';
 
-import PnLCalendar from '@/components/calendar/PnLCalendar';
+import TimelineCalendar from '@/components/calendar/TimelineCalendar';
 import { useRuleSci } from '@/lib/context';
 import { motion } from 'framer-motion';
 import { Target, TrendingUp, ShieldCheck, AlertCircle, Zap } from 'lucide-react';
@@ -16,7 +16,7 @@ export default function CalendarPage() {
     };
 
     return (
-        <div className="flex flex-col gap-10 px-6 py-8">
+        <div className="flex flex-col gap-10 px-6 py-8 pb-32">
             <header className="flex flex-col gap-1">
                 <div className="flex items-center gap-2 mb-2">
                     <div className="w-8 h-8 bg-blue-500/10 text-blue-600 rounded-lg flex items-center justify-center">
@@ -24,13 +24,13 @@ export default function CalendarPage() {
                     </div>
                     <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Performance Sync</span>
                 </div>
-                <h1 className="text-[32px] font-black tracking-[-0.04em] text-[#1a1a2e] leading-tight">Architecture.</h1>
-                <p className="text-[15px] font-bold text-gray-300 leading-relaxed">
-                    Correlation between discipline grades, net P&L, and institutional volatility events.
+                <h1 className="text-[32px] font-black tracking-[-0.04em] text-[#1a1a2e] leading-tight text-center">Protocol Architecture.</h1>
+                <p className="text-[14px] font-bold text-gray-300 leading-relaxed text-center px-4">
+                    Visualizing the direct correlation between discipline grades & institutional volatility.
                 </p>
             </header>
 
-            <PnLCalendar />
+            <TimelineCalendar />
 
             {/* Quick Insights */}
             <div className="grid grid-cols-2 gap-4">
