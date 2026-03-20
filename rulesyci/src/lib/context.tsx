@@ -389,6 +389,8 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         }
     }, [isPlaceholderAuth]);
 
+    const SYSTEM_VERSION = '1.1.0'; // Updated for Calendar Architecture
+
     // Load from LocalStorage (Fallback / Non-Auth data)
     useEffect(() => {
         const saved = localStorage.getItem('rulesci_data');
@@ -396,6 +398,13 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
             try {
                 const parsed = JSON.parse(saved);
                 if (parsed) {
+                    // VERSION CHECK: If architecture is old, we force a fresh start or migrate
+                    if (parsed.version !== SYSTEM_VERSION) {
+                        console.log('Old architecture detected. Syncing to version', SYSTEM_VERSION);
+                        localStorage.removeItem('rulesci_data');
+                        return;
+                    }
+
                     // Hydrate everything except user (which comes from Supabase)
                     const { user, ...rest } = parsed;
                     dispatch({ type: 'HYDRATE_STATE', payload: { ...initialState, ...rest } });
@@ -410,7 +419,10 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         if (state !== initialState) {
             const { toasts, user, ...persistable } = state; 
-            localStorage.setItem('rulesci_data', JSON.stringify(persistable));
+            localStorage.setItem('rulesci_data', JSON.stringify({
+                ...persistable,
+                version: SYSTEM_VERSION
+            }));
         }
     }, [state, initialState]);
 
