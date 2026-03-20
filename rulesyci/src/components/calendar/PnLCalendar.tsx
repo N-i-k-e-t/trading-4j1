@@ -1,392 +1,247 @@
 'use client';
 
-import { useRuleSci } from '@/lib/context';
-import { DailyLog, MarketEvent } from '@/types/trading';
-import { 
-    ChevronLeft, 
-    ChevronRight, 
-    TrendingUp, 
-    TrendingDown, 
-    Check, 
-    X, 
-    Shield, 
-    Brain,
-    X as CloseIcon,
-    CalendarDays,
-    Info,
-    ArrowRight
-} from 'lucide-react';
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence, useScroll } from 'framer-motion';
-
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const YEARS = [2024, 2025, 2026];
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay, isToday } from 'date-fns';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Target, ShieldCheck, AlertCircle, TrendingUp, Calendar as CalendarIcon, Zap, Flame, Award } from 'lucide-react';
+import { useRuleSci } from '@/lib/context';
+import { DailyLog } from '@/types/trading';
+import CalendarDetailSheet from './CalendarDetailSheet';
 
 export default function PnLCalendar() {
-    const { dailyLogs, marketEvents, trades } = useRuleSci();
+    const { dailyLogs, marketEvents } = useRuleSci();
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
 
-    const month = currentDate.getMonth();
-    const year = currentDate.getFullYear();
+    // Navigation
+    const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+    const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+    const goToToday = () => setCurrentDate(new Date());
 
-    const daysInMonth = useMemo(() => {
-        const date = new Date(year, month, 1);
-        const days = [];
-        while (date.getMonth() === month) {
-            days.push(new Date(date));
-            date.setDate(date.getDate() + 1);
-        }
-        return days;
-    }, [month, year]);
+    const days = useMemo(() => {
+        const start = startOfMonth(currentDate);
+        const end = endOfMonth(currentDate);
+        const dateInterval = eachDayOfInterval({ start, end });
+        
+        // Pad beginning of month
+        const firstDayOfMonth = getDay(start);
+        const padding = Array.from({ length: firstDayOfMonth }).map((_, i) => null);
+        
+        return [...padding, ...dateInterval];
+    }, [currentDate]);
 
-    const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
-    const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
-    const jumpToToday = () => setCurrentDate(new Date());
-
-    const selectYearMonth = (newYear: number, newMonth: number) => {
-        setCurrentDate(new Date(newYear, newMonth, 1));
-        setIsYearPickerOpen(false);
+    const getDayData = (date: Date) => {
+        const dateStr = format(date, 'yyyy-MM-dd');
+        const log = dailyLogs.find(l => l.date === dateStr);
+        const events = marketEvents.filter(e => e.date === dateStr);
+        return { log, events };
     };
 
-    // Calculate Monthly Summary
-    const stats = useMemo(() => {
-        const monthTrades = trades.filter(t => {
-            const d = new Date(t.date);
-            return d.getMonth() === month && d.getFullYear() === year;
-        });
-        const uniqueDays = new Set(monthTrades.map(t => t.date)).size;
-        
-        const dayStats = Array.from(new Set(monthTrades.map(t => t.date))).map(d => {
-            const dayTrades = monthTrades.filter(t => t.date === d);
-            const pnl = dayTrades.reduce((acc, t) => acc + (t.pnl || 0), 0);
-            const perfect = dayTrades.every(t => t.rules_broken.length === 0);
-            return { pnl, perfect };
-        });
-
-        const aDays = dayStats.filter(s => s.pnl > 0 && s.perfect).length;
-        let grade = 'N/A';
-        let gradeColor = 'text-gray-400';
-        let gradeBg = 'bg-gray-50';
-
-        if (uniqueDays > 0) {
-            const ratio = aDays / uniqueDays;
-            if (ratio >= 0.8) { grade = 'A'; gradeColor = 'text-green-600'; gradeBg = 'bg-green-100'; }
-            else if (ratio >= 0.6) { grade = 'B'; gradeColor = 'text-blue-600'; gradeBg = 'bg-blue-100'; }
-            else if (ratio >= 0.4) { grade = 'C'; gradeColor = 'text-amber-600'; gradeBg = 'bg-amber-100'; }
-            else { grade = 'D'; gradeColor = 'text-red-600'; gradeBg = 'bg-red-100'; }
-        }
-
-        const totalPnL = monthTrades.reduce((acc, t) => acc + (t.pnl || 0), 0);
-
-        return { uniqueDays, grade, gradeColor, gradeBg, totalPnL };
-    }, [trades, month, year]);
-
-    const selectedLog = dailyLogs.find(l => l.date === selectedDate);
-    const selectedTrades = trades.filter(t => t.date === selectedDate);
-    const selectedEvents = marketEvents.filter(e => e.date === selectedDate);
-
-    const todayStr = new Date().toISOString().split('T')[0];
+    // Streak Logic (Derived)
+    const activeStreak = 4; // Mock for UI
+    const maxStreak = 12;
 
     return (
         <div className="flex flex-col gap-6">
-            <div className="bg-white/70 backdrop-blur-3xl rounded-[32px] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-white relative overflow-hidden">
-                {/* Year/Month Picker Overlay */}
+            {/* Nav Header */}
+            <header className="flex items-center justify-between px-2">
+                <div className="flex flex-col">
+                    <button 
+                        onClick={() => setIsYearPickerOpen(!isYearPickerOpen)}
+                        className="flex items-center gap-2 group"
+                    >
+                        <h2 className="text-2xl font-black tracking-tight text-[#1a1a2e]">
+                            {format(currentDate, 'MMMM')} <span className="text-gray-300 group-hover:text-blue-500 transition-colors">{format(currentDate, 'yyyy')}</span>
+                        </h2>
+                    </button>
+                    <p className="text-[11px] font-black text-gray-300 uppercase tracking-widest mt-0.5">Performance Grid</p>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                    <button 
+                        onClick={goToToday}
+                        className="h-10 px-4 bg-gray-50 border border-gray-100 rounded-full text-[12px] font-black text-[#1a1a2e] active:scale-95 transition-all shadow-sm flex items-center gap-2"
+                    >
+                        <Zap size={14} className="text-blue-500" />
+                        Today
+                    </button>
+                    <div className="flex bg-gray-50 border border-gray-100 rounded-full p-1 shadow-sm">
+                        <button onClick={prevMonth} className="p-2 hover:bg-white rounded-full transition-colors active:scale-90 text-gray-400 hover:text-[#1a1a2e]"><ChevronLeft size={18} /></button>
+                        <button onClick={nextMonth} className="p-2 hover:bg-white rounded-full transition-colors active:scale-90 text-gray-400 hover:text-[#1a1a2e]"><ChevronRight size={18} /></button>
+                    </div>
+                </div>
+            </header>
+
+            {/* Calendar Structure */}
+            <div className="bg-white rounded-[40px] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-gray-50/50 relative overflow-hidden min-h-[420px]">
+                {/* Year Picker Overlay */}
                 <AnimatePresence>
                     {isYearPickerOpen && (
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="absolute inset-0 bg-white/95 backdrop-blur-md z-50 p-6 flex flex-col"
+                            className="absolute inset-x-6 top-6 bottom-6 bg-white/95 backdrop-blur-xl z-20 rounded-[32px] p-6 flex flex-col gap-6 shadow-2xl border border-gray-100"
                         >
-                            <div className="flex items-center justify-between mb-8">
-                                <h3 className="text-[18px] font-black text-[#1a1a2e] uppercase tracking-widest">Jump to Date</h3>
-                                <button onClick={() => setIsYearPickerOpen(false)} className="p-2 bg-gray-100 rounded-full">
-                                    <CloseIcon size={20} />
-                                </button>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-black uppercase tracking-widest text-[#1a1a2e]">Select Epoch</span>
+                                <button onClick={() => setIsYearPickerOpen(false)} className="text-gray-400 font-bold p-2">Close</button>
                             </div>
-                            
-                            <div className="flex-1 overflow-y-auto custom-scrollbar">
-                                {YEARS.map(y => (
-                                    <div key={y} className="mb-8">
-                                        <h4 className="text-[14px] font-black text-gray-300 mb-4 ml-1">{y}</h4>
-                                        <div className="grid grid-cols-3 gap-2">
-                                            {MONTHS.map((m, idx) => (
-                                                <button 
-                                                    key={m}
-                                                    onClick={() => selectYearMonth(y, idx)}
-                                                    className={`h-12 rounded-[16px] text-[12px] font-black uppercase tracking-wider transition-all ${
-                                                        y === year && idx === month 
-                                                        ? 'bg-[#1a1a2e] text-white' 
-                                                        : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
-                                                    }`}
-                                                >
-                                                    {m.substring(0, 3)}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
+                            <div className="grid grid-cols-3 gap-3">
+                                {[2024, 2025, 2026].map(y => (
+                                    <button 
+                                        key={y}
+                                        onClick={() => {
+                                            setCurrentDate(new Date(y, currentDate.getMonth(), 1));
+                                            setIsYearPickerOpen(false);
+                                        }}
+                                        className={`h-16 rounded-2xl flex items-center justify-center text-lg font-black transition-all ${currentDate.getFullYear() === y ? 'bg-[#1a1a2e] text-white shadow-lg' : 'bg-gray-50 text-gray-400'}`}
+                                    >
+                                        {y}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="grid grid-cols-4 gap-2 flex-1">
+                                {Array.from({ length: 12 }).map((_, i) => (
+                                    <button 
+                                        key={i}
+                                        onClick={() => {
+                                            setCurrentDate(new Date(currentDate.getFullYear(), i, 1));
+                                            setIsYearPickerOpen(false);
+                                        }}
+                                        className={`rounded-2xl flex items-center justify-center text-[10px] font-black uppercase tracking-tighter transition-all ${currentDate.getMonth() === i ? 'bg-blue-500 text-white shadow-md' : 'bg-gray-50 text-gray-300'}`}
+                                    >
+                                        {format(new Date(2025, i, 1), 'MMM')}
+                                    </button>
                                 ))}
                             </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                <div className="flex items-center justify-between mb-10 px-2">
-                    <button 
-                        onClick={() => setIsYearPickerOpen(true)}
-                        className="flex items-center gap-3 active:scale-95 transition-all text-left"
-                    >
-                        <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-[#1a1a2e] shadow-sm">
-                            <CalendarDays size={24} />
-                        </div>
-                        <div>
-                            <h2 className="text-[24px] font-black text-[#1a1a2e] leading-tight">{MONTHS[month]}</h2>
-                            <p className="text-[14px] font-bold text-gray-300 tracking-widest uppercase">{year}</p>
-                        </div>
-                    </button>
-                    <div className="flex gap-2">
-                        <button onClick={jumpToToday} className="px-4 h-12 bg-gray-50 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 active:scale-95 transition-all">
-                            Today
-                        </button>
-                        <button onClick={prevMonth} className="w-12 h-12 bg-gray-50 rounded-2xl text-[#1a1a2e] flex items-center justify-center active:scale-95 transition-all shadow-sm">
-                            <ChevronLeft size={20} />
-                        </button>
-                        <button onClick={nextMonth} className="w-12 h-12 bg-gray-50 rounded-2xl text-[#1a1a2e] flex items-center justify-center active:scale-95 transition-all shadow-sm">
-                            <ChevronRight size={20} />
-                        </button>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-7 gap-3 mb-6">
-                    {['M','T','W','T','F','S','S'].map((d, i) => (
-                        <div key={i} className="text-center">
-                            <span className={`text-[10px] font-black uppercase tracking-[0.25em] ${i >= 5 ? 'text-red-300' : 'text-[#9ca3af]'}`}>{d}</span>
+                {/* Day Labels */}
+                <div className="grid grid-cols-7 gap-1 mb-4">
+                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+                        <div key={i} className="text-center text-[10px] font-black text-gray-200 uppercase tracking-widest py-2">
+                            {day}
                         </div>
                     ))}
                 </div>
 
-                <div className="grid grid-cols-7 gap-3">
-                    {/* Padding cells */}
-                    {Array.from({ length: (new Date(year, month, 1).getDay() || 7) - 1 }).map((_, i) => (
-                        <div key={`pad-${i}`} className="aspect-square" />
-                    ))}
-
-                    {daysInMonth.map((date) => {
-                        const dateStr = date.toISOString().split('T')[0];
-                        const dayTrades = trades.filter(t => t.date === dateStr);
-                        const events = marketEvents.filter(e => e.date === dateStr);
-                        const isToday = dateStr === todayStr;
+                {/* Grid */}
+                <div className="grid grid-cols-7 gap-y-4 gap-x-2">
+                    {days.map((date, i) => {
+                        if (!date) return <div key={`pad-${i}`} className="aspect-square" />;
                         
-                        let colorClass = 'bg-[#fcfcfc]';
-                        let textColorClass = 'text-[#1a1a2e]/30';
-                        let borderClass = 'border-transparent';
+                        const { log, events } = getDayData(date);
+                        const isTodayDate = isToday(date);
                         
-                        if (dayTrades.length > 0) {
-                            const totalPnL = dayTrades.reduce((acc, t) => acc + (t.pnl || 0), 0);
-                            const hasBroken = dayTrades.some(t => t.rules_broken.length > 0);
-                            
-                            if (totalPnL > 0 && !hasBroken) {
-                                colorClass = 'bg-[#10b981] shadow-xl shadow-green-100/50';
-                                textColorClass = 'text-white';
-                            } else if (totalPnL < 0 || hasBroken) {
-                                colorClass = 'bg-[#ef4444] shadow-xl shadow-red-100/50';
-                                textColorClass = 'text-white';
-                            } else {
-                                colorClass = 'bg-[#f59e0b] shadow-xl shadow-amber-100/50';
-                                textColorClass = 'text-white';
-                            }
-                        }
-
-                        if (isToday) {
-                            borderClass = 'border-2 border-[#1a1a2e] ring-4 ring-[#1a1a2e]/5';
-                        }
-
-                        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                        // Rule Adherence Progress (Cal AI Ring logic)
+                        const rulesTotal = 9; 
+                        const rulesFollowed = log?.grade === 'A' ? 9 : log?.grade === 'B' ? 7 : log?.grade === 'C' ? 5 : 0;
+                        const adherencePct = (rulesFollowed / rulesTotal) * 100;
+                        const isPerfect = rulesFollowed === rulesTotal && log;
 
                         return (
-                            <motion.div
-                                key={dateStr}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={() => setSelectedDate(dateStr)}
-                                className={`aspect-square rounded-[20px] relative flex flex-col items-center justify-center cursor-pointer transition-all border-2 ${colorClass} ${borderClass} ${isWeekend && dayTrades.length === 0 ? 'opacity-20' : ''}`}
+                            <motion.button
+                                key={date.toISOString()}
+                                whileTap={{ scale: 0.85 }}
+                                onClick={() => setSelectedDate(date)}
+                                className="relative aspect-square flex items-center justify-center transition-all group"
                             >
-                                <span className={`text-[14px] font-black ${textColorClass}`}>
-                                    {date.getDate()}
-                                </span>
-                                
-                                {events.length > 0 && (
-                                    <div className="absolute top-2 right-2">
-                                        <div className={`w-1.5 h-1.5 rounded-full ${events.some(e => e.impact === 'high' || e.impact === 'critical') ? 'bg-red-400' : 'bg-yellow-400'} ring-1 ring-white`} />
-                                    </div>
+                                {/* THE RING (Cal AI Style) */}
+                                {log && !isPerfect && (
+                                    <svg className="absolute inset-0 w-full h-full -rotate-90 p-1">
+                                        <circle
+                                            cx="50%"
+                                            cy="50%"
+                                            r="42%"
+                                            stroke="currentColor"
+                                            strokeWidth="3"
+                                            fill="transparent"
+                                            className="text-gray-50"
+                                        />
+                                        <motion.circle
+                                            initial={{ strokeDashoffset: 100 }}
+                                            animate={{ strokeDashoffset: 100 - adherencePct }}
+                                            cx="50%"
+                                            cy="50%"
+                                            r="42%"
+                                            stroke="currentColor"
+                                            strokeWidth="3"
+                                            fill="transparent"
+                                            strokeDasharray="100 100"
+                                            className="text-blue-500"
+                                            strokeLinecap="round"
+                                        />
+                                    </svg>
                                 )}
-                                
-                                {dayTrades.length > 0 && (
-                                    <div className="absolute bottom-2 flex gap-0.5">
-                                        <div className={`w-3 h-0.5 rounded-full ${textColorClass === 'text-white' ? 'bg-white/40' : 'bg-[#1a1a2e]/10'}`} />
-                                    </div>
+
+                                {/* THE CELL (Perfect Day Style) */}
+                                <div className={`
+                                    w-[85%] h-[85%] rounded-full flex flex-col items-center justify-center z-10 
+                                    transition-all duration-300 relative overflow-hidden shadow-sm
+                                    ${isPerfect ? 'bg-[#22c55e] shadow-[0_4px_15px_rgba(34,197,94,0.4)] scale-110' : 
+                                      log ? 'bg-white border border-gray-100' : 'bg-transparent'}
+                                    ${isTodayDate && !isPerfect ? 'border-2 border-blue-500' : ''}
+                                `}>
+                                    <span className={`text-[13px] font-black ${isPerfect ? 'text-white' : isTodayDate ? 'text-blue-500' : 'text-[#1a1a2e]'}`}>
+                                        {format(date, 'd')}
+                                    </span>
+
+                                    {/* P&L Glow/Indicator */}
+                                    {log?.pnl !== undefined && log.pnl !== 0 && !isPerfect && (
+                                        <div className={`w-1 h-1 rounded-full mt-0.5 ${log.pnl > 0 ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`} />
+                                    )}
+                                </div>
+
+                                {/* Event Pulse */}
+                                {events.some(e => e.impact === 'high' || e.impact === 'critical') && (
+                                    <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse z-20" />
                                 )}
-                            </motion.div>
+                            </motion.button>
                         );
                     })}
                 </div>
-
-                {/* Monthly Sync Status */}
-                <div className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-2 gap-6">
-                    <div className="flex flex-col gap-1">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Monthly Architecture</span>
-                        <div className="flex items-center gap-3 mt-1">
-                            <div className={`px-4 py-2 rounded-2xl ${stats.gradeBg} ${stats.gradeColor} text-[18px] font-black`}>
-                                {stats.grade}
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-[16px] font-black text-[#1a1a2e]">{stats.uniqueDays} Days Active</span>
-                                <span className="text-[11px] font-bold text-gray-300">Compliance Factor</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Net Revenue</span>
-                        <div className="flex items-center gap-3 mt-1">
-                            <div className={`text-[24px] font-black tabular-nums ${stats.totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                {stats.totalPnL >= 0 ? '+' : ''}₹{Math.abs(stats.totalPnL).toLocaleString()}
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            {/* DETAIL SHEET */}
-            <AnimatePresence>
-                {selectedDate && (
-                    <>
-                        <motion.div 
-                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            onClick={() => setSelectedDate(null)}
-                            className="fixed inset-0 bg-black/50 z-[200] backdrop-blur-md"
-                        />
-                        <motion.div
-                            initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-                            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] z-[201] max-h-[90vh] overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+32px)] shadow-[0_-20px_60px_rgba(0,0,0,0.15)]"
-                        >
-                            <div className="w-12 h-1.5 bg-gray-100 rounded-full mx-auto my-6" />
-                            <div className="px-8 flex flex-col gap-10">
-                                <header className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="text-[28px] font-black text-[#1a1a2e] leading-tight mb-1">
-                                            {new Date(selectedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}.
-                                        </h3>
-                                        <div className="flex items-center gap-3 mt-2">
-                                            <div className="px-3 py-1 bg-[#1a1a2e] text-white rounded-full text-[10px] font-black uppercase tracking-widest">{year}</div>
-                                            <span className="text-[13px] font-bold text-gray-400 uppercase tracking-widest">
-                                                {selectedLog?.grade ? `Grade ${selectedLog.grade}` : 'Zero Day'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <button onClick={() => setSelectedDate(null)} className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 active:scale-90 transition-all">
-                                        <CloseIcon size={24} />
-                                    </button>
-                                </header>
+            {/* Streak Architecture (Perfect Day Inspired Footer) */}
+            <div className="grid grid-cols-2 gap-4">
+                <motion.div 
+                    whileTap={{ scale: 0.98 }}
+                    className="bg-[#1a1a2e] rounded-[32px] p-5 flex items-center justify-between border border-white/5 shadow-xl"
+                >
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">Active Sequence</span>
+                        <div className="flex items-center gap-2">
+                            <Flame size={16} className="text-orange-500 fill-orange-500" />
+                            <span className="text-xl font-black text-white">{activeStreak} <span className="text-[10px] text-white/40">DAYS</span></span>
+                        </div>
+                    </div>
+                </motion.div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-[#fafafa] p-6 rounded-[32px] border border-gray-100">
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Performance</span>
-                                        <div className={`text-[24px] font-black tabular-nums flex items-center gap-2 ${selectedLog?.pnl && selectedLog.pnl > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                            ₹{Math.abs(selectedLog?.pnl || 0).toLocaleString()}
-                                            {selectedLog?.pnl && selectedLog.pnl > 0 ? <TrendingUp size={24} /> : <TrendingDown size={24} />}
-                                        </div>
-                                    </div>
-                                    <div className="bg-[#fafafa] p-6 rounded-[32px] border border-gray-100">
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Tactical</span>
-                                        <div className="text-[24px] font-black text-[#1a1a2e] tabular-nums">{selectedTrades.length} Trades</div>
-                                    </div>
-                                </div>
+                <motion.div 
+                    whileTap={{ scale: 0.98 }}
+                    className="bg-blue-600 rounded-[32px] p-5 flex items-center justify-between border border-white/10 shadow-xl shadow-blue-500/10"
+                >
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">Max Architecture</span>
+                        <div className="flex items-center gap-2">
+                            <Award size={16} className="text-blue-200" />
+                            <span className="text-xl font-black text-white">{maxStreak} <span className="text-[10px] text-white/40">DAYS</span></span>
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
 
-                                {selectedTrades.length > 0 && (
-                                    <section>
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="px-3 py-1 bg-gray-50 rounded-full border border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">Trade Architecture</div>
-                                            <div className="h-[1px] flex-1 bg-gray-50" />
-                                        </div>
-                                        <div className="flex flex-col gap-4">
-                                            {selectedTrades.map((trade, i) => (
-                                                <div key={i} className="bg-white border-2 border-gray-50 p-5 rounded-[24px] flex items-center justify-between shadow-sm">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className={`w-12 h-12 rounded-[16px] flex items-center justify-center font-black text-[16px] ${trade.type === 'Long' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                                                            {trade.pair.substring(0, 1).toUpperCase()}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[16px] font-black text-[#1a1a2e]">{trade.pair} — {trade.type}</p>
-                                                            <p className="text-[12px] font-bold text-gray-300 uppercase tracking-widest">{trade.setupId || 'Neural Edge'}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className={`text-[17px] font-black tabular-nums ${(trade.pnl || 0) > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                                        {(trade.pnl || 0) > 0 ? '+' : ''}₹{(trade.pnl || 0).toLocaleString()}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                )}
-
-                                <section>
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="px-3 py-1 bg-gray-50 rounded-full border border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">Neural Sync</div>
-                                        <div className="h-[1px] flex-1 bg-gray-50" />
-                                    </div>
-                                    <div className="grid grid-cols-1 gap-4">
-                                        <div className="bg-blue-50/20 p-6 rounded-[32px] border border-blue-50 flex items-center gap-5">
-                                            <div className="w-12 h-12 bg-blue-500 text-white rounded-[20px] flex items-center justify-center shadow-lg shadow-blue-200/50">
-                                                <Shield size={22} />
-                                            </div>
-                                            <div>
-                                                <p className="text-[15px] font-black text-blue-900 leading-tight">System Compliance</p>
-                                                <p className="text-[13px] font-bold text-blue-400 uppercase tracking-widest mt-1">
-                                                    {selectedLog?.rulesChecked?.length || 0} followed · {selectedLog?.rulesBroken || 0} Broken
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="bg-purple-50/20 p-6 rounded-[32px] border border-purple-50 flex items-center gap-5">
-                                            <div className="w-12 h-12 bg-purple-500 text-white rounded-[20px] flex items-center justify-center shadow-lg shadow-purple-200/50">
-                                                <Brain size={22} />
-                                            </div>
-                                            <div>
-                                                <p className="text-[15px] font-black text-purple-900 leading-tight">Emotional Architecture</p>
-                                                <p className="text-[13px] font-bold text-purple-400 uppercase tracking-widest mt-1">
-                                                    Baseline: {selectedLog?.mood || 'Equanimity'}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
-                                
-                                {selectedEvents.length > 0 && (
-                                    <section>
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="px-3 py-1 bg-gray-50 rounded-full border border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">Market Context</div>
-                                            <div className="h-[1px] flex-1 bg-gray-50" />
-                                        </div>
-                                        <div className="flex flex-col gap-3">
-                                            {selectedEvents.map(e => (
-                                                <div key={e.id} className="flex items-center justify-between p-4 bg-red-50/20 border border-red-50 rounded-2xl">
-                                                    <div className="flex items-center gap-3">
-                                                        <Info size={16} className="text-red-400" />
-                                                        <span className="text-[14px] font-bold text-red-900">{e.title}</span>
-                                                    </div>
-                                                    <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">{e.impact} impact</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                )}
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+            {/* Bottom Sheet Detail */}
+            <CalendarDetailSheet 
+                isOpen={!!selectedDate} 
+                onClose={() => setSelectedDate(null)} 
+                date={selectedDate}
+                data={selectedDate ? getDayData(selectedDate) : null}
+            />
         </div>
     );
 }
