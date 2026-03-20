@@ -92,8 +92,28 @@ export default function SettingsSheet({ isOpen, onClose }: { isOpen: boolean; on
                                             value="v1.1.0" 
                                         />
                                         <button 
-                                            onClick={() => {
+                                            onClick={async () => {
+                                                // Deep Clean: Clear everything browser can track
                                                 localStorage.clear();
+                                                sessionStorage.clear();
+                                                
+                                                // Clear Cookies
+                                                const cookies = document.cookie.split(";");
+                                                for (let i = 0; i < cookies.length; i++) {
+                                                    const cookie = cookies[i];
+                                                    const eqPos = cookie.indexOf("=");
+                                                    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                                                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                                                }
+
+                                                // Unregister any stale Service Workers (PWA)
+                                                if ('serviceWorker' in navigator) {
+                                                    const registrations = await navigator.serviceWorker.getRegistrations();
+                                                    for (const registration of registrations) {
+                                                        await registration.unregister();
+                                                    }
+                                                }
+
                                                 window.location.href = '/login';
                                             }}
                                             className="w-full h-14 bg-blue-50/30 border border-blue-100/50 flex items-center justify-between px-5 rounded-2xl active:bg-blue-100/50 transition-colors text-left"
