@@ -26,6 +26,7 @@ html {
   -webkit-overflow-scrolling: touch; 
   -webkit-text-size-adjust: 100%; 
   overflow-x: hidden; 
+  overflow-y: auto !important;
   height: 100%;
 }
 
@@ -43,8 +44,9 @@ body {
   -webkit-font-smoothing: antialiased;
   min-height: 100dvh;
   margin: 0;
-  overscroll-behavior: none; 
+  overscroll-behavior-y: auto; 
   font-variant-numeric: tabular-nums;
+  overflow-y: auto !important;
 }
 
 /* INPUTS */

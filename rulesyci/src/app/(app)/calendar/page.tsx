@@ -1,6 +1,6 @@
 'use client';
 
-import TimelineCalendar from '@/components/calendar/TimelineCalendar';
+import PnLCalendar from '@/components/calendar/PnLCalendar';
 import { useRuleSci } from '@/lib/context';
 import { motion } from 'framer-motion';
 import { Target, TrendingUp, ShieldCheck, AlertCircle, Zap } from 'lucide-react';
@@ -30,7 +30,7 @@ export default function CalendarPage() {
                 </p>
             </header>
 
-            <TimelineCalendar />
+            <PnLCalendar />
 
             {/* Quick Insights */}
             <div className="grid grid-cols-2 gap-4">
