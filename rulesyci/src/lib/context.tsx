@@ -332,7 +332,20 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
     // Sync with Supabase Auth (PWA Persistent)
     useEffect(() => {
         const syncUser = async () => {
-            // Only try real auth if keys exist
+            // OPTIMISTIC HYDRATION: Check localStorage first for instant-on
+            const savedData = localStorage.getItem('rulesci_data');
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    if (parsed.user && parsed.version === SYSTEM_VERSION) {
+                        dispatch({ type: 'SET_USER', payload: parsed.user });
+                        // Speed up: stop checking if we have valid local data
+                        dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
+                    }
+                } catch (e) {}
+            }
+
+            // Background Sync
             if (!isPlaceholderAuth) {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session?.user) {
@@ -348,18 +361,9 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
                         } 
                     });
                 }
-            } else {
-                // Check if we have a saved mock user in localstorage
-                const savedData = localStorage.getItem('rulesci_data');
-                if (savedData) {
-                    try {
-                        const parsed = JSON.parse(savedData);
-                        if (parsed.user) {
-                            dispatch({ type: 'SET_USER', payload: parsed.user });
-                        }
-                    } catch (e) {}
-                }
             }
+            
+            // Ensure flag is cleared even if offline/slow
             dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
         };
 

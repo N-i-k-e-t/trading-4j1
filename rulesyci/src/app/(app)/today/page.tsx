@@ -87,7 +87,14 @@ export default function DashboardPage() {
         showToast('System state updated', 'success');
     };
 
-    if (!mounted) return null;
+    if (!mounted) {
+        return (
+            <div className="min-h-screen bg-[#fafafa] flex flex-col items-center pt-32 px-6">
+                <div className="w-48 h-10 bg-gray-100 rounded-full animate-pulse mb-10" />
+                <div className="w-72 h-72 rounded-full border-8 border-gray-100 animate-pulse" />
+            </div>
+        );
+    }
 
     const phases = [
         { name: 'Onboarding Prep', icon: '⚡', category: 'Risk Management' },
@@ -137,8 +144,7 @@ export default function DashboardPage() {
                             strokeDashoffset={880 - (880 * score / 100)}
                             strokeLinecap="round" 
                             fill="transparent"
-                            className="transition-all duration-[1500ms] ease-out-quint"
-                            style={{ filter: `drop-shadow(0 0 10px ${isPerfect ? '#22c55e44' : '#3b82f644'})` }}
+                            className="transition-all duration-[1500ms] ease-out"
                         />
                     </svg>
                     
