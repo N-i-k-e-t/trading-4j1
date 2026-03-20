@@ -6,21 +6,26 @@ export async function updateSession(request: NextRequest) {
         request,
     })
 
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        // Bypass Supabase completely if env variables are missing (useful for MVP Demo mode on Vercel)
+    const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || 
+                          process.env.NEXT_PUBLIC_SUPABASE_URL.includes('your-project-id') ||
+                          !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+                          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.includes('your-anon-key');
+
+    if (isPlaceholder) {
+        // Bypass Supabase completely if env variables are missing or placeholders
         return supabaseResponse
     }
 
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
         {
             cookies: {
                 getAll() {
                     return request.cookies.getAll()
                 },
-                setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+                setAll(cookiesToSet: { name: string; value: string; options: any }[]) {
+                    cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
                     supabaseResponse = NextResponse.next({
                         request,
                     })

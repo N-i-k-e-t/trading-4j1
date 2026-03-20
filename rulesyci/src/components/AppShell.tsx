@@ -13,7 +13,7 @@ import { Target, Flame } from 'lucide-react';
 import { useMemo } from 'react';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-    const { labMode, user, isCheckingAuth } = useRuleSci();
+    const { labMode, user, isCheckingAuth, dailyLogs, analytics } = useRuleSci();
     const router = useRouter();
 
     const [isTrialExpired, setIsTrialExpired] = useState(false);
@@ -34,7 +34,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
     // STREAK LOGIC
     const streak = useMemo(() => {
-        const { dailyLogs, analytics } = useRuleSci();
         let count = 0;
         const today = new Date().toISOString().split('T')[0];
         const sortedLogs = [...dailyLogs].sort((a, b) => b.date.localeCompare(a.date));
@@ -53,7 +52,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             checkDate.setDate(checkDate.getDate() - 1);
         }
         return count;
-    }, [useRuleSci()]);
+    }, [dailyLogs, analytics]);
 
     useEffect(() => {
         if (!user) return;

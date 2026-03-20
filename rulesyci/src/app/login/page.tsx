@@ -22,7 +22,7 @@ export default function LoginPage() {
     // Handle session auto-redirect
     useEffect(() => {
         if (user) {
-            router.replace('/dashboard');
+            router.replace('/today');
         }
     }, [user, router]);
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
             setUser(mockUser);
             // Persistence for mock user handled by localStorage in context.tsx
             showToast('Booting System Architecture...', 'success');
-            router.replace('/dashboard');
+            router.replace('/today');
         }, 800);
     };
 
@@ -69,7 +69,7 @@ export default function LoginPage() {
 
             if (data.user) {
                 showToast('Architect Verified.', 'success');
-                router.replace('/dashboard');
+                router.replace('/today');
             }
         } catch (err: any) {
             showToast(err.message || 'Verification failed', 'error');

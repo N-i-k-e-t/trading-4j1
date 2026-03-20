@@ -52,3 +52,5 @@ export function EmptyState({
         </motion.div>
     );
 }
+
+export default EmptyState;

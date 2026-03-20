@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, TrendingUp, ShieldCheck, Zap, AlertCircle, ShoppingCart, Activity, Brain } from 'lucide-react';
+import { X, TrendingUp, ShieldCheck, Zap, AlertCircle, ShoppingCart, Activity, Brain, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { DailyLog, Trade, MarketEvent } from '@/types/trading';
 
@@ -163,7 +163,7 @@ export default function CalendarDetailSheet({ isOpen, onClose, date, data }: Cal
                             {!log && events.length === 0 && (
                                 <div className="py-20 text-center flex flex-col items-center gap-4">
                                     <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-200">
-                                        <CalendarIcon size={32} />
+                                        <Calendar size={32} />
                                     </div>
                                     <p className="text-[13px] font-bold text-gray-300 uppercase tracking-widest">No Architectural Data Detected</p>
                                 </div>
