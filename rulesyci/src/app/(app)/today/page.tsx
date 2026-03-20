@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRuleSci } from '@/lib/context';
 import { 
@@ -107,12 +108,15 @@ export default function DashboardPage() {
             <main className="px-5 pt-20 flex flex-col items-center">
                 {/* HORIZONTAL CALENDAR - PERFECT DAY STYLE */}
                 <header className="w-full mb-12 flex flex-col items-center">
-                    <div className="flex items-center gap-2 mb-8 cursor-pointer active:scale-95 transition-all">
-                        <span className="text-[22px] font-black text-[#1a1a2e] tracking-tight">
+                    <Link 
+                        href="/calendar"
+                        className="flex items-center gap-2 mb-8 cursor-pointer active:scale-95 transition-all hover:opacity-70 group"
+                    >
+                        <span className="text-[22px] font-black text-[#1a1a2e] tracking-tight group-hover:text-blue-600 transition-colors">
                             {new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                         </span>
-                        <ChevronRight size={20} className="rotate-90 text-[#1a1a2e]" strokeWidth={3} />
-                    </div>
+                        <ChevronRight size={20} className="rotate-90 text-[#1a1a2e] group-hover:text-blue-500 transition-colors" strokeWidth={3} />
+                    </Link>
 
                     <div className="w-full flex justify-between px-2">
                         {[-3, -2, -1, 0, 1, 2, 3].map((offset) => {

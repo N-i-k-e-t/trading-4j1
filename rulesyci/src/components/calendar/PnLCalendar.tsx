@@ -79,12 +79,13 @@ export default function PnLCalendar() {
         <div className="flex flex-col gap-6">
             <header className="flex items-center justify-between px-2">
                 <div className="flex flex-col">
-                    <button onClick={() => setIsYearPickerOpen(!isYearPickerOpen)} className="flex items-center gap-2 group">
-                        <h2 className="text-2xl font-black tracking-tight text-[#1a1a2e]">
-                            {format(currentDate, 'MMMM')} <span className="text-gray-300 group-hover:text-blue-500 transition-colors">{format(currentDate, 'yyyy')}</span>
+                    <button onClick={() => setIsYearPickerOpen(!isYearPickerOpen)} className="flex items-center gap-3 group">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                        <h2 className="text-[32px] font-black tracking-[-0.05em] text-[#1a1a2e] leading-none">
+                            {format(currentDate, 'MMMM')} <span className="text-gray-200 group-hover:text-blue-500 transition-colors">{format(currentDate, 'yyyy')}</span>
                         </h2>
                     </button>
-                    <p className="text-[11px] font-black text-gray-300 uppercase tracking-widest mt-0.5">Architecture Grid</p>
+                    <p className="text-[12px] font-bold text-gray-300 uppercase tracking-[0.2em] mt-1 pl-4">Architecture Grid</p>
                 </div>
                 
                 <div className="flex items-center gap-2">
@@ -101,10 +102,15 @@ export default function PnLCalendar() {
             <div className="bg-white rounded-[40px] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-gray-50/50 relative overflow-hidden min-h-[420px]">
                 <AnimatePresence>
                     {isYearPickerOpen && (
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="absolute inset-x-6 top-6 bottom-6 bg-white/95 backdrop-blur-xl z-20 rounded-[32px] p-6 flex flex-col gap-6 shadow-2xl border border-gray-100">
+                        <motion.div 
+                            initial={{ opacity: 0, y: -20 }} 
+                            animate={{ opacity: 1, y: 0 }} 
+                            exit={{ opacity: 0, y: -20 }} 
+                            className="absolute inset-x-4 top-4 bottom-4 bg-white/95 backdrop-blur-3xl z-20 rounded-[40px] p-8 flex flex-col gap-8 shadow-[0_40px_100px_rgba(0,0,0,0.15)] border border-gray-100"
+                        >
                             <div className="flex items-center justify-between">
-                                <span className="text-sm font-black uppercase tracking-widest text-[#1a1a2e]">System Epoch</span>
-                                <button onClick={() => setIsYearPickerOpen(false)} className="text-gray-400 font-bold p-2 active:scale-90">Close</button>
+                                <span className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">System Epoch Selection</span>
+                                <button onClick={() => setIsYearPickerOpen(false)} className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-[#1a1a2e] font-black active:scale-90 transition-all">✕</button>
                             </div>
                             <div className="grid grid-cols-3 gap-3">
                                 {[2024, 2025, 2026].map(y => (
