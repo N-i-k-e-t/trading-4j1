@@ -332,42 +332,56 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
     // Sync with Supabase Auth (PWA Persistent)
     useEffect(() => {
         const syncUser = async () => {
-            // OPTIMISTIC HYDRATION: Check localStorage first for instant-on
+            let userFound = false;
+
+            // 1. OPTIMISTIC: Check localStorage for instant-on
             const savedData = localStorage.getItem('rulesci_data');
             if (savedData) {
                 try {
                     const parsed = JSON.parse(savedData);
                     if (parsed.user && parsed.version === SYSTEM_VERSION) {
                         dispatch({ type: 'SET_USER', payload: parsed.user });
-                        // Speed up: stop checking if we have valid local data
-                        dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
+                        userFound = true;
+                    }
+                    if (parsed.rules) {
+                        dispatch({ type: 'HYDRATE_STATE', payload: { ...initialState, ...parsed } });
                     }
                 } catch (e) {}
             }
 
-            // Background Sync
+            // 2. REAL AUTH: Check Supabase in background
             if (!isPlaceholderAuth) {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session?.user) {
-                    const email = session.user.email || '';
-                    const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
-                    dispatch({ 
-                        type: 'SET_USER', 
-                        payload: { 
-                            email, 
-                            name: session.user.user_metadata?.full_name || 'Trader',
-                            isPro,
-                            isAdmin: isPro && email === 'niketpatil1624@gmail.com'
-                        } 
-                    });
+                try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (session?.user) {
+                        const email = session.user.email || '';
+                        const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
+                        dispatch({ 
+                            type: 'SET_USER', 
+                            payload: { 
+                                email, 
+                                name: session.user.user_metadata?.full_name || 'Trader',
+                                isPro,
+                                isAdmin: isPro && email === 'niketpatil1624@gmail.com'
+                            } 
+                        });
+                        userFound = true;
+                    }
+                } catch (e) {
+                    console.error('Auth check failed', e);
                 }
             }
-            
-            // Ensure flag is cleared even if offline/slow
+
+            // Release the loading lock
             dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
         };
 
         syncUser();
+
+        // Safety Valve: Force unlock after 3 seconds to prevent infinite spinners
+        const safetyValve = setTimeout(() => {
+            dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
+        }, 3000);
 
         if (!isPlaceholderAuth) {
             const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -384,51 +398,33 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
                         } 
                     });
                 } else {
-                    dispatch({ type: 'SET_USER', payload: null });
+                    // Only clear if not in placeholder mode
+                    if (!isPlaceholderAuth) dispatch({ type: 'SET_USER', payload: null });
                 }
                 dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
             });
 
-            return () => subscription.unsubscribe();
+            return () => {
+                subscription.unsubscribe();
+                clearTimeout(safetyValve);
+            };
         }
+
+        return () => clearTimeout(safetyValve);
     }, [isPlaceholderAuth]);
 
     const SYSTEM_VERSION = '1.1.0'; // Updated for Calendar Architecture
 
-    // Load from LocalStorage (Fallback / Non-Auth data)
-    useEffect(() => {
-        const saved = localStorage.getItem('rulesci_data');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                if (parsed) {
-                    // VERSION CHECK: If architecture is old, we force a fresh start or migrate
-                    if (parsed.version !== SYSTEM_VERSION) {
-                        console.log('Old architecture detected. Syncing to version', SYSTEM_VERSION);
-                        localStorage.removeItem('rulesci_data');
-                        return;
-                    }
-
-                    // Hydrate everything except user (which comes from Supabase)
-                    const { user, ...rest } = parsed;
-                    dispatch({ type: 'HYDRATE_STATE', payload: { ...initialState, ...rest } });
-                }
-            } catch (e) {
-                console.error('Failed to parse local data', e);
-            }
-        }
-    }, [initialState]);
-
-    // Save to LocalStorage (Incremental backup)
+    // Persist to LocalStorage
     useEffect(() => {
         if (state !== initialState) {
-            const { toasts, user, ...persistable } = state; 
+            const { toasts, ...persistable } = state; 
             localStorage.setItem('rulesci_data', JSON.stringify({
                 ...persistable,
                 version: SYSTEM_VERSION
             }));
         }
-    }, [state, initialState]);
+    }, [state]);
 
     // Financial Impact Calculator (Cost of Indiscipline)
     useEffect(() => {
