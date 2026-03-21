@@ -126,11 +126,11 @@ export default function DashboardPage() {
 
                     <div className="w-full flex flex-col gap-6">
                         <div className="flex items-center justify-between px-2">
-                            <button onClick={() => setWeekOffset(weekOffset - 1)} className="p-2 bg-gray-50 border border-gray-100 rounded-full text-gray-400 active:scale-90 transition-all">
+                            <button onClick={() => setWeekOffset(weekOffset - 1)} className="p-2 bg-gray-50 border border-gray-100 rounded-full text-gray-500 active:scale-90 transition-all">
                                 <ChevronRight size={18} className="rotate-180" />
                             </button>
-                            <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest">Temporal Navigation</span>
-                            <button onClick={() => setWeekOffset(weekOffset + 1)} className="p-2 bg-gray-50 border border-gray-100 rounded-full text-gray-400 active:scale-90 transition-all">
+                            <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Temporal Navigation</span>
+                            <button onClick={() => setWeekOffset(weekOffset + 1)} className="p-2 bg-gray-50 border border-gray-100 rounded-full text-gray-500 active:scale-90 transition-all">
                                 <ChevronRight size={18} />
                             </button>
                         </div>
@@ -149,7 +149,7 @@ export default function DashboardPage() {
                                         whileTap={{ scale: 0.9 }}
                                         className="flex flex-col items-center gap-2"
                                     >
-                                        <span className={`text-[12px] font-bold uppercase tracking-widest ${isCurrentInStrip ? 'text-[#1a1a2e]' : 'text-gray-300'}`}>
+                                        <span className={`text-[12px] font-bold uppercase tracking-widest ${isCurrentInStrip ? 'text-[#1a1a2e]' : 'text-gray-400'}`}>
                                             {date.toLocaleDateString('en-US', { weekday: 'narrow' })}
                                         </span>
                                         <div className={`w-11 h-11 rounded-full flex flex-col items-center justify-center transition-all ${isCurrentInStrip ? 'bg-[#1a1a2e] text-white shadow-xl scale-110' : 'text-gray-400'} ${isRealToday && !isCurrentInStrip ? 'border border-blue-200' : ''}`}>
@@ -190,26 +190,39 @@ export default function DashboardPage() {
                         <AnimatePresence mode="wait">
                             <motion.div 
                                 key={score}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
                                 className="flex flex-col items-center"
                             >
-                                <span className="text-[84px] font-black text-[#1a1a2e] tracking-tighter tabular-nums leading-none">
-                                    {score}<span className="text-[32px] font-bold text-gray-200">%</span>
+                                <span className="text-[96px] font-black text-[#1a1a2e] tracking-[-0.08em] tabular-nums leading-[0.8]">
+                                    {score}<span className="text-[32px] font-bold text-gray-400">%</span>
                                 </span>
                                 {isPerfect ? (
-                                    <div className="mt-2 px-3 py-1 bg-green-50 rounded-full flex items-center gap-1.5 border border-green-100">
-                                        <ShieldCheck size={14} className="text-green-500" />
-                                        <span className="text-[10px] font-black text-green-600 uppercase tracking-widest">Perfect Session</span>
-                                    </div>
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="mt-6 px-4 py-2 bg-[#1a1a2e] text-white rounded-full flex items-center gap-2 shadow-[0_10px_30px_rgba(0,0,0,0.2)]"
+                                    >
+                                        <Sparkles size={14} className="text-yellow-400 fill-yellow-400" />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Elite Architecture</span>
+                                    </motion.div>
                                 ) : (
-                                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] mt-3">
-                                        Architecture Score
+                                <span className="text-[11px] font-black text-gray-500 uppercase tracking-[0.4em] mt-6">
+                                        Precision Log
                                     </span>
                                 )}
                             </motion.div>
                         </AnimatePresence>
                     </div>
+
+                    {/* Orbiting Sync Indicator */}
+                    <motion.div 
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-4 border border-blue-500/5 rounded-full pointer-events-none"
+                    >
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-blue-500 rounded-full shadow-[0_0_15px_#3b82f6] border-2 border-white" />
+                    </motion.div>
                 </div>
 
                 {/* NEURAL STATUS CARDS */}
@@ -231,7 +244,7 @@ export default function DashboardPage() {
                 {/* SYSTEM STATE SELECTOR */}
                 <section className="w-full mb-14">
                     <div className="flex items-center gap-3 mb-6 px-2">
-                        <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest">Neural Baseline</span>
+                        <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Neural Baseline</span>
                         <div className="h-[1px] flex-1 bg-gray-100" />
                     </div>
                     <div className="grid grid-cols-4 gap-3">
@@ -265,12 +278,14 @@ export default function DashboardPage() {
                         
                         return (
                             <div key={phase.name} className="flex flex-col gap-6">
-                                <div className="flex items-center gap-3 px-2">
-                                    <div className="h-10 px-4 bg-white/60 backdrop-blur-md border border-gray-100 rounded-full flex items-center gap-3 shadow-sm">
-                                        <span className="text-[18px]">{phase.icon}</span>
-                                        <span className="text-[11px] font-black text-[#1a1a2e] uppercase tracking-widest leading-none">{phase.name}</span>
+                                <div className="flex items-center gap-4 px-2">
+                                    <div className="h-12 px-5 bg-white backdrop-blur-3xl border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.02)] rounded-[24px] flex items-center gap-4">
+                                        <div className="w-8 h-8 bg-[#1a1a2e] text-white rounded-xl flex items-center justify-center text-[18px] shadow-lg">
+                                            {phase.icon}
+                                        </div>
+                                        <span className="text-[12px] font-black text-[#1a1a2e] uppercase tracking-[0.2em] leading-none">{phase.name}</span>
                                     </div>
-                                    <div className="h-[1px] flex-1 bg-gray-100" />
+                                    <div className="h-[1px] flex-1 bg-gray-100/50" />
                                 </div>
 
                                 <div className="flex flex-col gap-4">
@@ -288,7 +303,7 @@ export default function DashboardPage() {
                                                 {idx > 0 && (
                                                     <div className="flex flex-col items-center gap-1">
                                                         <span className="text-3xl grayscale opacity-40">😎</span>
-                                                        <span className="text-[10px] font-bold text-gray-200 uppercase tracking-widest">Buffer Zone</span>
+                                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Buffer Zone</span>
                                                     </div>
                                                 )}
                                                 <motion.button
@@ -309,7 +324,7 @@ export default function DashboardPage() {
                                                             <span className={`text-[17px] font-black text-[#1a1a2e] leading-tight ${checkedIds.includes(rule.id) ? 'opacity-30 line-through' : ''}`}>
                                                                 {rule.text}
                                                             </span>
-                                                            <span className="text-[11px] font-bold text-gray-300 mt-1 uppercase tracking-widest">
+                                                            <span className="text-[11px] font-bold text-gray-400 mt-1 uppercase tracking-widest">
                                                                 {rule.category} • {checkedIds.includes(rule.id) ? 'Compliant' : 'Awaiting Entry'}
                                                             </span>
                                                         </div>

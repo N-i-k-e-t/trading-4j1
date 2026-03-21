@@ -133,7 +133,7 @@ export default function OnboardingPage() {
                 <button 
                     onClick={prevStep}
                     disabled={currentStep === 0}
-                    className="w-12 h-12 flex items-center justify-center text-[#1a1a2e] bg-gray-50 rounded-full disabled:opacity-0 active:scale-90 transition-all shadow-sm"
+                    className="w-12 h-12 flex items-center justify-center text-[#1a1a2e] bg-gray-50 rounded-full disabled:opacity-0 active:scale-90 transition-all shadow-sm group"
                 >
                     <ArrowLeft size={20} strokeWidth={3} />
                 </button>
@@ -180,7 +180,7 @@ export default function OnboardingPage() {
                         <motion.div key="s1" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="flex flex-col gap-8">
                             <div className="flex flex-col gap-2">
                                 <h2 className="text-[28px] font-black text-[#1a1a2e] leading-tight">I identify as a...</h2>
-                                <p className="text-[14px] font-bold text-gray-400">Defining your profile improves compliance.</p>
+                                <p className="text-[14px] font-bold text-gray-500 uppercase tracking-widest pl-1">Establishing Compliance Protocol</p>
                             </div>
                             <div className="flex flex-col gap-3">
                                 <OptionCard emoji="🏦" title="Institutional Mind" subtitle="Focus on large trends, risk-averse" onClick={() => handleSingleSelect('style', 'institutional')} selected={answers.style === 'institutional'} />
@@ -196,7 +196,7 @@ export default function OnboardingPage() {
                         <motion.div key="s2" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="flex flex-col gap-8">
                             <div className="flex flex-col gap-2">
                                 <h2 className="text-[28px] font-black text-[#1a1a2e] leading-tight">Primary Asset?</h2>
-                                <p className="text-[14px] font-bold text-gray-400">Where do you spend 80% of your time?</p>
+                                <p className="text-[14px] font-bold text-gray-500 uppercase tracking-widest pl-1">Targeting Execution Space</p>
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 {[
@@ -227,7 +227,7 @@ export default function OnboardingPage() {
                         <motion.div key="s3" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="flex flex-col gap-8">
                             <div className="flex flex-col gap-2 text-center">
                                 <h2 className="text-[28px] font-black text-[#1a1a2e] leading-tight">Trading Tenure?</h2>
-                                <p className="text-[14px] font-bold text-gray-400 text-center">How many years of live market exposure?</p>
+                                <p className="text-[14px] font-bold text-gray-500 uppercase tracking-widest">Experience calibration</p>
                             </div>
                             <div className="grid grid-cols-1 gap-3">
                                 <OptionCard emoji="🌱" title="Apprentice" subtitle="Less than 1 Year" onClick={() => handleSingleSelect('experience', '1')} selected={answers.experience === '1'} />
@@ -243,7 +243,7 @@ export default function OnboardingPage() {
                         <motion.div key="s4" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="flex flex-col gap-8">
                             <div className="flex flex-col gap-2">
                                 <h2 className="text-[28px] font-black text-[#1a1a2e] leading-tight">Trading Window?</h2>
-                                <p className="text-[14px] font-bold text-gray-400">Constraint-based trading reduces errors.</p>
+                                <p className="text-[14px] font-bold text-gray-500 uppercase tracking-widest pl-1">Temporal Constraint Selection</p>
                             </div>
                             <div className="flex flex-col gap-3">
                                 <OptionCard emoji="🗽" title="New York Session" subtitle="9:30 AM - 4:00 PM EST" onClick={() => handleSingleSelect('timeWindow', 'nyc')} selected={answers.timeWindow === 'nyc'} />
@@ -259,7 +259,7 @@ export default function OnboardingPage() {
                         <motion.div key="s5" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, y: -20 }} className="flex flex-col items-center justify-center flex-1 gap-12">
                             <div className="flex flex-col gap-2 text-center">
                                 <h2 className="text-[28px] font-black text-[#1a1a2e] leading-tight">Daily Execution Cap?</h2>
-                                <p className="text-[14px] font-bold text-gray-400 px-8">System will lock entries after this limit to prevent overtrading.</p>
+                                <p className="text-[14px] font-bold text-gray-500 px-8 uppercase tracking-widest">Hard Terminal Lock Protection</p>
                             </div>
                             <div className="flex items-center gap-8">
                                 <button onClick={() => setAnswers({...answers, frequency: Math.max(1, answers.frequency - 1)})} className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center text-[#1a1a2e] border border-gray-100 active:scale-90 transition-all font-black text-3xl"><Minus /></button>
@@ -275,7 +275,7 @@ export default function OnboardingPage() {
                         <motion.div key="s6" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="flex flex-col gap-8">
                             <div className="flex flex-col gap-2">
                                 <h2 className="text-[28px] font-black text-[#1a1a2e] leading-tight">Risk Per Trade?</h2>
-                                <p className="text-[14px] font-bold text-gray-400">High volatility requires tighter risk architecture.</p>
+                                <p className="text-[14px] font-bold text-gray-500 uppercase tracking-widest pl-1">Volatility architecture tightener</p>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 {['0.25%', '0.5%', '1.0%', '2.0%'].map(val => (
@@ -298,7 +298,7 @@ export default function OnboardingPage() {
                         <motion.div key="s7" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="flex flex-col gap-8">
                             <div className="flex flex-col gap-2">
                                 <h2 className="text-[28px] font-black text-[#1a1a2e] leading-tight">Hardest Constraint?</h2>
-                                <p className="text-[14px] font-bold text-gray-400">Be honest — where does it go wrong?</p>
+                                <p className="text-[14px] font-bold text-gray-500 uppercase tracking-widest pl-1">Neuro-vulnerability isolation</p>
                             </div>
                             <div className="flex flex-col gap-3">
                                 <OptionCard emoji="🎰" title="Impulse Entry" subtitle="Entering without rules confirmation" onClick={() => handleSingleSelect('primaryConstraint', 'impulse')} selected={answers.primaryConstraint === 'impulse'} />
@@ -317,8 +317,8 @@ export default function OnboardingPage() {
                             </div>
                             <div className="flex flex-col gap-4">
                                 <h2 className="text-[32px] font-black text-[#1a1a2e] leading-tight">The Discipline <br/> Contract.</h2>
-                                <p className="text-[16px] font-bold text-gray-400 px-10">
-                                    I commit to following my custom architecture for the next **14 days** without deviation.
+                                <p className="text-[16px] font-bold text-gray-600 px-10 leading-relaxed">
+                                    I commit to following my custom architecture for the next <strong className="text-[#1a1a2e]">14 days</strong> without deviation.
                                 </p>
                             </div>
                             <button onClick={nextStep} className="h-[72px] w-full max-w-[320px] bg-[#1a1a2e] text-white rounded-[28px] font-black text-[20px] active:scale-95 transition-all shadow-2xl">

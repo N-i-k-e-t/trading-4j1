@@ -192,7 +192,13 @@ function ruleSciReducer(state: AppState, action: Action): AppState {
                 session: { ...state.session, preSessionComplete: true },
             };
         case 'HYDRATE_STATE':
-            return { ...action.payload, labMode: false, toasts: [] };
+            return { 
+                ...state, 
+                ...action.payload, 
+                isCheckingAuth: state.isCheckingAuth, // Preserve the ongoing auth check status
+                labMode: false, 
+                toasts: [] 
+            };
 
         // New actions
         case 'ADD_RULE':
@@ -334,19 +340,18 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
 
     // Sync with Supabase Auth (PWA Persistent)
     useEffect(() => {
-        const syncUser = async () => {
-            let userFound = false;
+        let isMounted = true;
 
+        const syncUser = async () => {
             // 1. OPTIMISTIC: Check localStorage for instant-on
             const savedData = localStorage.getItem('rulesci_data');
             if (savedData) {
                 try {
                     const parsed = JSON.parse(savedData);
-                    if (parsed.user && parsed.version === SYSTEM_VERSION) {
-                        dispatch({ type: 'SET_USER', payload: parsed.user });
-                        userFound = true;
-                    }
-                    if (parsed.rules) {
+                    if (parsed.version === SYSTEM_VERSION) {
+                        if (parsed.user) {
+                            dispatch({ type: 'SET_USER', payload: parsed.user });
+                        }
                         dispatch({ type: 'HYDRATE_STATE', payload: { ...initialState, ...parsed } });
                     }
                 } catch (e) {}
@@ -356,7 +361,7 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
             if (!isPlaceholderAuth) {
                 try {
                     const { data: { session } } = await supabase.auth.getSession();
-                    if (session?.user) {
+                    if (session?.user && isMounted) {
                         const email = session.user.email || '';
                         const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
                         dispatch({ 
@@ -368,27 +373,29 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
                                 isAdmin: isPro && email === 'niketpatil1624@gmail.com'
                             } 
                         });
-                        userFound = true;
                     }
                 } catch (e) {
                     console.error('Auth check failed', e);
                 }
             }
 
-            // Release the loading lock
-            dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
+            // Always release the loading lock
+            if (isMounted) {
+                dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
+            }
         };
 
         syncUser();
 
-        // Safety Valve: Force unlock after 3 seconds to prevent infinite spinners
+        // Safety Valve: Force unlock after 2 seconds to prevent infinite spinners
         const safetyValve = setTimeout(() => {
-            dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
-        }, 3000);
+            if (isMounted) dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
+        }, 2000);
 
+        let subscription: any = null;
         if (!isPlaceholderAuth) {
-            const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-                if (session?.user) {
+            const res = supabase.auth.onAuthStateChange((event, session) => {
+                if (session?.user && isMounted) {
                     const email = session.user.email || '';
                     const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
                     dispatch({ 
@@ -400,28 +407,27 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
                             isAdmin: isPro && email === 'niketpatil1624@gmail.com'
                         } 
                     });
-                } else {
-                    // Only clear if not in placeholder mode
-                    if (!isPlaceholderAuth) dispatch({ type: 'SET_USER', payload: null });
+                } else if (!isPlaceholderAuth && isMounted) {
+                    dispatch({ type: 'SET_USER', payload: null });
                 }
-                dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
+                if (isMounted) dispatch({ type: 'SET_CHECKING_AUTH', payload: false });
             });
-
-            return () => {
-                subscription.unsubscribe();
-                clearTimeout(safetyValve);
-            };
+            subscription = res.data.subscription;
         }
 
-        return () => clearTimeout(safetyValve);
-    }, [isPlaceholderAuth]);
+        return () => {
+            isMounted = false;
+            if (subscription) subscription.unsubscribe();
+            clearTimeout(safetyValve);
+        };
+    }, [isPlaceholderAuth, supabase]);
 
     const SYSTEM_VERSION = '1.1.0'; // Updated for Calendar Architecture
 
-    // Persist to LocalStorage
+    // Persist to LocalStorage (Excluding transient auth states)
     useEffect(() => {
         if (state !== initialState) {
-            const { toasts, ...persistable } = state; 
+            const { toasts, isCheckingAuth, ...persistable } = state; 
             localStorage.setItem('rulesci_data', JSON.stringify({
                 ...persistable,
                 version: SYSTEM_VERSION

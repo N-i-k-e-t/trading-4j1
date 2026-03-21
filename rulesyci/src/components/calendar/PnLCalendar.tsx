@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay, isToday } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay, isToday, setYear, setMonth, setDate } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Zap, Flame, Award, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Zap, Flame, Award, Check, Calendar as CalendarIcon, Filter, Search, X } from 'lucide-react';
 import { useRuleSci } from '@/lib/context';
 import CalendarDetailSheet from './CalendarDetailSheet';
 
@@ -12,6 +12,7 @@ export default function PnLCalendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
+    const [isAdvancedPickerOpen, setIsAdvancedPickerOpen] = useState(false);
 
     // Navigation
     const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
@@ -79,13 +80,18 @@ export default function PnLCalendar() {
         <div className="flex flex-col gap-6">
             <header className="flex items-center justify-between px-2">
                 <div className="flex flex-col">
-                    <button onClick={() => setIsYearPickerOpen(!isYearPickerOpen)} className="flex items-center gap-3 group">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                        <h2 className="text-[32px] font-black tracking-[-0.05em] text-[#1a1a2e] leading-none">
+                    <button onClick={() => setIsAdvancedPickerOpen(true)} className="flex flex-col items-start group">
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                            <span className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Live Epoch</span>
+                        </div>
+                        <h2 className="text-[32px] font-black tracking-[-0.05em] text-[#1a1a2e] leading-none flex items-center gap-2">
                             {format(currentDate, 'MMMM')} <span className="text-gray-200 group-hover:text-blue-500 transition-colors">{format(currentDate, 'yyyy')}</span>
+                            <div className="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 group-hover:bg-blue-50 group-hover:text-blue-500 transition-all">
+                                <Search size={12} strokeWidth={3} />
+                            </div>
                         </h2>
                     </button>
-                    <p className="text-[12px] font-bold text-gray-300 uppercase tracking-[0.2em] mt-1 pl-4">Architecture Grid</p>
                 </div>
                 
                 <div className="flex items-center gap-2">
@@ -101,34 +107,62 @@ export default function PnLCalendar() {
 
             <div className="bg-white rounded-[40px] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-gray-50/50 relative overflow-hidden min-h-[420px]">
                 <AnimatePresence>
-                    {isYearPickerOpen && (
+                    {isAdvancedPickerOpen && (
                         <motion.div 
-                            initial={{ opacity: 0, y: -20 }} 
-                            animate={{ opacity: 1, y: 0 }} 
-                            exit={{ opacity: 0, y: -20 }} 
-                            className="absolute inset-x-4 top-4 bottom-4 bg-white/95 backdrop-blur-3xl z-20 rounded-[40px] p-8 flex flex-col gap-8 shadow-[0_40px_100px_rgba(0,0,0,0.15)] border border-gray-100"
+                            initial={{ opacity: 0, scale: 0.95 }} 
+                            animate={{ opacity: 1, scale: 1 }} 
+                            exit={{ opacity: 0, scale: 0.95 }} 
+                            className="absolute inset-0 bg-white/95 backdrop-blur-3xl z-40 p-8 flex flex-col gap-8 shadow-2xl"
                         >
                             <div className="flex items-center justify-between">
-                                <span className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">System Epoch Selection</span>
-                                <button onClick={() => setIsYearPickerOpen(false)} className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-[#1a1a2e] font-black active:scale-90 transition-all">✕</button>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Jump to Session</span>
+                                    <h3 className="text-2xl font-black text-[#1a1a2e]">Select Date</h3>
+                                </div>
+                                <button onClick={() => setIsAdvancedPickerOpen(false)} className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 font-black active:scale-90 transition-all">
+                                    <X size={20} />
+                                </button>
                             </div>
-                            <div className="grid grid-cols-4 gap-2">
-                                {[2022, 2023, 2024, 2025, 2026, 2027, 2028].map(y => (
-                                    <button 
-                                        key={y} 
-                                        onClick={() => { setCurrentDate(new Date(y, currentDate.getMonth(), 1)); setIsYearPickerOpen(false); }} 
-                                        className={`h-12 rounded-xl flex items-center justify-center text-sm font-black transition-all ${currentDate.getFullYear() === y ? 'bg-[#1a1a2e] text-white shadow-lg' : 'bg-gray-50 text-gray-400'}`}
-                                    >
-                                        {y}
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="grid grid-cols-4 gap-2 flex-1">
-                                {Array.from({ length: 12 }).map((_, i) => (
-                                    <button key={i} onClick={() => { setCurrentDate(new Date(currentDate.getFullYear(), i, 1)); setIsYearPickerOpen(false); }} className={`rounded-2xl flex items-center justify-center text-[10px] font-black uppercase tracking-tighter transition-all ${currentDate.getMonth() === i ? 'bg-blue-500 text-white shadow-md' : 'bg-gray-50 text-gray-300'}`}>
-                                        {format(new Date(2025, i, 1), 'MMM')}
-                                    </button>
-                                ))}
+
+                            <div className="flex flex-col gap-6">
+                                {/* Year Selection */}
+                                <div className="flex flex-col gap-3">
+                                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest px-1">Epoch</span>
+                                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                                        {[2024, 2025, 2026, 2027].map(y => (
+                                            <button 
+                                                key={y} 
+                                                onClick={() => setCurrentDate(setYear(currentDate, y))}
+                                                className={`px-6 py-3 rounded-2xl text-sm font-black transition-all flex-none ${currentDate.getFullYear() === y ? 'bg-[#1a1a2e] text-white shadow-xl' : 'bg-gray-50 text-gray-400 border border-gray-100'}`}
+                                            >
+                                                {y}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Month Selection */}
+                                <div className="flex flex-col gap-3">
+                                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest px-1">Month</span>
+                                    <div className="grid grid-cols-4 gap-2">
+                                        {Array.from({ length: 12 }).map((_, i) => (
+                                            <button 
+                                                key={i} 
+                                                onClick={() => setCurrentDate(setMonth(currentDate, i))}
+                                                className={`py-3 rounded-[20px] text-[10px] font-bold uppercase tracking-widest transition-all ${currentDate.getMonth() === i ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-gray-50 text-gray-300 border border-gray-100'}`}
+                                            >
+                                                {format(new Date(2025, i, 1), 'MMM')}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <button 
+                                    onClick={() => setIsAdvancedPickerOpen(false)}
+                                    className="h-[64px] w-full bg-[#1a1a2e] text-white rounded-[28px] font-black text-[16px] shadow-2xl active:scale-95 transition-all mt-4"
+                                >
+                                    Confirm Session
+                                </button>
                             </div>
                         </motion.div>
                     )}
@@ -140,7 +174,10 @@ export default function PnLCalendar() {
                     ))}
                 </div>
 
-                <div className="grid grid-cols-7 gap-y-4 gap-x-2">
+                <motion.div 
+                    layout
+                    className="grid grid-cols-7 gap-y-4 gap-x-2"
+                >
                     {days.map((date, i) => {
                         if (!date) return <div key={`pad-${i}`} className="aspect-square" />;
                         const { log, events } = getDayData(date);
@@ -149,7 +186,13 @@ export default function PnLCalendar() {
                         const isPerfect = adherencePct === 100 && log;
 
                         return (
-                            <motion.button key={date.toISOString()} whileTap={{ scale: 0.85 }} onClick={() => setSelectedDate(date)} className="relative aspect-square flex items-center justify-center transition-all group">
+                            <motion.button 
+                                key={date.toISOString()} 
+                                layoutId={`date-${date.toISOString()}`}
+                                whileTap={{ scale: 0.85 }} 
+                                onClick={() => setSelectedDate(date)} 
+                                className="relative aspect-square flex items-center justify-center transition-all group"
+                            >
                                 {log && !isPerfect && (
                                     <svg className="absolute inset-0 w-full h-full -rotate-90 p-1">
                                         <circle cx="50%" cy="50%" r="42%" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-gray-50" />
@@ -163,38 +206,50 @@ export default function PnLCalendar() {
                                     )}
                                 </div>
                                 {events.some(e => e.impact === 'high' || e.impact === 'critical') && (
-                                    <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse z-20" />
+                                    <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse z-20 shadow-sm" />
                                 )}
                             </motion.button>
                         );
                     })}
-                </div>
+                </motion.div>
             </div>
 
-            <div className="bg-white rounded-[32px] p-6 border border-gray-50 shadow-sm flex flex-col gap-4">
+            <div className="bg-white rounded-[32px] p-6 border border-gray-50 shadow-[0_10px_30px_rgba(0,0,0,0.02)] flex flex-col gap-4">
                 <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Protocol Efficiency</span>
-                    <span className="text-xl font-black text-blue-600">{monthlyEfficiency}%</span>
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Protocol Efficiency</span>
+                        <p className="text-[13px] font-black text-[#1a1a2e]">Monthly Benchmark</p>
+                    </div>
+                    <div className="text-right">
+                        <span className="text-2xl font-black text-blue-600 tracking-tighter">{monthlyEfficiency}%</span>
+                    </div>
                 </div>
-                <div className="h-2 w-full bg-gray-50 rounded-full overflow-hidden">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${monthlyEfficiency}%` }} className="h-full bg-blue-500" />
+                <div className="h-3 w-full bg-gray-50 rounded-full overflow-hidden p-0.5 border border-gray-100">
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${monthlyEfficiency}%` }} className="h-full bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.3)]" />
                 </div>
-                <p className="text-[12px] font-bold text-gray-400">You've maintained a perfect architecture for <span className="text-[#1a1a2e]">{monthlyEfficiency}%</span> of your trading days this month.</p>
+                <p className="text-[12px] font-bold text-gray-400 leading-relaxed">You've maintained a perfect architecture for <span className="text-[#1a1a2e] font-black">{monthlyEfficiency}%</span> of your trading days this month.</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <motion.div whileTap={{ scale: 0.98 }} className="bg-[#1a1a2e] rounded-[32px] p-5 border border-white/5 shadow-xl flex flex-col">
+                <motion.div whileTap={{ scale: 0.98 }} className="bg-[#1a1a2e] rounded-[32px] p-6 border border-white/5 shadow-2xl flex flex-col">
+                    <div className="w-10 h-10 bg-white/5 rounded-2xl flex items-center justify-center mb-4">
+                        <Flame size={20} className="text-orange-500 fill-orange-500" />
+                    </div>
                     <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">Active Streak</span>
-                    <div className="flex items-center gap-2">
-                        <Flame size={16} className="text-orange-500 fill-orange-500" />
-                        <span className="text-xl font-black text-white">{activeStreak} <span className="text-[10px] text-white/40">DAYS</span></span>
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-3xl font-black text-white leading-none">{activeStreak}</span>
+                        <span className="text-[10px] font-black text-white/40">DAYS</span>
                     </div>
                 </motion.div>
-                <motion.div whileTap={{ scale: 0.98 }} className="bg-blue-600 rounded-[32px] p-5 border border-white/10 shadow-xl flex flex-col">
+                
+                <motion.div whileTap={{ scale: 0.98 }} className="bg-blue-600 rounded-[32px] p-6 border border-white/10 shadow-2xl shadow-blue-500/20 flex flex-col">
+                    <div className="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center mb-4">
+                        <Award size={20} className="text-blue-100" />
+                    </div>
                     <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">Architecture Max</span>
-                    <div className="flex items-center gap-2">
-                        <Award size={16} className="text-blue-200" />
-                        <span className="text-xl font-black text-white">{maxStreak} <span className="text-[10px] text-white/40">DAYS</span></span>
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-3xl font-black text-white leading-none">{maxStreak}</span>
+                        <span className="text-[10px] font-black text-white/40">DAYS</span>
                     </div>
                 </motion.div>
             </div>
@@ -208,3 +263,4 @@ export default function PnLCalendar() {
         </div>
     );
 }
+
