@@ -103,7 +103,7 @@ export default function LandingPage() {
 
                     <motion.div variants={itemVariants} className="w-full sm:w-auto flex flex-col items-center">
                         <Link
-                            href="/onboarding"
+                            href="/signup"
                             className="bg-[#1a1a2e] text-white text-[15px] font-bold h-[52px] rounded-full w-full sm:w-auto sm:min-w-[280px] sm:px-12 flex items-center justify-center active:scale-[0.97] transition-transform touch-manipulation shadow-xl shadow-gray-200"
                         >
                             Start Free — 3 Day Trial

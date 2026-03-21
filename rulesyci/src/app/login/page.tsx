@@ -17,7 +17,23 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({ email: '', password: '' });
 
+    const [localStats, setLocalStats] = useState<{ streak: number; score: number } | null>(null);
     const isPlaceholderAuth = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('your-project-id') || !process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    // Load local stats if they exist
+    useEffect(() => {
+        const savedData = localStorage.getItem('rulesci_data');
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                const streak = parsed.analytics?.consistencyDays || 0;
+                const score = parsed.analytics?.ruleAdherence || 0;
+                if (streak > 0 || score > 0) {
+                    setLocalStats({ streak, score: Math.round(score) });
+                }
+            } catch (e) {}
+        }
+    }, []);
 
     // Handle session auto-redirect
     useEffect(() => {
@@ -34,7 +50,8 @@ export default function LoginPage() {
                 email: 'demo@rulesci.app',
                 name: 'Elite Trader',
                 isPro: true,
-                isAdmin: true
+                isAdmin: true,
+                trialStartDate: new Date().toISOString()
             };
             setUser(mockUser);
             // Persistence for mock user handled by localStorage in context.tsx
@@ -117,22 +134,27 @@ export default function LoginPage() {
                 </div>
 
                 {/* STREAK PREVIEW CARD */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white border border-gray-100 rounded-[32px] p-5 mb-5 flex items-center gap-4 shadow-sm"
-                >
-                    <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center shadow-sm text-xl border border-orange-100">
-                        🔥
-                    </div>
-                    <div className="flex-1 flex flex-col">
-                        <span className="text-[15px] font-black text-[#1a1a2e]">4-day streak active.</span>
-                        <div className="flex items-center gap-2 mt-0.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                            <span className="text-[12px] font-bold text-gray-300 uppercase tracking-wider tabular-nums">7/9 Rules Followed</span>
-                        </div>
-                    </div>
-                </motion.div>
+                <AnimatePresence>
+                    {localStats && (
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="bg-white border border-gray-100 rounded-[32px] p-5 mb-5 flex items-center gap-4 shadow-sm"
+                        >
+                            <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center shadow-sm text-xl border border-orange-100">
+                                🔥
+                            </div>
+                            <div className="flex-1 flex flex-col">
+                                <span className="text-[15px] font-black text-[#1a1a2e]">{localStats.streak}-day streak active.</span>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                    <span className="text-[12px] font-bold text-gray-300 uppercase tracking-wider tabular-nums">Score: {localStats.score}% Precision</span>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 {/* LOGIN CARD */}
                 <motion.div

@@ -59,7 +59,16 @@ export default function TimelineCalendar() {
                     </div>
                 </div>
 
-                <div className="flex justify-between px-2 bg-white rounded-[40px] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-gray-50/50 relative overflow-hidden">
+                <motion.div 
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={0.2}
+                    onDragEnd={(e, { offset }) => {
+                        if (offset.x > 80) setSelectedDate(addDays(selectedDate, -7));
+                        else if (offset.x < -80) setSelectedDate(addDays(selectedDate, 7));
+                    }}
+                    className="flex justify-between px-2 bg-white rounded-[40px] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-gray-50/50 relative overflow-hidden cursor-grab active:cursor-grabbing"
+                >
                     <AnimatePresence>
                         {isAdvancedPickerOpen && (
                             <motion.div 
@@ -110,14 +119,14 @@ export default function TimelineCalendar() {
                                 <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${isSelected ? 'text-blue-500' : 'text-gray-200'}`}>
                                     {format(date, 'eee')}
                                 </span>
-                                <div className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center transition-all duration-500 ${isSelected ? 'bg-[#1a1a2e] text-white shadow-2xl scale-125 rounded-[18px]' : 'text-gray-400 bg-gray-50 border border-transparent'}`}>
+                                <div className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-all duration-500 ${isSelected ? 'bg-[#1a1a2e] text-white shadow-2xl scale-125' : 'text-gray-400 bg-gray-50 border border-transparent'}`}>
                                     <span className="text-[16px] font-black">{format(date, 'd')}</span>
                                     {hasLog && <div className={`w-1 h-1 rounded-full mt-1 ${isSelected ? 'bg-blue-400' : 'bg-blue-500'}`} />}
                                 </div>
                             </button>
                         );
                     })}
-                </div>
+                </motion.div>
             </header>
 
             {/* TIMELINE LIST - PERFECT DAY STYLE */}

@@ -86,8 +86,8 @@ export default function OnboardingPage() {
 
     if (!isHydrated) return <div className="min-h-[100dvh] bg-white flex items-center justify-center"><Loader2 className="animate-spin text-blue-500" /></div>;
 
-    const totalSteps = 15; // Consolidated 25-step feel into 15 high-impact screens
-    const progress = (currentStep / totalSteps) * 100;
+    const totalSteps = 11; // 0-10
+    const progress = ((currentStep + 1) / totalSteps) * 100;
 
     const OptionCard = ({ emoji, title, subtitle, selected, onClick }: any) => (
         <motion.button
@@ -140,7 +140,7 @@ export default function OnboardingPage() {
                 <div className="w-12 h-12" />
             </nav>
 
-            <main className="flex-1 px-5 flex flex-col pt-4 overflow-x-hidden">
+            <main className="flex-1 px-5 flex flex-col pt-4 overflow-x-hidden pb-20">
                 <AnimatePresence mode="wait">
                     {/* STEP 0: THE SPLASH - PREMIUM CAL AI STYLE */}
                     {currentStep === 0 && (
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
                                 ].map(item => (
                                     <button 
                                         key={item.t}
-                                        onClick={() => handleSingleSelect('assetClass', item.t)}
+                                        onClick={() => setAnswers({ ...answers, assetClass: item.t })}
                                         className={`h-[110px] rounded-[32px] border-2 transition-all p-4 flex flex-col items-center justify-center gap-1 ${
                                             answers.assetClass === item.t ? 'border-blue-500 bg-blue-50/20 text-[#1a1a2e]' : 'border-gray-50 text-gray-400'
                                         }`}
@@ -219,6 +219,16 @@ export default function OnboardingPage() {
                                     </button>
                                 ))}
                             </div>
+                            {answers.assetClass && (
+                                <motion.button 
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    onClick={nextStep}
+                                    className="h-[72px] w-full bg-[#1a1a2e] text-white rounded-[28px] font-black text-[20px] shadow-2xl active:scale-95 transition-all mt-4"
+                                >
+                                    Continue
+                                </motion.button>
+                            )}
                         </motion.div>
                     )}
 
@@ -281,15 +291,21 @@ export default function OnboardingPage() {
                                 {['0.25%', '0.5%', '1.0%', '2.0%'].map(val => (
                                     <button 
                                         key={val} 
-                                        onClick={() => handleSingleSelect('riskPerTrade', val)}
+                                        onClick={() => setAnswers({ ...answers, riskPerTrade: val })}
                                         className={`h-[80px] rounded-[28px] border-2 font-black text-xl transition-all ${
-                                            answers.riskPerTrade === val ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-50 bg-white text-gray-300'
+                                            answers.riskPerTrade === val ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-md' : 'border-gray-50 bg-white text-gray-300'
                                         }`}
                                     >
                                         {val}
                                     </button>
                                 ))}
                             </div>
+                            <button 
+                                onClick={nextStep}
+                                className="h-[72px] w-full bg-[#1a1a2e] text-white rounded-[28px] font-black text-[20px] shadow-2xl active:scale-95 transition-all mt-8"
+                            >
+                                Confirm Risk Level
+                            </button>
                         </motion.div>
                     )}
 

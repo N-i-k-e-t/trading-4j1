@@ -135,30 +135,35 @@ export default function DashboardPage() {
                             </button>
                         </div>
                         
-                        <div className="w-full flex justify-between px-2">
-                            {[-3, -2, -1, 0, 1, 2, 3].map((offset) => {
-                                const date = new Date();
-                                date.setDate(date.getDate() + (weekOffset * 7) + offset);
-                                const isCurrentInStrip = selectedDate.toDateString() === date.toDateString();
-                                const isRealToday = new Date().toDateString() === date.toDateString();
-                                
-                                return (
-                                    <motion.button 
-                                        key={offset}
-                                        onClick={() => setSelectedDate(date)}
-                                        whileTap={{ scale: 0.9 }}
-                                        className="flex flex-col items-center gap-2"
-                                    >
-                                        <span className={`text-[12px] font-bold uppercase tracking-widest ${isCurrentInStrip ? 'text-[#1a1a2e]' : 'text-gray-400'}`}>
-                                            {date.toLocaleDateString('en-US', { weekday: 'narrow' })}
-                                        </span>
-                                        <div className={`w-11 h-11 rounded-full flex flex-col items-center justify-center transition-all ${isCurrentInStrip ? 'bg-[#1a1a2e] text-white shadow-xl scale-110' : 'text-gray-400'} ${isRealToday && !isCurrentInStrip ? 'border border-blue-200' : ''}`}>
-                                            <span className="text-[15px] font-black leading-none">{date.getDate()}</span>
-                                            {isRealToday && <div className={`w-1 h-1 rounded-full mt-1 ${isCurrentInStrip ? 'bg-white' : 'bg-blue-500'}`} />}
-                                        </div>
-                                    </motion.button>
-                                );
-                            })}
+                        <div className="w-full relative">
+                            <div className="flex gap-4 overflow-x-auto px-5 pb-4 scrollbar-hide snap-x snap-mandatory mask-fade-edges">
+                                {Array.from({ length: 31 }).map((_, i) => {
+                                    const date = new Date();
+                                    // Start from 15 days ago to 15 days ahead for a wide scrollable range
+                                    date.setDate(date.getDate() + (i - 15));
+                                    const isCurrentInStrip = selectedDate.toDateString() === date.toDateString();
+                                    const isRealToday = new Date().toDateString() === date.toDateString();
+                                    
+                                    return (
+                                        <motion.button 
+                                            key={i}
+                                            onClick={() => setSelectedDate(date)}
+                                            whileTap={{ scale: 0.9 }}
+                                            className="flex flex-col items-center gap-2 flex-none snap-center"
+                                        >
+                                            <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${isCurrentInStrip ? 'text-[#1a1a2e]' : 'text-gray-300'}`}>
+                                                {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                                            </span>
+                                            <div className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 ${isCurrentInStrip ? 'bg-[#1a1a2e] text-white shadow-[0_10px_25px_rgba(0,0,0,0.15)] scale-110 rounded-[18px]' : 'text-gray-400 bg-white border border-gray-50'}`}>
+                                                <span className="text-[16px] font-black leading-none">{date.getDate()}</span>
+                                                {isRealToday && (
+                                                    <div className={`w-1.5 h-1.5 rounded-full mt-1.5 ${isCurrentInStrip ? 'bg-blue-400' : 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]'}`} />
+                                                )}
+                                            </div>
+                                        </motion.button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 </header>

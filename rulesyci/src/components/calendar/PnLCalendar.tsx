@@ -112,7 +112,7 @@ export default function PnLCalendar() {
                             initial={{ opacity: 0, scale: 0.95 }} 
                             animate={{ opacity: 1, scale: 1 }} 
                             exit={{ opacity: 0, scale: 0.95 }} 
-                            className="absolute inset-0 bg-white/95 backdrop-blur-3xl z-40 p-8 flex flex-col gap-8 shadow-2xl"
+                            className="absolute inset-0 bg-white/95 backdrop-blur-3xl z-40 p-8 flex flex-col gap-8 shadow-2xl overflow-y-auto custom-scrollbar"
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex flex-col">
@@ -176,7 +176,14 @@ export default function PnLCalendar() {
 
                 <motion.div 
                     layout
-                    className="grid grid-cols-7 gap-y-4 gap-x-2"
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={0.2}
+                    onDragEnd={(e, { offset, velocity }) => {
+                        if (offset.x > 100) prevMonth();
+                        else if (offset.x < -100) nextMonth();
+                    }}
+                    className="grid grid-cols-7 gap-y-4 gap-x-2 cursor-grab active:cursor-grabbing"
                 >
                     {days.map((date, i) => {
                         if (!date) return <div key={`pad-${i}`} className="aspect-square" />;
