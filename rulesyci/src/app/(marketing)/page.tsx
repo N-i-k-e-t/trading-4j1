@@ -65,8 +65,22 @@ export default function LandingPage() {
     }, [isHydrated, user, router]);
 
     useEffect(() => {
+        // Hydrate timer from localStorage or set default
+        const savedTime = localStorage.getItem('rulesci_pricing_timer');
+        if (savedTime) {
+            setTimeLeft(parseInt(savedTime));
+        } else {
+            setTimeLeft(600);
+        }
+    }, []);
+
+    useEffect(() => {
         const timer = setInterval(() => {
-            setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+            setTimeLeft((prev) => {
+                const next = prev > 0 ? prev - 1 : 0;
+                localStorage.setItem('rulesci_pricing_timer', next.toString());
+                return next;
+            });
         }, 1000);
         return () => clearInterval(timer);
     }, []);
@@ -164,7 +178,7 @@ export default function LandingPage() {
                         >
                             <div className="w-full h-full bg-white rounded-[32px] overflow-hidden relative shadow-inner">
                                 <img 
-                                    src="file:///C:/Users/user/.gemini/antigravity/brain/97973678-19ed-4bd3-8fc4-0873982efec8/rulesci_dashboard_mockup_1774182186935.png" 
+                                    src="/rulesci_dashboard_mockup_1774182186935.png" 
                                     alt="RuleSci Dashboard Mockup" 
                                     className="w-full h-full object-cover"
                                 />
@@ -666,8 +680,14 @@ export default function LandingPage() {
                                                     <CheckCircle2 size={16} />
                                                 </div>
                                             </td>
-                                            <td className="p-8 text-center opacity-20">
-                                                <span className="text-[20px] font-black text-gray-400">—</span>
+                                            <td className="p-8 text-center">
+                                                {row.o ? (
+                                                    <div className="inline-flex w-8 h-8 rounded-full bg-gray-100 text-gray-300 items-center justify-center">
+                                                        <CheckCircle2 size={16} />
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-[20px] font-black text-gray-200">—</span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
@@ -706,60 +726,87 @@ export default function LandingPage() {
             <footer className="py-24 bg-[#1a1a2e] text-white/40 border-t border-white/5 relative z-10 px-8"
                 style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 64px)' }}
             >
-                <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 sm:gap-24 mb-20">
+                <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 sm:gap-24 mb-24">
                     <div className="col-span-1 md:col-span-1">
-                        <div className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 bg-white text-[#1a1a2e] rounded-lg flex items-center justify-center">
-                                <Target size={18} strokeWidth={3} />
+                        <div className="flex items-center gap-2 mb-8">
+                            <div className="w-9 h-9 bg-white text-[#1a1a2e] rounded-xl flex items-center justify-center shadow-lg">
+                                <Target size={20} strokeWidth={3} />
                             </div>
-                            <span className="text-[20px] font-black tracking-tight text-white">RuleSci</span>
+                            <span className="text-[22px] font-black tracking-tight text-white">RuleSci</span>
                         </div>
-                        <p className="text-[14px] font-bold leading-relaxed mb-6">
-                            Building the world's most disciplined trading community. No fluff, just pure habit architecture.
+                        <p className="text-[14px] font-bold leading-relaxed mb-8 text-white/60">
+                            Building the world's most disciplined trading community. No fluff, just pure habit architecture for elite execution.
                         </p>
                         <div className="flex gap-4">
-                            {[1,2,3].map(i => <div key={i} className="w-10 h-10 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 transition-colors cursor-pointer" />)}
+                            {[
+                                { icon: <MessageSquare size={18} />, label: "Twitter" },
+                                { icon: <Star size={18} />, label: "LinkedIn" },
+                                { icon: <Zap size={18} />, label: "ProductHunt" }
+                            ].map((social, i) => (
+                                <div 
+                                    key={i} 
+                                    className="w-11 h-11 bg-white/5 rounded-2xl border border-white/10 hover:bg-white hover:text-[#1a1a2e] hover:border-white transition-all cursor-pointer flex items-center justify-center group shadow-sm active:scale-90"
+                                    title={social.label}
+                                >
+                                    {social.icon}
+                                </div>
+                            ))}
                         </div>
                     </div>
                     
-                    <div>
-                        <h5 className="text-[11px] font-black text-white uppercase tracking-[0.2em] mb-8">Product</h5>
-                        <ul className="flex flex-col gap-4 text-[13px] font-bold">
+                    <div className="md:pl-12">
+                        <h5 className="text-[11px] font-black text-white uppercase tracking-[0.3em] mb-8">Product</h5>
+                        <ul className="flex flex-col gap-5 text-[14px] font-bold">
                             <li className="hover:text-white cursor-pointer transition-colors">Pricing</li>
                             <li className="hover:text-white cursor-pointer transition-colors">Features</li>
                             <li className="hover:text-white cursor-pointer transition-colors">Security</li>
-                            <li className="hover:text-white cursor-pointer transition-colors">Changelog</li>
+                            <li className="hover:text-white cursor-pointer transition-colors">Rule Scanner</li>
+                            <li className="hover:text-white cursor-pointer transition-colors">AI Coaching</li>
                         </ul>
                     </div>
 
                     <div>
-                        <h5 className="text-[11px] font-black text-white uppercase tracking-[0.2em] mb-8">Company</h5>
-                        <ul className="flex flex-col gap-4 text-[13px] font-bold">
-                            <li className="hover:text-white cursor-pointer transition-colors">About</li>
-                            <li className="hover:text-white cursor-pointer transition-colors">Blog</li>
-                            <li className="hover:text-white cursor-pointer transition-colors">Careers</li>
-                            <li className="hover:text-white cursor-pointer transition-colors">Contact</li>
+                        <h5 className="text-[11px] font-black text-white uppercase tracking-[0.3em] mb-8">Resources</h5>
+                        <ul className="flex flex-col gap-5 text-[14px] font-bold">
+                            <li className="hover:text-white cursor-pointer transition-colors">Psychology Blog</li>
+                            <li className="hover:text-white cursor-pointer transition-colors">Rule Library</li>
+                            <li className="hover:text-white cursor-pointer transition-colors">Trader Community</li>
+                            <li className="hover:text-white cursor-pointer transition-colors">Contact Support</li>
                         </ul>
                     </div>
 
-                    <div>
-                        <h5 className="text-[11px] font-black text-white uppercase tracking-[0.2em] mb-8">Newsletter</h5>
-                        <p className="text-[12px] font-bold mb-6 italic leading-relaxed">Weekly insights on the psychology of trading excellence.</p>
-                        <div className="relative">
-                            <input type="email" placeholder="Email Address" className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-[13px] font-bold placeholder:text-white/20 focus:outline-none focus:border-white/20" />
-                            <button className="absolute right-2 top-2 w-8 h-8 bg-white text-[#1a1a2e] rounded-lg flex items-center justify-center active:scale-90 transition-transform">
-                                <ArrowRight size={16} />
-                            </button>
+                    <div className="bg-white/5 p-8 rounded-[32px] border border-white/10 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-10">
+                            <ShieldCheck size={80} />
                         </div>
+                        <h5 className="text-[11px] font-black text-white uppercase tracking-[0.3em] mb-6 relative z-10">Newsletter</h5>
+                        <p className="text-[13px] font-bold mb-6 italic leading-relaxed text-white/50 relative z-10">
+                            Get weekly insights on the psychology of trading excellence. 
+                        </p>
+                        <form className="relative z-10" onSubmit={(e) => { e.preventDefault(); alert('Subscribed to RuleSci Labs!'); }}>
+                            <input 
+                                required
+                                type="email" 
+                                placeholder="Your Email" 
+                                className="w-full h-12 bg-white/5 border border-white/20 rounded-xl px-4 text-[13px] font-bold placeholder:text-white/20 focus:outline-none focus:border-white/40 mb-3" 
+                            />
+                            <button 
+                                type="submit"
+                                className="w-full h-12 bg-white text-[#1a1a2e] rounded-xl flex items-center justify-center font-black text-[13px] uppercase tracking-widest active:scale-95 transition-all shadow-xl"
+                            >
+                                Subscribe
+                            </button>
+                        </form>
                     </div>
                 </div>
 
-                <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-[11px] font-black uppercase tracking-widest border-t border-white/5 pt-12">
-                    <div className="flex items-center gap-6">
-                        <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-                        <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+                <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-[11px] font-black uppercase tracking-[0.2em] border-t border-white/5 pt-12">
+                    <div className="flex items-center gap-8">
+                        <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+                        <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
                     </div>
-                    <span className="opacity-30">© 2026 RuleSci. All Rights Reserved.</span>
+                    <span className="text-white/20">© 2026 RuleSci. Engineered for Discipline.</span>
                 </div>
             </footer>
         </div>
