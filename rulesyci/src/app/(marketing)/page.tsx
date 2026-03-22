@@ -65,19 +65,9 @@ export default function LandingPage() {
     }, [isHydrated, user, router]);
 
     useEffect(() => {
-        // Hydrate timer from localStorage or set default
-        const savedTime = localStorage.getItem('rulesci_pricing_timer');
-        if (savedTime) {
-            setTimeLeft(parseInt(savedTime));
-        } else {
-            setTimeLeft(600);
-        }
-    }, []);
-
-    useEffect(() => {
         const timer = setInterval(() => {
             setTimeLeft((prev) => {
-                const next = prev > 0 ? prev - 1 : 0;
+                const next = prev > 0 ? prev - 1 : 600; // Reset if reaches zero
                 localStorage.setItem('rulesci_pricing_timer', next.toString());
                 return next;
             });
@@ -204,14 +194,20 @@ export default function LandingPage() {
                 {/* LOGO BAR */}
                 <section className="py-12 bg-gray-50/50 border-y border-gray-100/50">
                     <div className="max-w-6xl mx-auto px-6 overflow-hidden">
-                        <p className="text-[11px] font-black text-gray-300 uppercase tracking-[0.3em] text-center mb-8">Trusted by Traders from Top Prop Firms</p>
-                        <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale contrast-150">
-                            {/* MOCK FIRM LOGOS */}
-                            <span className="text-[20px] font-black tracking-tighter">FTMO</span>
-                            <span className="text-[20px] font-black tracking-tighter">MYFOREXFUNDS</span>
-                            <span className="text-[20px] font-black tracking-tighter">APEX FUNDING</span>
-                            <span className="text-[20px] font-black tracking-tighter">TOPSTEP</span>
-                            <span className="text-[20px] font-black tracking-tighter">THE5ERS</span>
+                        <p className="text-[11px] font-black text-gray-300 uppercase tracking-[0.3em] text-center mb-10">Trusted by Traders from Elite Prop Firms</p>
+                        <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-30 grayscale saturate-0">
+                            {[
+                                { n: "FTMO", i: <ShieldCheck size={28} /> },
+                                { n: "Topstep", i: <BarChart3 size={28} /> },
+                                { n: "FundingPips", i: <Target size={28} /> },
+                                { n: "The5%ers", i: <Star size={28} /> },
+                                { n: "Elite Funded", i: <Zap size={28} /> }
+                            ].map((firm, i) => (
+                                <div key={i} className="flex items-center gap-3">
+                                    {firm.i}
+                                    <span className="text-[22px] font-black tracking-tighter">{firm.n}</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </section>
@@ -494,37 +490,31 @@ export default function LandingPage() {
                                     whileHover={{ y: -4 }}
                                     className="relative bg-white rounded-[32px] border-2 border-[#1a1a2e] p-8 shadow-2xl text-left overflow-hidden group-hover:shadow-[0_20px_40px_rgba(26,26,46,0.1)] transition-shadow"
                                 >
-                                    <div className="absolute top-0 left-0 right-0 bg-[#1a1a2e] py-1.5 text-center">
-                                        <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">MOST POPULAR</span>
-                                    </div>
-
                                     <div className="flex items-center justify-between mt-6">
                                         <div className="flex flex-col">
-                                            <span className="text-[20px] font-black text-[#1a1a2e] tracking-tight">12-MONTHS</span>
+                                            <span className="text-[20px] font-black text-[#1a1a2e] tracking-tight">ANNUAL ACCESS</span>
                                             <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-[14px] font-bold text-gray-300 line-through tracking-tight">$199.99</span>
-                                                <span className="text-[16px] font-black text-green-500 tracking-tight">$59.99</span>
+                                                <span className="text-[14px] font-bold text-gray-300 line-through tracking-tight">₹11,999</span>
+                                                <span className="text-[16px] font-black text-green-500 tracking-tight">Save 33%</span>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <span className="text-[32px] font-black text-[#1a1a2e] leading-none tracking-tighter">$4.99</span>
-                                            <span className="block text-[11px] text-gray-400 font-black uppercase tracking-widest mt-1">per month</span>
+                                            <span className="text-[32px] font-black text-[#1a1a2e] leading-none tracking-tighter">₹7,999</span>
+                                            <span className="block text-[11px] text-gray-400 font-black uppercase tracking-widest mt-1">Billed Annually</span>
                                         </div>
                                     </div>
 
-                                    <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col gap-1">
-                                        <div className="h-1.5 bg-red-500/10 rounded-full overflow-hidden">
-                                            <div className="h-full bg-red-500 transition-all duration-1000" style={{ width: '40%' }} />
-                                        </div>
-                                        <p className="text-[11px] font-black text-red-500 mt-2 uppercase tracking-widest flex items-center gap-2">
+                                    <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
+                                        <p className="text-[11px] font-black text-red-500 uppercase tracking-widest flex items-center gap-2">
                                             <Zap size={10} className="fill-red-500" />
                                             Limited offer: ends in {formatTime(timeLeft)}
                                         </p>
+                                        <span className="text-[13px] font-black text-[#1a1a2e]">~₹666/mo</span>
                                     </div>
                                 </motion.div>
                             </Link>
 
-                            {/* Weekly Plan */}
+                            {/* Monthly Plan */}
                             <Link href="/signup" className="group">
                                 <motion.div 
                                     whileHover={{ y: -4 }}
@@ -532,15 +522,12 @@ export default function LandingPage() {
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex flex-col">
-                                            <span className="text-[20px] font-black text-[#1a1a2e] tracking-tight">1-WEEK</span>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-[14px] font-bold text-gray-300 line-through tracking-tight">$14.99</span>
-                                                <span className="text-[16px] font-black text-gray-400 tracking-tight">$9.99</span>
-                                            </div>
+                                            <span className="text-[20px] font-black text-[#1a1a2e] tracking-tight">MONTHLY PASS</span>
+                                            <span className="text-[12px] font-bold text-gray-400 mt-1 uppercase tracking-widest">Full Pro Access</span>
                                         </div>
                                         <div className="text-right">
-                                            <span className="text-[32px] font-black text-[#1a1a2e] leading-none tracking-tighter">$1.42</span>
-                                            <span className="block text-[11px] text-gray-400 font-black uppercase tracking-widest mt-1">per day</span>
+                                            <span className="text-[32px] font-black text-[#1a1a2e] leading-none tracking-tighter">₹999</span>
+                                            <span className="block text-[11px] text-gray-400 font-black uppercase tracking-widest mt-1">per month</span>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -737,7 +724,7 @@ export default function LandingPage() {
                         <p className="text-[14px] font-bold leading-relaxed mb-8 text-white/60">
                             Building the world's most disciplined trading community. No fluff, just pure habit architecture for elite execution.
                         </p>
-                        <div className="flex gap-4">
+                        <div className="flex gap-4 text-white">
                             {[
                                 { icon: <MessageSquare size={18} />, label: "Twitter" },
                                 { icon: <Star size={18} />, label: "LinkedIn" },
