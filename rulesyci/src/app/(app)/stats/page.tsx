@@ -121,7 +121,13 @@ export default function StatsPage() {
     const streakPercent = bestStreak > 0 ? Math.min((streak / Math.max(bestStreak, 1)) * 100, 100) : (streak > 0 ? 100 : 0);
 
     return (
-        <div className="flex flex-col gap-6 px-5 pt-8 pb-[calc(env(safe-area-inset-bottom)+84px)] italic-none">
+        <div className="flex flex-col gap-6 px-5 pt-12 pb-[calc(env(safe-area-inset-bottom)+84px)] italic-none">
+            {/* HEADER */}
+            <header className="px-1 mb-2">
+                <h1 className="text-[38px] font-black text-[#1a1a2e] leading-none mb-2 tracking-tighter">My Stats.</h1>
+                <p className="text-[14px] font-bold text-gray-400 uppercase tracking-widest pl-1">Analyze my trading performance</p>
+            </header>
+
             {/* AI COACH — HERO INSIGHT */}
             {aiOutput.coachMessages.length > 0 && (
                 <section className="bg-[#1a1a2e] rounded-[40px] p-8 text-white shadow-2xl relative overflow-hidden">
@@ -133,8 +139,8 @@ export default function StatsPage() {
                             <Lightbulb size={32} strokeWidth={2.5} />
                         </div>
                         <div>
-                            <h3 className="text-[20px] font-black text-white leading-tight">Neural Coach</h3>
-                            <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">{aiOutput.coachMessages[0].tone} Sync</span>
+                            <h3 className="text-[20px] font-black text-white leading-tight">AI Coach</h3>
+                            <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">Today's Insight</span>
                         </div>
                     </div>
                     <p className="text-[17px] font-bold text-white leading-relaxed italic border-l-4 border-white/20 pl-6 py-2 relative z-10">
@@ -164,11 +170,11 @@ export default function StatsPage() {
                 </section>
 
                 <section className="bg-red-50/50 rounded-[32px] p-6 border border-red-100 flex flex-col items-center justify-center gap-2">
-                    <span className="text-[11px] font-black text-red-500 uppercase tracking-widest">Protocol Leak</span>
+                    <span className="text-[11px] font-black text-red-500 uppercase tracking-widest">Money Lost to Rules</span>
                     <span className="text-[24px] font-black text-red-600 tabular-nums leading-none">
                         ₹{analytics.indisciplineCost.toLocaleString()}
                     </span>
-                    <p className="text-[10px] font-bold text-red-400/60 uppercase text-center px-2">Cost of Indiscipline</p>
+                    <p className="text-[10px] font-bold text-red-400/60 uppercase text-center px-2">Cost of Breaking Rules</p>
                 </section>
             </div>
 
@@ -176,8 +182,8 @@ export default function StatsPage() {
             <section className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm overflow-hidden relative">
                 <header className="flex justify-between items-start mb-8">
                     <div>
-                        <h3 className="text-[22px] font-black text-[#1a1a2e] tracking-tight">Capital Scaling</h3>
-                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest pl-0.5">Stage 1: Structural Proof</p>
+                        <h3 className="text-[22px] font-black text-[#1a1a2e] tracking-tight">Scale My Account</h3>
+                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest pl-0.5">Phase 1: Building Habits</p>
                     </div>
                     <div className="bg-green-50 px-4 py-2 rounded-2xl border border-green-100">
                         <span className="text-[12px] font-black text-green-600">₹1L CAP Active</span>
@@ -186,8 +192,8 @@ export default function StatsPage() {
 
                 <div className="flex flex-col gap-4 mb-2">
                     <div className="flex justify-between text-[11px] font-black uppercase tracking-[0.2em] text-[#1a1a2e]">
-                        <span>Baseline</span>
-                        <span className="opacity-30">Unlock 2L+</span>
+                        <span>Starting Point</span>
+                        <span className="opacity-30">Unlock Next Level</span>
                     </div>
                     <div className="h-4 bg-gray-50 rounded-full overflow-hidden border border-gray-100 p-0.5">
                         <motion.div 
@@ -197,7 +203,7 @@ export default function StatsPage() {
                         />
                     </div>
                     <p className="text-[14px] font-bold text-gray-400 pl-1">
-                        {streak >= 30 ? 'Architecture Stable: Scaling Authorized.' : `${30 - streak} days of compliance until phase expansion.`}
+                        {streak >= 30 ? 'Habits Stable: Scaling Ready.' : `${30 - streak} days of discipline until you can scale.`}
                     </p>
                 </div>
             </section>
@@ -243,8 +249,8 @@ export default function StatsPage() {
                 ) : (
                     <EmptyState 
                         emoji="📈"
-                        title="Architecture Growth"
-                        description="Log trades and maintain discipline to see your performance stats here."
+                        title="Trading Performance"
+                        description="Log trades and stay disciplined to see your performance stats here."
                         action={{ label: "Log First Trade", onClick: () => setCaptureOpen(true) }}
                     />
                 )}
@@ -273,7 +279,7 @@ export default function StatsPage() {
                 {aiOutput.insights.map(insight => (
                     <div key={insight.id} className="card-premium !bg-yellow-50/30 !border-yellow-100">
                         <div className="flex items-center gap-2 mb-2">
-                            <span className="text-[10px] font-black text-yellow-600 uppercase tracking-widest">Pattern Architecture</span>
+                            <span className="text-[10px] font-black text-yellow-600 uppercase tracking-widest">Trading Pattern</span>
                             <span className="text-[10px] font-bold text-gray-400">({Math.round(insight.confidence * 100)}% Conf.)</span>
                         </div>
                         <p className="text-[15px] font-black text-[#1a1a2e] mb-1">{insight.pattern}</p>
@@ -303,7 +309,7 @@ export default function StatsPage() {
                     <EmptyState 
                         emoji="🧠"
                         title="AI Analysis Pending"
-                        description={`Log at least ${3 - trades.length} more trades to unlock architectural pattern analysis.`}
+                        description={`Log at least ${3 - trades.length} more trades to unlock detailed pattern analysis.`}
                         action={{ label: "Log Trade", onClick: () => setCaptureOpen(true) }}
                     />
                 )}

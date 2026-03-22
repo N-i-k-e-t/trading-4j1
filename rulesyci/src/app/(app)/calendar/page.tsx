@@ -26,11 +26,11 @@ export default function CalendarPage() {
                         <div className="w-8 h-8 bg-blue-500/10 text-blue-600 rounded-lg flex items-center justify-center">
                             <Zap size={16} strokeWidth={3} />
                         </div>
-                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Performance Sync</span>
+                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Result History</span>
                     </div>
-                    <h1 className="text-[32px] font-black tracking-[-0.04em] text-[#1a1a2e] leading-tight text-center">Protocol Architecture.</h1>
+                    <h1 className="text-[32px] font-black tracking-[-0.04em] text-[#1a1a2e] leading-tight text-center">Trading Calendar.</h1>
                     <p className="text-[14px] font-bold text-gray-400 leading-relaxed text-center px-4">
-                        Visualizing the direct correlation between discipline grades & institutional volatility.
+                        See how your discipline impacts your profits over time.
                     </p>
                 </div>
 
@@ -107,7 +107,7 @@ export default function CalendarPage() {
             {/* Upcoming Crucial Events */}
             <section className="pb-10">
                 <div className="flex items-center justify-between mb-6 px-1">
-                    <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Institutional Volatility</h3>
+                    <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Market Events</h3>
                     <div className="h-[1px] flex-1 bg-gray-50 ml-4" />
                 </div>
                 <div className="bg-white rounded-[32px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.03)] border border-gray-50">
@@ -146,4 +146,3 @@ export default function CalendarPage() {
         </div>
     );
 }
-

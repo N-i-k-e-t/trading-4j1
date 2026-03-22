@@ -64,8 +64,8 @@ export default function JournalPage() {
             <header className="px-5 pt-12 mb-8">
                 <div className="flex items-center justify-between mb-10">
                     <div className="flex flex-col">
-                        <h1 className="text-[38px] font-black text-[#1a1a2e] leading-none mb-1 tracking-tighter">Execution <br/> History.</h1>
-                        <p className="text-[14px] font-bold text-gray-400 uppercase tracking-widest pl-1">Neural Records</p>
+                        <h1 className="text-[38px] font-black text-[#1a1a2e] leading-none mb-1 tracking-tighter">Trade <br/> Journal.</h1>
+                        <p className="text-[14px] font-bold text-gray-400 uppercase tracking-widest pl-1">My Trading History</p>
                     </div>
                     <button 
                         onClick={() => mode === 'trades' ? setCaptureOpen(true) : setIsScannerOpen(true)}
@@ -121,50 +121,52 @@ export default function JournalPage() {
             <main className="px-5 flex-1 flex flex-col gap-4">
                 <AnimatePresence mode="popLayout">
                     {mode === 'trades' ? (
-                        filteredTrades.length > 0 ? filteredTrades.map((trade, idx) => (
-                            <motion.button
-                                key={trade.id}
-                                layout
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                onClick={() => router.push(`/journal/${trade.id}`)}
-                                className="p-6 bg-white rounded-[40px] border border-gray-50 shadow-sm flex flex-col gap-5 text-left group active:scale-[0.98] transition-all"
-                            >
-                                <div className="flex items-center justify-between">
-                                    <div className="flex-1">
-                                        <h3 className="text-[18px] font-black text-[#1a1a2e] mb-1 leading-tight">{trade.pair}</h3>
-                                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{trade.date} • {trade.type}</p>
+                        filteredTrades.length > 0 ? (
+                            filteredTrades.map((trade) => (
+                                <motion.button
+                                    key={trade.id}
+                                    layout
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    onClick={() => router.push(`/journal/${trade.id}`)}
+                                    className="p-6 bg-white rounded-[40px] border border-gray-50 shadow-sm flex flex-col gap-5 text-left group active:scale-[0.98] transition-all"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex-1">
+                                            <h3 className="text-[18px] font-black text-[#1a1a2e] mb-1 leading-tight">{trade.pair}</h3>
+                                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{trade.date} • {trade.type}</p>
+                                        </div>
+                                        <div className="text-right flex flex-col items-end">
+                                            <span className={`text-[22px] font-black tabular-nums leading-none mb-1 ${(trade.pnl || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                                {(trade.pnl || 0) >= 0 ? '+' : ''}{(trade.pnl || 0).toFixed(1)}R
+                                            </span>
+                                            <div className={`w-8 h-1 bg-current opacity-20 rounded-full ${(trade.pnl || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`} />
+                                        </div>
                                     </div>
-                                    <div className="text-right flex flex-col items-end">
-                                        <span className={`text-[22px] font-black tabular-nums leading-none mb-1 ${(trade.pnl || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                            {(trade.pnl || 0) >= 0 ? '+' : ''}{(trade.pnl || 0).toFixed(1)}R
-                                        </span>
-                                        <div className={`w-8 h-1 bg-current opacity-20 rounded-full ${(trade.pnl || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`} />
+                                    <div className="flex items-center justify-between pt-4 border-t border-gray-50/50">
+                                        <div className="flex gap-1.5">
+                                            {trade.rules_followed?.slice(0, 5).map((_, i) => (
+                                                <div key={i} className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
+                                            ))}
+                                        </div>
+                                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300">
+                                            <ChevronRight size={16} strokeWidth={3} />
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex items-center justify-between pt-4 border-t border-gray-50/50">
-                                    <div className="flex gap-1.5">
-                                        {trade.rules_followed?.slice(0, 5).map((_, i) => (
-                                            <div key={i} className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
-                                        ))}
-                                    </div>
-                                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300">
-                                        <ChevronRight size={16} strokeWidth={3} />
-                                    </div>
-                                </div>
-                            </motion.button>
-                        )) : (
+                                </motion.button>
+                            ))
+                        ) : (
                             <EmptyState 
                                 emoji="📖"
                                 title="No trades found"
-                                description="Log your executions to start tracking your trading discipline architecture."
-                                action={{ label: "Log Trade", onClick: () => setCaptureOpen(true) }}
+                                description="Log your trades to start tracking your trading history and progress."
+                                action={{ label: "Log First Trade", onClick: () => setCaptureOpen(true) }}
                             />
                         )
                     ) : (
                         filteredScans.length > 0 ? (
                             <div className="grid grid-cols-2 gap-4">
-                                {filteredScans.map((entry, idx) => (
+                                {filteredScans.map((entry) => (
                                     <motion.div 
                                         key={entry.id}
                                         layout
@@ -180,7 +182,7 @@ export default function JournalPage() {
                                         </div>
                                         <div className="p-3">
                                             <span className="text-[13px] font-black text-[#1a1a2e] block truncate">{entry.date}</span>
-                                            <span className="text-[10px] font-bold text-gray-300">Digtally Secured</span>
+                                            <span className="text-[10px] font-bold text-gray-300">Digitally Secured</span>
                                         </div>
                                     </motion.div>
                                 ))}

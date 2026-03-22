@@ -100,22 +100,25 @@ export default function BottomTabs() {
                             <Link
                                 key={item.to}
                                 href={item.to!}
-                                className={`flex flex-col items-center justify-center transition-all flex-1 h-full ${
+                                className={`flex flex-col items-center justify-center transition-all flex-1 h-full gap-1 ${
                                     isActive ? 'text-[#1a1a2e]' : 'text-gray-300'
                                 }`}
                             >
                                 <motion.div 
                                     whileTap={{ scale: 0.9 }}
-                                    className={`relative flex items-center justify-center h-12 w-12 rounded-full transition-all ${isActive ? 'bg-gray-50' : ''}`}
+                                    className={`relative flex items-center justify-center h-10 w-10 rounded-full transition-all ${isActive ? 'bg-gray-50/50' : ''}`}
                                 >
-                                    <Icon size={24} strokeWidth={isActive ? 3 : 2} />
-                                    {isActive && (
-                                        <motion.div 
-                                            layoutId="activeTabDot"
-                                            className="absolute -bottom-2 w-1.5 h-1.5 bg-[#1a1a2e] rounded-full"
-                                        />
-                                    )}
+                                    <Icon size={22} strokeWidth={isActive ? 3 : 2} />
                                 </motion.div>
+                                <span className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'opacity-100' : 'opacity-40'}`}>
+                                    {item.label}
+                                </span>
+                                {isActive && (
+                                    <motion.div 
+                                        layoutId="activeTabDot"
+                                        className="w-1 h-1 bg-[#1a1a2e] rounded-full mt-0.5"
+                                    />
+                                )}
                             </Link>
                         );
                     })}
