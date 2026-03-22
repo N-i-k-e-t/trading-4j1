@@ -168,7 +168,7 @@ export default function LandingPage() {
                         >
                             <div className="w-full h-full bg-white rounded-[32px] overflow-hidden relative shadow-inner">
                                 <img 
-                                    src="/rulesci_dashboard_mockup_1774182186935.png" 
+                                    src="/mockup-hero.png" 
                                     alt="RuleSci Dashboard Mockup" 
                                     className="w-full h-full object-cover"
                                 />
