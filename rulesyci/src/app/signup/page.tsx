@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useRuleSci } from '@/lib/context';
 import { createClient } from '@/utils/supabase/client';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, Target, User, ArrowLeft, Loader2, Sparkles } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Target, User, ArrowLeft, Loader2, Sparkles, Check } from 'lucide-react';
 
 export default function SignupPage() {
     const { showToast } = useRuleSci();
@@ -15,6 +15,7 @@ export default function SignupPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+    const [termsAccepted, setTermsAccepted] = useState(false);
 
     const strength = useMemo(() => {
         const pass = formData.password;
@@ -36,6 +37,11 @@ export default function SignupPage() {
         
         if (formData.password.length < 8) {
             showToast('Password too short (min 8 chars)', 'error');
+            return;
+        }
+
+        if (!termsAccepted) {
+            showToast('Please accept the Terms & Conditions', 'info');
             return;
         }
 
@@ -163,6 +169,22 @@ export default function SignupPage() {
                             )}
                         </div>
 
+                        {/* TERMS CHECKBOX */}
+                        <div className="flex items-start gap-3 mt-1 px-1">
+                            <button
+                                type="button"
+                                onClick={() => setTermsAccepted(!termsAccepted)}
+                                className={`w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-all ${
+                                    termsAccepted ? 'bg-[#1a1a2e] border-[#1a1a2e] text-white' : 'bg-gray-50 border-gray-100'
+                                }`}
+                            >
+                                {termsAccepted && <Check size={14} strokeWidth={4} />}
+                            </button>
+                            <span className="text-[11px] font-bold text-gray-400 leading-tight uppercase tracking-wider">
+                                I accept the <Link href="/terms" className="text-[#1a1a2e] underline underline-offset-4">Terms</Link> & <Link href="/privacy" className="text-[#1a1a2e] underline underline-offset-4">Privacy Policy</Link>
+                            </span>
+                        </div>
+
                         <button 
                             disabled={isLoading}
                             className="w-full h-[68px] bg-[#1a1a2e] text-white font-black rounded-[24px] shadow-2xl shadow-gray-200 active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-4 disabled:opacity-70 group"
@@ -193,15 +215,8 @@ export default function SignupPage() {
                     </div>
                 </motion.div>
 
-                {/* TERMS */}
-                <p className="mt-8 px-6 text-center text-[11px] font-bold text-gray-400 leading-relaxed uppercase tracking-widest opacity-60">
-                    By signing up, you accept our{' '}
-                    <Link href="/terms" className="text-[#1a1a2e] underline underline-offset-4">Terms</Link> &{' '}
-                    <Link href="/privacy" className="text-[#1a1a2e] underline underline-offset-4">Privacy Policy</Link>
-                </p>
-
                 {/* FOOTER */}
-                <p className="mt-10 text-center text-[15px] font-bold text-gray-400">
+                <p className="mt-12 text-center text-[15px] font-bold text-gray-400">
                     Already have an account?{' '}
                     <Link href="/login" className="text-blue-600 font-black border-b-2 border-blue-600/10 pb-1">
                         Log In
