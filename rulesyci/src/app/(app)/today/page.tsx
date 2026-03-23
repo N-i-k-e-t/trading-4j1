@@ -49,7 +49,7 @@ export default function DashboardPage() {
 
     const activeRules = rules.filter(r => r.isActive !== false);
     const score = activeRules.length > 0 
-        ? Math.round((checkedIds.length / activeRules.length) * 100) 
+        ? Number(((checkedIds.length / activeRules.length) * 100).toFixed(1)) 
         : 0;
     const isPerfect = score === 100 && activeRules.length > 0;
 
@@ -114,8 +114,18 @@ export default function DashboardPage() {
     return (
         <div className="min-h-screen bg-[#fafafa] pb-48 selection:bg-blue-100 italic-none">
             <main className="px-5 pt-20 flex flex-col items-center">
-                {/* HORIZONTAL CALENDAR */}
-                <header className="w-full mb-8 flex flex-col items-center">
+                <header className="w-full mb-10 flex flex-col items-center">
+                    <div className="w-full flex justify-between items-center mb-8 px-2">
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Instance Level</span>
+                            <span className="text-[13px] font-black text-[#1a1a2e]">RULESCI ARCH-V1</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Neural Link Active</span>
+                        </div>
+                    </div>
+
                     <Link 
                         href="/calendar"
                         className="flex flex-col items-center gap-1 mb-6 cursor-pointer active:scale-95 transition-all group"
@@ -287,10 +297,9 @@ export default function DashboardPage() {
                     </div>
                 </section>
 
-                {/* TRADE COUNTER & ACTION - Fix 4 */}
                 <section className="w-full flex flex-col items-center gap-6 mb-14">
-                    <div className="flex flex-col items-center gap-1">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Daily Trades</span>
+                    <div className="flex flex-col items-center gap-1.5">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Execution Terminal</span>
                         <div className="flex items-baseline gap-2">
                             <span className="text-5xl font-black text-[#1a1a2e] leading-none">{targetTrades.length}</span>
                             <span className="text-xl font-bold text-gray-300">/ {session.tradesAllowed}</span>
@@ -329,8 +338,8 @@ export default function DashboardPage() {
                     </svg>
                     
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-[64px] font-black text-[#1a1a2e] tracking-tight tabular-nums leading-none">
-                            {score}<span className="text-[20px] font-bold text-gray-300">%</span>
+                        <span className="text-[52px] font-black text-[#1a1a2e] tracking-tighter tabular-nums leading-none">
+                            {score}<span className="text-[18px] font-bold text-gray-300 ml-0.5">%</span>
                         </span>
                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mt-2">Discipline Score</span>
                     </div>

@@ -54,7 +54,6 @@ export default function LoginPage() {
                 trialStartDate: new Date().toISOString()
             };
             setUser(mockUser);
-            // Persistence for mock user handled by localStorage in context.tsx
             showToast('Booting System Architecture...', 'success');
             router.replace('/today');
         }, 800);
@@ -95,15 +94,15 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-[100dvh] bg-white flex flex-col items-center justify-center px-6 selection:bg-orange-100 relative overflow-hidden"
+        <div className="min-h-[100dvh] bg-white flex flex-col items-center justify-center px-6 selection:bg-blue-100 relative overflow-hidden"
             style={{ 
                 paddingTop: 'env(safe-area-inset-top, 24px)', 
                 paddingBottom: 'env(safe-area-inset-bottom, 24px)' 
             }}
         >
             {/* BACKGROUND ACCENT */}
-            <div className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-orange-100/30 blur-[100px] rounded-full" />
-            <div className="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-blue-100/30 blur-[100px] rounded-full" />
+            <div className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-blue-100/30 blur-[100px] rounded-full" />
+            <div className="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-indigo-100/30 blur-[100px] rounded-full" />
 
             {/* BACK LINK */}
             <Link 
@@ -112,44 +111,45 @@ export default function LoginPage() {
                 style={{ top: 'max(env(safe-area-inset-top), 32px)' }}
             >
                 <ArrowLeft size={16} strokeWidth={3} />
-                System
+                Portal
             </Link>
 
             {isPlaceholderAuth && (
                 <div className="absolute top-8 right-6">
-                    <div className="px-3 py-1 bg-amber-100 border border-amber-200 text-amber-700 text-[9px] font-black uppercase tracking-widest rounded-full">
-                        Local Dev Mode
+                    <div className="px-3 py-1 bg-blue-100 border border-blue-200 text-blue-700 text-[9px] font-black uppercase tracking-widest rounded-full">
+                        Local Instance
                     </div>
                 </div>
             )}
 
             <div className="w-full max-w-[400px] flex flex-col pt-12 relative z-10">
                 {/* HEADER */}
-                <div className="flex flex-col items-center mb-8">
-                    <div className="w-14 h-14 bg-[#1a1a2e] text-white rounded-[20px] flex items-center justify-center shadow-2xl shadow-gray-200 mb-6">
-                        <Target size={32} strokeWidth={2.5} />
+                <div className="flex flex-col items-center mb-10">
+                    <div className="w-16 h-16 bg-[#1a1a2e] text-white rounded-[24px] flex items-center justify-center shadow-2xl shadow-blue-100/50 mb-8 border border-white/10 group active:scale-90 transition-transform">
+                        <Target size={32} strokeWidth={2.5} className="group-hover:rotate-12 transition-transform" />
                     </div>
-                    <h1 className="text-[28px] font-black text-[#1a1a2e] mb-1 tracking-tight">Access RuleSci.</h1>
-                    <p className="text-[15px] font-bold text-gray-300">Synchronizing your performance data.</p>
+                    <h1 className="text-[34px] font-black text-[#1a1a2e] mb-1 tracking-tighter leading-none">Initialize Access.</h1>
+                    <p className="text-[15px] font-bold text-gray-400 mt-2">Synchronizing your Discipline Protocol.</p>
                 </div>
 
                 {/* STREAK PREVIEW CARD */}
                 <AnimatePresence>
                     {localStats && (
                         <motion.div 
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="bg-white border border-gray-100 rounded-[32px] p-5 mb-5 flex items-center gap-4 shadow-sm"
+                            className="bg-white border border-gray-100 rounded-[32px] p-6 mb-8 flex items-center gap-5 shadow-xl shadow-gray-100/50 relative overflow-hidden group"
                         >
-                            <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center shadow-sm text-xl border border-orange-100">
+                            <div className="absolute inset-0 bg-blue-50/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="w-14 h-14 bg-blue-600 rounded-[20px] flex items-center justify-center shadow-lg text-white text-2xl relative z-10">
                                 🔥
                             </div>
-                            <div className="flex-1 flex flex-col">
-                                <span className="text-[15px] font-black text-[#1a1a2e]">{localStats.streak}-day streak active.</span>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                                    <span className="text-[12px] font-bold text-gray-300 uppercase tracking-wider tabular-nums">Score: {localStats.score}% Precision</span>
+                            <div className="flex-1 flex flex-col relative z-10">
+                                <span className="text-[17px] font-black text-[#1a1a2e]">{localStats.streak}-day streak detected.</span>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                    <span className="text-[13px] font-bold text-gray-400 uppercase tracking-widest tabular-nums">{localStats.score}% Adherence Level</span>
                                 </div>
                             </div>
                         </motion.div>
@@ -158,19 +158,19 @@ export default function LoginPage() {
 
                 {/* LOGIN CARD */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 }}
-                    className="bg-white rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-50 overflow-hidden"
+                    className="bg-white rounded-[40px] shadow-[0_32px_80px_rgba(0,0,0,0.06)] border border-gray-50 overflow-hidden"
                 >
-                    <form onSubmit={handleSubmit} className="p-8 flex flex-col gap-5">
+                    <form onSubmit={handleSubmit} className="p-10 flex flex-col gap-6">
                         <div className="flex flex-col gap-2">
-                            <label className="text-[11px] font-black text-[#1a1a2e] ml-1 uppercase tracking-[0.1em] opacity-40">Neural Identity</label>
+                            <label className="text-[11px] font-black text-[#1a1a2e] ml-1 uppercase tracking-[0.2em] opacity-30">Neural Identity</label>
                             <input
                                 type="email"
                                 inputMode="email"
-                                placeholder="name@domain.com"
-                                className="w-full h-[58px] bg-gray-50/50 border border-gray-100 rounded-[18px] px-5 text-[16px] font-bold text-[#1a1a2e] focus:bg-white focus:border-blue-500/30 transition-all outline-none"
+                                placeholder="name@rulesci.io"
+                                className="w-full h-[64px] bg-gray-50/50 border-2 border-transparent rounded-[22px] px-6 text-[16px] font-bold text-[#1a1a2e] focus:bg-white focus:border-blue-500/20 transition-all outline-none"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 required
@@ -179,14 +179,14 @@ export default function LoginPage() {
 
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between px-1">
-                                <label className="text-[11px] font-black text-[#1a1a2e] uppercase tracking-[0.1em] opacity-40">Encryption Key</label>
-                                <button type="button" className="text-[11px] font-bold text-blue-500 uppercase tracking-widest active:opacity-50">Reset</button>
+                                <label className="text-[11px] font-black text-[#1a1a2e] uppercase tracking-[0.2em] opacity-30">Security Key</label>
+                                <button type="button" className="text-[11px] font-black text-blue-600 uppercase tracking-widest active:opacity-50">Forgot?</button>
                             </div>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     placeholder="••••••••"
-                                    className="w-full h-[58px] bg-gray-50/50 border border-gray-100 rounded-[18px] px-5 text-[16px] font-bold text-[#1a1a2e] pr-14 focus:bg-white focus:border-blue-500/30 transition-all outline-none"
+                                    className="w-full h-[64px] bg-gray-50/50 border-2 border-transparent rounded-[22px] px-6 text-[16px] font-bold text-[#1a1a2e] pr-16 focus:bg-white focus:border-blue-500/20 transition-all outline-none"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     required
@@ -194,58 +194,57 @@ export default function LoginPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-0 top-0 h-[58px] w-14 flex items-center justify-center text-gray-300 active:text-[#1a1a2e]"
+                                    className="absolute right-0 top-0 h-[64px] w-16 flex items-center justify-center text-gray-300 active:text-[#1a1a2e]"
                                 >
-                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
                                 </button>
                             </div>
                         </div>
 
                         <button 
                             disabled={isLoading}
-                            className="w-full h-[64px] bg-[#1a1a2e] text-white font-black rounded-[22px] shadow-2xl shadow-[#1a1a2e]/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-2 disabled:opacity-70 group"
+                            className="w-full h-[68px] bg-[#1a1a2e] text-white font-black rounded-[24px] shadow-2xl shadow-gray-200 active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-4 disabled:opacity-70 group"
                         >
                             {isLoading ? (
                                 <Loader2 className="animate-spin" size={24} />
                             ) : (
-                                <>Verify Identity <ArrowLeft className="rotate-180 group-hover:translate-x-1 transition-transform" size={20} strokeWidth={3} /></>
+                                <>Verify Identity <ArrowLeft className="rotate-180 group-hover:translate-x-1 transition-transform" size={22} strokeWidth={3} /></>
                             )}
                         </button>
                     </form>
 
                     {/* DIVIDER */}
-                    <div className="px-8 pb-4 flex items-center gap-4">
-                        <div className="flex-1 h-[1px] bg-gray-50" />
-                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Deployment Choice</span>
-                        <div className="flex-1 h-[1px] bg-gray-50" />
+                    <div className="px-10 pb-6 flex items-center gap-4">
+                        <div className="flex-1 h-[1px] bg-gray-100/50" />
+                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Deployment Path</span>
+                        <div className="flex-1 h-[1px] bg-gray-100/50" />
                     </div>
 
-                    {/* GUEST ACCESS */}
-                    <div className="px-8 pb-4">
+                    {/* ACTIONS */}
+                    <div className="px-10 pb-10 flex flex-col gap-4">
                         <button 
                             onClick={handleGuestLogin}
-                            className="w-full h-[58px] bg-blue-500 text-white font-black rounded-[20px] shadow-lg shadow-blue-100/50 active:scale-[0.97] transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-[13px]"
+                            className="w-full h-[60px] bg-white border-2 border-gray-100 text-[#1a1a2e] font-black rounded-[22px] active:scale-[0.97] transition-all flex items-center justify-center gap-2 uppercase tracking-[0.15em] text-[12px] hover:border-blue-500/20 shadow-sm"
                         >
-                            <Zap size={18} /> Skip to Demo
+                            <Zap size={18} className="text-blue-500" /> Enter Simulation Mode
                         </button>
-                    </div>
-
-                    {/* OAUTH */}
-                    <div className="px-8 pb-10 flex gap-3">
-                        <button className="flex-1 h-[58px] bg-white border-2 border-gray-50 rounded-[20px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm">
-                            <img src="https://www.google.com/favicon.ico" className="w-5 h-5 grayscale opacity-50" alt="G" />
-                        </button>
-                        <button className="flex-1 h-[58px] bg-white border-2 border-gray-50 rounded-[20px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm">
-                            <img src="https://github.com/favicon.ico" className="w-5 h-5 grayscale opacity-50" alt="A" />
-                        </button>
+                        
+                        <div className="flex gap-4">
+                            <button className="flex-1 h-[60px] bg-white border-2 border-gray-100 rounded-[22px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm group hover:border-gray-200">
+                                <img src="https://www.google.com/favicon.ico" className="w-5 h-5 grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all" alt="G" />
+                            </button>
+                            <button className="flex-1 h-[60px] bg-white border-2 border-gray-100 rounded-[22px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm group hover:border-gray-200">
+                                <img src="https://github.com/favicon.ico" className="w-5 h-5 grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all" alt="A" />
+                            </button>
+                        </div>
                     </div>
                 </motion.div>
 
                 {/* FOOTER */}
-                <p className="mt-10 text-center text-[15px] font-bold text-gray-300">
+                <p className="mt-12 text-center text-[15px] font-bold text-gray-400">
                     New Architect?{' '}
-                    <Link href="/signup" className="text-[#1a1a2e] font-black border-b-2 border-[#1a1a2e]/10 pb-0.5">
-                        Initialize Account
+                    <Link href="/signup" className="text-blue-600 font-black border-b-2 border-blue-600/10 pb-1 hover:text-blue-700 transition-colors">
+                        Register Protocol
                     </Link>
                 </p>
             </div>
