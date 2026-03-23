@@ -170,7 +170,7 @@ export default function StatsPage() {
                 </section>
 
                 <section className="bg-red-50/50 rounded-[32px] p-6 border border-red-100 flex flex-col items-center justify-center gap-2">
-                    <span className="text-[11px] font-black text-red-500 uppercase tracking-widest">Money Lost to Rules</span>
+                    <span className="text-[11px] font-black text-red-500 uppercase tracking-widest">Money Lost to Broken Rules</span>
                     <span className="text-[24px] font-black text-red-600 tabular-nums leading-none">
                         ₹{analytics.indisciplineCost.toLocaleString()}
                     </span>
@@ -182,8 +182,8 @@ export default function StatsPage() {
             <section className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm overflow-hidden relative">
                 <header className="flex justify-between items-start mb-8">
                     <div>
-                        <h3 className="text-[22px] font-black text-[#1a1a2e] tracking-tight">Scale My Account</h3>
-                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest pl-0.5">Phase 1: Building Habits</p>
+                        <h3 className="text-[22px] font-black text-[#1a1a2e] tracking-tight">Account Growth</h3>
+                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest pl-0.5">Level 1: Building Habits</p>
                     </div>
                     <div className="bg-green-50 px-4 py-2 rounded-2xl border border-green-100">
                         <span className="text-[12px] font-black text-green-600">₹1L CAP Active</span>
@@ -211,7 +211,7 @@ export default function StatsPage() {
             {/* Rule Compliance Chart */}
             <section className="px-1">
                 <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-[16px] font-black text-[#1a1a2e] uppercase tracking-[0.2em]">Compliance</h3>
+                    <h3 className="text-[16px] font-black text-[#1a1a2e] uppercase tracking-[0.2em]">Monthly Discipline %</h3>
                     <div className="flex gap-2 bg-gray-50 p-1.5 rounded-[20px] border border-gray-100 shadow-inner">
                         {['Week', 'Month', 'All'].map(p => (
                             <button
@@ -247,12 +247,17 @@ export default function StatsPage() {
                         ))}
                     </div>
                 ) : (
-                    <EmptyState 
-                        emoji="📈"
-                        title="Trading Performance"
-                        description="Log trades and stay disciplined to see your performance stats here."
-                        action={{ label: "Log First Trade", onClick: () => setCaptureOpen(true) }}
-                    />
+                    <div className="p-12 border-2 border-dashed border-gray-100 rounded-[40px] flex flex-col items-center text-center gap-4">
+                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-3xl">📈</div>
+                        <h3 className="text-[18px] font-black text-[#1a1a2e]">Your progress will appear after your first week.</h3>
+                        <p className="text-[14px] font-bold text-gray-400">Log trades daily and we'll show you patterns you can't see on your own.</p>
+                        <button 
+                            onClick={() => setCaptureOpen(true)}
+                            className="bg-[#1a1a2e] text-white px-8 h-12 rounded-full font-black text-[13px] uppercase tracking-widest mt-2"
+                        >
+                            Start Today →
+                        </button>
+                    </div>
                 )}
             </section>
 

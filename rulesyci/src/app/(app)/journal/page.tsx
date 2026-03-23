@@ -156,12 +156,17 @@ export default function JournalPage() {
                                 </motion.button>
                             ))
                         ) : (
-                            <EmptyState 
-                                emoji="📖"
-                                title="No trades found"
-                                description="Log your trades to start tracking your trading history and progress."
-                                action={{ label: "Log First Trade", onClick: () => setCaptureOpen(true) }}
-                            />
+                            <div className="p-12 border-2 border-dashed border-gray-100 rounded-[40px] flex flex-col items-center text-center gap-4 py-20">
+                                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-3xl">📖</div>
+                                <h3 className="text-[18px] font-black text-[#1a1a2e]">No trades yet today.</h3>
+                                <p className="text-[14px] font-bold text-gray-400">After your next trade, tap here to log it. It takes 30 seconds.</p>
+                                <button 
+                                    onClick={() => setCaptureOpen(true)}
+                                    className="bg-[#1a1a2e] text-white px-8 h-12 rounded-full font-black text-[13px] uppercase tracking-widest mt-2"
+                                >
+                                    Log My First Trade
+                                </button>
+                            </div>
                         )
                     ) : (
                         filteredScans.length > 0 ? (

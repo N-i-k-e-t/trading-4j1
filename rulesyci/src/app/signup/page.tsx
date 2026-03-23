@@ -55,7 +55,7 @@ export default function SignupPage() {
             if (error) throw error;
 
             if (data.user) {
-                showToast('Protocol Registered. Welcome Architect.', 'success');
+                showToast('Account created! Welcome to RuleSci.', 'success');
                 router.push('/onboarding');
             }
         } catch (err: any) {
@@ -80,7 +80,7 @@ export default function SignupPage() {
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-1 bg-[#1a1a2e] rounded-full" />
                     <div className="w-8 h-1 bg-gray-100 rounded-full" />
-                    <span className="text-[11px] font-black text-gray-300 uppercase tracking-[0.2em] ml-2">Phase 01</span>
+                    <span className="text-[11px] font-black text-gray-300 uppercase tracking-[0.2em] ml-2">Step 1 of 2</span>
                 </div>
             </div>
 
@@ -90,8 +90,8 @@ export default function SignupPage() {
                     <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-[18px] flex items-center justify-center mb-6 shadow-inner">
                         <Sparkles size={24} />
                     </div>
-                    <h1 className="text-[34px] font-black text-[#1a1a2e] mb-1 tracking-tighter leading-none">New Protocol.</h1>
-                    <p className="text-[15px] font-bold text-gray-400 mt-2">Initialize your core discipline system.</p>
+                    <h1 className="text-[34px] font-black text-[#1a1a2e] mb-1 tracking-tighter leading-none">Create Account.</h1>
+                    <p className="text-[15px] font-bold text-gray-400 mt-2">Join RuleSci and build your trading plan.</p>
                 </div>
 
                 {/* SIGNUP CARD */}
@@ -102,7 +102,7 @@ export default function SignupPage() {
                 >
                     <form onSubmit={handleSubmit} className="p-10 flex flex-col gap-6">
                         <div className="flex flex-col gap-2">
-                            <label className="text-[11px] font-black text-[#1a1a2e] ml-1 uppercase tracking-[0.2em] opacity-30">Architect Name</label>
+                            <label className="text-[11px] font-black text-[#1a1a2e] ml-1 uppercase tracking-[0.2em] opacity-30">Your Name</label>
                             <input
                                 type="text"
                                 placeholder="Your trading alias"
@@ -114,7 +114,7 @@ export default function SignupPage() {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-[11px] font-black text-[#1a1a2e] ml-1 uppercase tracking-[0.2em] opacity-30">Neural ID (Email)</label>
+                            <label className="text-[11px] font-black text-[#1a1a2e] ml-1 uppercase tracking-[0.2em] opacity-30">Email Address</label>
                             <input
                                 type="email"
                                 placeholder="name@rulesci.io"
@@ -126,7 +126,7 @@ export default function SignupPage() {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-[11px] font-black text-[#1a1a2e] ml-1 uppercase tracking-[0.2em] opacity-30">Encryption Key</label>
+                            <label className="text-[11px] font-black text-[#1a1a2e] ml-1 uppercase tracking-[0.2em] opacity-30">Password</label>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
@@ -158,7 +158,7 @@ export default function SignupPage() {
                                             />
                                         ))}
                                     </div>
-                                    <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Complexity Level: {strength.score === 4 ? 'Elite' : strength.score >= 2 ? 'Secure' : 'Weak'}</p>
+                                    <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Password Strength: {strength.score === 4 ? 'Elite' : strength.score >= 2 ? 'Secure' : 'Weak'}</p>
                                 </div>
                             )}
                         </div>
@@ -170,7 +170,7 @@ export default function SignupPage() {
                             {isLoading ? (
                                 <Loader2 className="animate-spin" size={24} />
                             ) : (
-                                <>Deploy Protocol <Sparkles className="group-hover:rotate-12 transition-transform" size={22} /></>
+                                <>Get Started <Sparkles className="group-hover:rotate-12 transition-transform" size={22} /></>
                             )}
                         </button>
                     </form>
@@ -178,7 +178,7 @@ export default function SignupPage() {
                     {/* DIVIDER */}
                     <div className="px-10 pb-6 flex items-center gap-4">
                         <div className="flex-1 h-[1px] bg-gray-100/50" />
-                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">or initialize with</span>
+                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">or sign up with</span>
                         <div className="flex-1 h-[1px] bg-gray-100/50" />
                     </div>
 
@@ -195,16 +195,16 @@ export default function SignupPage() {
 
                 {/* TERMS */}
                 <p className="mt-8 px-6 text-center text-[11px] font-bold text-gray-400 leading-relaxed uppercase tracking-widest opacity-60">
-                    By initializing, you accept our{' '}
+                    By signing up, you accept our{' '}
                     <Link href="/terms" className="text-[#1a1a2e] underline underline-offset-4">Terms</Link> &{' '}
-                    <Link href="/privacy" className="text-[#1a1a2e] underline underline-offset-4">Protocols</Link>
+                    <Link href="/privacy" className="text-[#1a1a2e] underline underline-offset-4">Privacy Policy</Link>
                 </p>
 
                 {/* FOOTER */}
                 <p className="mt-10 text-center text-[15px] font-bold text-gray-400">
-                    Existing Account?{' '}
+                    Already have an account?{' '}
                     <Link href="/login" className="text-blue-600 font-black border-b-2 border-blue-600/10 pb-1">
-                        Portal Link
+                        Log In
                     </Link>
                 </p>
             </div>

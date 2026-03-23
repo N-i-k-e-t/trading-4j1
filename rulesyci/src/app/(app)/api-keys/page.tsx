@@ -42,7 +42,7 @@ export default function ApiKeysPage() {
                         <ShieldCheck size={20} />
                     </span>
                     <div className="text-right">
-                        <p className="text-[10px] font-black text-[#1a1a2e] uppercase tracking-widest leading-none mb-1">AES-256 Encrypted</p>
+                        <p className="text-[10px] font-black text-[#1a1a2e] uppercase tracking-widest leading-none mb-1">Secure Encryption</p>
                         <p className="text-[11px] font-bold text-[#6b7280]">Your keys never leave your device.</p>
                     </div>
                 </div>
@@ -70,8 +70,8 @@ export default function ApiKeysPage() {
                             <Terminal size={24} />
                         </div>
                         <div>
-                            <h3 className="text-lg font-bold text-[#1a1a2e]">AI Orchestration Keys</h3>
-                            <p className="text-sm text-[#6b7280]">Powers Scribe, Pattern, and Coach Agents.</p>
+                            <h3 className="text-lg font-bold text-[#1a1a2e]">AI Tools</h3>
+                            <p className="text-sm text-[#6b7280]">Powers AI signals, charting, and coaching.</p>
                         </div>
                     </div>
                     <button className="h-11 px-6 bg-[#1a1a2e] text-white rounded-[18px] text-[13px] font-bold shadow-xl shadow-[#1a1a2e]/20 hover:scale-[1.05] active:scale-95 transition-all flex items-center gap-2">
@@ -92,9 +92,9 @@ export default function ApiKeysPage() {
                     <Info size={20} />
                 </div>
                 <div>
-                    <h4 className="text-[15px] font-bold text-[#1a1a2e] mb-1">Local Storage Policy</h4>
+                    <h4 className="text-[15px] font-bold text-[#1a1a2e] mb-1">Your Privacy</h4>
                     <p className="text-sm text-[#6b7280] leading-relaxed">
-                        RuleSci stores all API credentials in your browser's encrypted `localStorage`. We do not have a middle-man server that sees your keys. This ensures absolute privacy, but means you must re-enter keys if you clear your browser cache.
+                        RuleSci stores all your keys safely on your device. We never see your data. This ensures absolute privacy, but means you must re-enter keys if you clear your browser cache.
                     </p>
                 </div>
             </div>

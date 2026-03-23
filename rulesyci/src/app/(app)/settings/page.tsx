@@ -46,6 +46,7 @@ export default function ProfilePage() {
         </h3>
     );
 
+    const goals = ['Consistency', 'Account Growth', 'Career Full-time', 'Recovery'];
     const MenuItem = ({ icon: Icon, label, value, color = "text-[#1a1a2e]", iconColor, onClick, isLast = false }: any) => (
         <button 
             onClick={onClick}
@@ -111,7 +112,7 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-2 mb-4">
                         <span className="text-xl">🧬</span>
                         <h2 className="text-[16px] font-black tracking-tight flex items-center gap-2">
-                            Trading Persona & Intent
+                            My Trading Style
                             <ChevronRight size={14} className="opacity-40" />
                         </h2>
                     </div>
@@ -137,7 +138,7 @@ export default function ProfilePage() {
                     </ul>
 
                     <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
-                        <span className="text-[11px] font-black text-white/40 uppercase tracking-widest">Tap to recalibrate AI coach</span>
+                        <span className="text-[11px] font-black text-white/40 uppercase tracking-widest">Tap to update profile</span>
                         <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
                             <Brain size={14} className="text-white/60" />
                         </div>

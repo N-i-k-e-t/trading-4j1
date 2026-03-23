@@ -237,21 +237,21 @@ export default function CaptureHub() {
                             {/* STEP 1: WIN OR LOSS */}
                             {tradeStep === 1 && (
                                 <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex flex-col gap-6">
-                                    <h3 className="text-xl font-black text-[#1a1a2e]">Was it a Win or Loss?</h3>
+                                    <h3 className="text-xl font-black text-[#1a1a2e]">Win or Loss?</h3>
                                     <div className="grid grid-cols-2 gap-4">
                                         <button 
                                             onClick={() => { setTradeResult('WIN'); setTradeStep(2); }}
-                                            className="h-32 bg-green-50 rounded-[32px] border-2 border-transparent hover:border-green-500 transition-all flex flex-col items-center justify-center gap-2 group"
+                                            className="h-36 bg-green-50 rounded-[32px] border-2 border-transparent hover:border-green-500 transition-all flex flex-col items-center justify-center gap-2 group"
                                         >
-                                            <TrendingUp size={32} className="text-green-500" />
-                                            <span className="font-black text-green-600 uppercase tracking-widest">WIN</span>
+                                            <TrendingUp size={40} className="text-green-500" />
+                                            <span className="font-black text-green-600 uppercase tracking-widest text-lg">WIN</span>
                                         </button>
                                         <button 
                                             onClick={() => { setTradeResult('LOSS'); setTradeStep(2); }}
-                                            className="h-32 bg-red-50 rounded-[32px] border-2 border-transparent hover:border-red-500 transition-all flex flex-col items-center justify-center gap-2 group"
+                                            className="h-36 bg-red-50 rounded-[32px] border-2 border-transparent hover:border-red-500 transition-all flex flex-col items-center justify-center gap-2 group"
                                         >
-                                            <TrendingDown size={32} className="text-red-500" />
-                                            <span className="font-black text-red-600 uppercase tracking-widest">LOSS</span>
+                                            <TrendingDown size={40} className="text-red-500" />
+                                            <span className="font-black text-red-600 uppercase tracking-widest text-lg">LOSS</span>
                                         </button>
                                     </div>
                                 </motion.div>
@@ -261,20 +261,20 @@ export default function CaptureHub() {
                             {tradeStep === 2 && (
                                 <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex flex-col gap-6">
                                     <h3 className="text-xl font-black text-[#1a1a2e]">Did you follow your rules?</h3>
-                                    <div className="flex flex-col gap-4">
+                                    <div className="grid grid-cols-2 gap-4">
                                         <button 
                                             onClick={() => { setRulesStatus('ALL'); setTradeStep(3); }}
-                                            className="w-full h-20 bg-blue-50 rounded-[28px] border-2 border-transparent hover:border-blue-500 transition-all flex items-center justify-center gap-4 px-6"
+                                            className="h-28 bg-blue-50 rounded-[28px] border-2 border-transparent hover:border-blue-500 transition-all flex flex-col items-center justify-center gap-2 px-4 text-center"
                                         >
                                             <CheckCircle2 size={24} className="text-blue-500" />
-                                            <span className="font-black text-blue-600 uppercase tracking-widest">Yes, all rules</span>
+                                            <span className="font-black text-blue-600 uppercase tracking-widest text-[11px]">YES, ALL</span>
                                         </button>
                                         <button 
                                             onClick={() => { setRulesStatus('SOME'); }}
-                                            className={`w-full h-20 rounded-[28px] border-2 transition-all flex items-center justify-center gap-4 px-6 ${rulesStatus === 'SOME' ? 'bg-[#1a1a2e] border-[#1a1a2e] text-white' : 'bg-gray-50 border-transparent hover:border-gray-200 text-gray-400'}`}
+                                            className={`h-28 rounded-[28px] border-2 transition-all flex flex-col items-center justify-center gap-2 px-4 text-center ${rulesStatus === 'SOME' ? 'bg-[#1a1a2e] border-[#1a1a2e] text-white shadow-xl' : 'bg-gray-50 border-transparent text-gray-400'}`}
                                         >
                                             <AlertCircle size={24} className={rulesStatus === 'SOME' ? 'text-white' : 'text-gray-300'} />
-                                            <span className={`font-black uppercase tracking-widest ${rulesStatus === 'SOME' ? 'text-white' : 'text-gray-400'}`}>Broke some rules</span>
+                                            <span className={`font-black uppercase tracking-widest text-[11px] ${rulesStatus === 'SOME' ? 'text-white' : 'text-gray-400'}`}>BROKE SOME</span>
                                         </button>
                                     </div>
 
@@ -315,14 +315,14 @@ export default function CaptureHub() {
                             {/* STEP 3: FINAL NOTES & ADVANCED */}
                             {tradeStep === 3 && (
                                 <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex flex-col gap-6">
-                                    <h3 className="text-xl font-black text-[#1a1a2e]">Reflections & Details</h3>
+                                    <h3 className="text-xl font-black text-[#1a1a2e]">Notes</h3>
                                     
                                     <textarea 
-                                        placeholder="Quick note (optional)..." 
-                                        rows={3}
+                                        placeholder="Optional text..." 
+                                        rows={2}
                                         value={tradeData.notes}
                                         onChange={(e) => setTradeData({...tradeData, notes: e.target.value})}
-                                        className="w-full bg-gray-50 rounded-[28px] p-6 text-[15px] font-bold text-[#1a1a2e] outline-none border border-transparent focus:bg-white focus:border-yellow-200 transition-all resize-none"
+                                        className="w-full bg-gray-50 rounded-[28px] p-6 text-[15px] font-bold text-[#1a1a2e] outline-none border border-transparent focus:bg-white focus:border-blue-100 transition-all resize-none shadow-inner"
                                     />
 
                                     <button 

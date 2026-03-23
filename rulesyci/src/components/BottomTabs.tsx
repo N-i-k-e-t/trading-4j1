@@ -110,9 +110,9 @@ export default function BottomTabs() {
                                 >
                                     <Icon size={22} strokeWidth={isActive ? 3 : 2} />
                                 </motion.div>
-                                <span className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'opacity-100' : 'opacity-40'}`}>
-                                    {item.label}
-                                </span>
+                                <span className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'text-[#1a1a2e]' : 'text-gray-400'}`}>
+                                     {item.label}
+                                 </span>
                                 {isActive && (
                                     <motion.div 
                                         layoutId="activeTabDot"

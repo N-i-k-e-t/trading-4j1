@@ -106,9 +106,9 @@ export default function DashboardPage() {
     }
 
     const phases = [
-        { name: 'Pre-Session Rules', icon: '⚡', category: 'Risk Management' },
-        { name: 'Entry/Exit Rules', icon: '🎯', category: 'Entry' },
-        { name: 'Mindset Rules', icon: '🧠', category: 'Mindset' }
+        { name: 'Pre-Session Rules', icon: '⚡', category: 'Pre-Session Rules' },
+        { name: 'Entry/Exit Rules', icon: '🎯', category: 'Entry/Exit Rules' },
+        { name: 'Mindset Rules', icon: '🧠', category: 'Mindset Rules' }
     ];
 
     return (
@@ -117,27 +117,27 @@ export default function DashboardPage() {
                 <header className="w-full mb-10 flex flex-col items-center">
                     <div className="w-full flex justify-between items-center mb-8 px-2">
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Instance Level</span>
-                            <span className="text-[13px] font-black text-[#1a1a2e]">RULESCI ARCH-V1</span>
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Account Level</span>
+                            <span className="text-[13px] font-black text-[#1a1a2e]">RULESCI COMPLIANCE</span>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">
-                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Neural Link Active</span>
+                        <div className="flex items-center gap-1.5 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
+                            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                            <span className="text-[10px] font-black text-green-600 uppercase tracking-widest">Systems Active</span>
                         </div>
                     </div>
 
-                    <Link 
-                        href="/calendar"
-                        className="flex flex-col items-center gap-1 mb-6 cursor-pointer active:scale-95 transition-all group"
-                    >
-                        <span className="text-[20px] font-black text-[#1a1a2e] tracking-tight group-hover:text-blue-600 transition-colors">
-                            {selectedDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
-                        </span>
-                        <div className="flex items-center gap-1">
-                             <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">My Trading Plan</span>
-                             <ChevronRight size={12} className="rotate-90 text-blue-500" strokeWidth={3} />
+                    <div className="flex flex-col items-center gap-1 mb-8">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[28px] font-black text-[#1a1a2e] tracking-tight">
+                                {selectedDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long' })}
+                            </span>
+                            <div className="flex items-center gap-1 bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                <Flame size={14} className="text-orange-500 fill-orange-500" />
+                                <span className="text-[13px] font-black text-orange-600">{streak} Day Streak</span>
+                            </div>
                         </div>
-                    </Link>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{selectedDate.getFullYear()}</span>
+                    </div>
 
                     {/* WELCOME CARD - Fix 2 */}
                     <AnimatePresence>
@@ -222,10 +222,10 @@ export default function DashboardPage() {
                     </div>
                 </header>
 
-                {/* MORNING CHECK-IN (MOOD SELECTOR) - Fix 4 */}
+                {/* MORNING CHECK-IN */}
                 <section className="w-full mb-10">
                     <div className="flex items-center gap-3 mb-4 px-2">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">How I'm Feeling</span>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Morning Check-In</span>
                         <div className="h-[1px] flex-1 bg-gray-100" />
                     </div>
                     <div className="grid grid-cols-4 gap-3">
@@ -251,55 +251,70 @@ export default function DashboardPage() {
                     </div>
                 </section>
 
-                {/* TODAY'S RULES - Fix 4 Hero */}
-                <section className="w-full flex flex-col gap-10 mb-14">
+                {/* TODAY'S RULES - HERO SECTION */}
+                <section className="w-full flex flex-col gap-6 mb-12">
                     <div className="flex items-center gap-3 px-2">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Today's Rules</span>
-                        <div className="h-[1px] flex-1 bg-gray-100" />
+                        <span className="text-[10px] font-black text-[#1a1a2e] uppercase tracking-widest">Today's Rules</span>
+                        <div className="h-[1.5px] flex-1 bg-blue-100" />
+                        <Link href="/rules" className="text-[10px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-1">
+                            Edit <ChevronRight size={10} strokeWidth={4} />
+                        </Link>
                     </div>
 
-                    <div className="flex flex-col gap-4">
-                        {phases.flatMap(phase => {
-                            const phaseRules = rules.filter(r => r.category === phase.category && r.isActive);
-                            return phaseRules.map((rule, idx) => (
-                                <motion.button
-                                    key={rule.id}
-                                    onClick={() => handleToggleRule(rule.id)}
-                                    whileTap={{ scale: 0.98 }}
-                                    className={`w-full p-4 rounded-[28px] border-2 transition-all flex items-center justify-between group bg-white shadow-sm hover:shadow-md ${
-                                        checkedIds.includes(rule.id) ? 'border-gray-50' : 'border-transparent'
-                                    }`}
-                                >
-                                    <div className="flex items-center gap-4 text-left">
-                                        <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-lg shrink-0">
-                                            {rule.emoji || '🛡️'}
+                    <div className="flex flex-col gap-3">
+                        {activeRules.length > 0 ? (
+                            activeRules.map((rule) => {
+                                const phase = phases.find(p => p.category === rule.category) || phases[0];
+                                return (
+                                    <motion.button
+                                        key={rule.id}
+                                        onClick={() => handleToggleRule(rule.id)}
+                                        whileTap={{ scale: 0.98 }}
+                                        className={`w-full p-4 rounded-[24px] border-2 transition-all flex items-center justify-between group ${
+                                            checkedIds.includes(rule.id) 
+                                            ? 'bg-blue-50/30 border-blue-50' 
+                                            : 'bg-white border-transparent shadow-sm'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-4 text-left">
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0 ${
+                                                checkedIds.includes(rule.id) ? 'bg-blue-100/50' : 'bg-gray-50'
+                                            }`}>
+                                                {rule.emoji || '🛡️'}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className={`text-[15px] font-black text-[#1a1a2e] leading-tight ${checkedIds.includes(rule.id) ? 'opacity-30 line-through' : ''}`}>
+                                                    {rule.text}
+                                                </span>
+                                                <span className="text-[9px] font-bold text-gray-400 mt-0.5 uppercase tracking-widest">
+                                                    {phase.name} • {checkedIds.includes(rule.id) ? 'Followed' : 'Not checked yet'}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className={`text-[15px] font-black text-[#1a1a2e] leading-tight ${checkedIds.includes(rule.id) ? 'opacity-30 line-through' : ''}`}>
-                                                {rule.text}
-                                            </span>
-                                            <span className="text-[9px] font-bold text-gray-400 mt-0.5 uppercase tracking-widest">
-                                                {phase.name} • {checkedIds.includes(rule.id) ? 'Followed' : 'Not checked yet'}
-                                            </span>
-                                        </div>
-                                    </div>
 
-                                    <div className={`w-8 h-8 rounded-full border-2 shrink-0 flex items-center justify-center transition-all ${
-                                        checkedIds.includes(rule.id)
-                                        ? 'bg-[#1a1a2e] border-[#1a1a2e] text-white shadow-lg'
-                                        : 'border-gray-100'
-                                    }`}>
-                                        {checkedIds.includes(rule.id) && <Check size={16} strokeWidth={4} />}
-                                    </div>
-                                </motion.button>
-                            ));
-                        })}
+                                        <div className={`w-8 h-8 rounded-full border-2 shrink-0 flex items-center justify-center transition-all ${
+                                            checkedIds.includes(rule.id)
+                                            ? 'bg-[#1a1a2e] border-[#1a1a2e] text-white shadow-lg'
+                                            : 'border-gray-100'
+                                        }`}>
+                                            {checkedIds.includes(rule.id) && <Check size={16} strokeWidth={4} />}
+                                        </div>
+                                    </motion.button>
+                                );
+                            })
+                        ) : (
+                            <Link href="/onboarding" className="p-10 border-2 border-dashed border-gray-200 rounded-[32px] flex flex-col items-center gap-3 text-center">
+                                <Shield className="text-gray-300" size={32} />
+                                <span className="text-[13px] font-bold text-gray-400">No rules set up yet.<br/>Tap to architect your plan.</span>
+                            </Link>
+                        )}
                     </div>
                 </section>
 
+                {/* TRADE COUNTER & ACTION */}
                 <section className="w-full flex flex-col items-center gap-6 mb-14">
-                    <div className="flex flex-col items-center gap-1.5">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Execution Terminal</span>
+                    <div className="flex flex-col items-center gap-1">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Trade Counter</span>
                         <div className="flex items-baseline gap-2">
                             <span className="text-5xl font-black text-[#1a1a2e] leading-none">{targetTrades.length}</span>
                             <span className="text-xl font-bold text-gray-300">/ {session.tradesAllowed}</span>
@@ -308,66 +323,67 @@ export default function DashboardPage() {
 
                     <button 
                         onClick={() => setCaptureOpen(true)}
-                        className="w-full h-16 bg-[#1a1a2e] text-white rounded-[32px] font-black text-[15px] flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(0,0,0,0.15)] active:scale-95 transition-all"
+                        className="w-full h-18 bg-[#1a1a2e] text-white rounded-[32px] font-black text-[16px] flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(26,26,46,0.2)] active:scale-95 transition-all py-5"
                     >
-                        <Plus size={20} strokeWidth={3} />
+                        <Plus size={20} strokeWidth={4} />
                         Log Trade
                     </button>
                 </section>
 
-                {/* DISCIPLINE SCORE - Fix 4 Ring */}
-                <div className="relative w-64 h-64 mb-14">
-                    <motion.div 
-                        animate={{ scale: [1, 1.05, 1], opacity: [0.05, 0.1, 0.05] }}
-                        transition={{ duration: 4, repeat: Infinity }}
-                        className={`absolute inset-0 rounded-full blur-3xl -z-10 ${isPerfect ? 'bg-green-400' : 'bg-blue-400'}`}
-                    />
-                    
-                    <svg className="w-full h-full transform -rotate-90">
-                        <circle cx="128" cy="128" r="110" stroke="#f1f5f9" strokeWidth="18" fill="transparent" />
-                        <motion.circle 
-                            cx="128" cy="128" r="110" 
-                            stroke={isPerfect ? "#22c55e" : "#3b82f6"} 
-                            strokeWidth="18"
-                            strokeDasharray={691}
-                            strokeDashoffset={691 - (691 * score / 100)}
-                            strokeLinecap="round" 
-                            fill="transparent"
-                            className="transition-all duration-[1000ms] ease-out"
+                {/* DISCIPLINE SCORE */}
+                <div className="w-full flex flex-col items-center mb-14">
+                    <div className="relative w-64 h-64">
+                        <motion.div 
+                            animate={{ scale: [1, 1.05, 1], opacity: [0.05, 0.1, 0.05] }}
+                            transition={{ duration: 4, repeat: Infinity }}
+                            className={`absolute inset-0 rounded-full blur-3xl -z-10 ${isPerfect ? 'bg-green-400' : 'bg-blue-400'}`}
                         />
-                    </svg>
-                    
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-[52px] font-black text-[#1a1a2e] tracking-tighter tabular-nums leading-none">
-                            {score}<span className="text-[18px] font-bold text-gray-300 ml-0.5">%</span>
-                        </span>
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mt-2">Discipline Score</span>
+                        
+                        <svg className="w-full h-full transform -rotate-90">
+                            <circle cx="128" cy="128" r="110" stroke="#f1f5f9" strokeWidth="18" fill="transparent" />
+                            <motion.circle 
+                                cx="128" cy="128" r="110" 
+                                stroke={isPerfect ? "#22c55e" : "#3b82f6"} 
+                                strokeWidth="18"
+                                strokeDasharray={691}
+                                strokeDashoffset={691 - (691 * score / 100)}
+                                strokeLinecap="round" 
+                                fill="transparent"
+                                className="transition-all duration-[1000ms] ease-out"
+                            />
+                        </svg>
+                        
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span className="text-[52px] font-black text-[#1a1a2e] tracking-tighter tabular-nums leading-none">
+                                {score}<span className="text-[18px] font-bold text-gray-300 ml-0.5">%</span>
+                            </span>
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mt-2">Discipline Score</span>
+                        </div>
+                    </div>
+
+                    <div className="w-full grid grid-cols-2 gap-4 mt-10">
+                        <div className="bg-white rounded-[28px] p-5 shadow-sm border border-gray-50 flex flex-col items-center gap-1.5">
+                            <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-1">
+                                <Zap size={10} /> Rules Followed
+                            </span>
+                            <span className="text-[18px] font-black text-[#1a1a2e]">{score}%</span>
+                        </div>
+                        <div className="bg-white rounded-[28px] p-5 shadow-sm border border-gray-50 flex flex-col items-center gap-1.5">
+                            <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-1">
+                                <TrendingUp size={10} /> Today's Focus
+                            </span>
+                            <span className="text-[18px] font-black text-blue-600 uppercase">Strong</span>
+                        </div>
                     </div>
                 </div>
 
-                {/* NEURAL STATUS CARDS */}
-                <div className="w-full grid grid-cols-2 gap-4 mb-14">
-                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-gray-50 flex flex-col items-center gap-1.5">
-                        <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-1">
-                            <Zap size={10} /> Rules Followed
-                        </span>
-                        <span className="text-[18px] font-black text-[#1a1a2e]">99.2%</span>
-                    </div>
-                    <div className="bg-white rounded-[28px] p-5 shadow-sm border border-gray-50 flex flex-col items-center gap-1.5">
-                        <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-1">
-                            <TrendingUp size={10} /> Today's Focus
-                        </span>
-                        <span className="text-[18px] font-black text-blue-600 uppercase">Strong</span>
-                    </div>
-                </div>
-
-                {/* AI TIP - Fix 4 */}
+                {/* AI TIP - SIMPLIFIED */}
                 <div className="w-full bg-[#f8fafc] border border-gray-100 rounded-[28px] p-5 flex items-start gap-4">
                     <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
-                        <Info size={16} />
+                        <Info size={16} strokeWidth={3} />
                     </div>
-                    <p className="text-[13px] font-bold text-gray-500 leading-relaxed italic">
-                        {streak >= 30 ? "Elite focus today. Your emotional baseline is stable and ready for phase expansion." : "Maintain discipline for a 5-day streak to unlock advanced scaling rules."}
+                    <p className="text-[14px] font-bold text-gray-600 leading-tight">
+                        {streak >= 30 ? "Elite focus today. Your emotional baseline is stable." : "Maintain discipline for a 5-day streak to unlock rewards."}
                     </p>
                 </div>
             </main>

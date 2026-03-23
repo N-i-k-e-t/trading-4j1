@@ -54,7 +54,7 @@ export default function LoginPage() {
                 trialStartDate: new Date().toISOString()
             };
             setUser(mockUser);
-            showToast('Booting System Architecture...', 'success');
+            showToast('Loading your dashboard...', 'success');
             router.replace('/today');
         }, 800);
     };
@@ -84,7 +84,7 @@ export default function LoginPage() {
             if (error) throw error;
 
             if (data.user) {
-                showToast('Architect Verified.', 'success');
+                showToast('Welcome back!', 'success');
                 router.replace('/today');
             }
         } catch (err: any) {
@@ -111,13 +111,13 @@ export default function LoginPage() {
                 style={{ top: 'max(env(safe-area-inset-top), 32px)' }}
             >
                 <ArrowLeft size={16} strokeWidth={3} />
-                Portal
+                Back
             </Link>
 
             {isPlaceholderAuth && (
                 <div className="absolute top-8 right-6">
                     <div className="px-3 py-1 bg-blue-100 border border-blue-200 text-blue-700 text-[9px] font-black uppercase tracking-widest rounded-full">
-                        Local Instance
+                        Offline Mode
                     </div>
                 </div>
             )}
@@ -128,8 +128,8 @@ export default function LoginPage() {
                     <div className="w-16 h-16 bg-[#1a1a2e] text-white rounded-[24px] flex items-center justify-center shadow-2xl shadow-blue-100/50 mb-8 border border-white/10 group active:scale-90 transition-transform">
                         <Target size={32} strokeWidth={2.5} className="group-hover:rotate-12 transition-transform" />
                     </div>
-                    <h1 className="text-[34px] font-black text-[#1a1a2e] mb-1 tracking-tighter leading-none">Initialize Access.</h1>
-                    <p className="text-[15px] font-bold text-gray-400 mt-2">Synchronizing your Discipline Protocol.</p>
+                    <h1 className="text-[34px] font-black text-[#1a1a2e] mb-1 tracking-tighter leading-none">Welcome Back.</h1>
+                    <p className="text-[15px] font-bold text-gray-400 mt-2">Log in to your account.</p>
                 </div>
 
                 {/* STREAK PREVIEW CARD */}
@@ -165,7 +165,7 @@ export default function LoginPage() {
                 >
                     <form onSubmit={handleSubmit} className="p-10 flex flex-col gap-6">
                         <div className="flex flex-col gap-2">
-                            <label className="text-[11px] font-black text-[#1a1a2e] ml-1 uppercase tracking-[0.2em] opacity-30">Neural Identity</label>
+                            <label className="text-[11px] font-black text-[#1a1a2e] ml-1 uppercase tracking-[0.2em] opacity-30">Email Address</label>
                             <input
                                 type="email"
                                 inputMode="email"
@@ -179,7 +179,7 @@ export default function LoginPage() {
 
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between px-1">
-                                <label className="text-[11px] font-black text-[#1a1a2e] uppercase tracking-[0.2em] opacity-30">Security Key</label>
+                                <label className="text-[11px] font-black text-[#1a1a2e] uppercase tracking-[0.2em] opacity-30">Password</label>
                                 <button type="button" className="text-[11px] font-black text-blue-600 uppercase tracking-widest active:opacity-50">Forgot?</button>
                             </div>
                             <div className="relative">
@@ -208,7 +208,7 @@ export default function LoginPage() {
                             {isLoading ? (
                                 <Loader2 className="animate-spin" size={24} />
                             ) : (
-                                <>Verify Identity <ArrowLeft className="rotate-180 group-hover:translate-x-1 transition-transform" size={22} strokeWidth={3} /></>
+                                <>Log In <ArrowLeft className="rotate-180 group-hover:translate-x-1 transition-transform" size={22} strokeWidth={3} /></>
                             )}
                         </button>
                     </form>
@@ -226,7 +226,7 @@ export default function LoginPage() {
                             onClick={handleGuestLogin}
                             className="w-full h-[60px] bg-white border-2 border-gray-100 text-[#1a1a2e] font-black rounded-[22px] active:scale-[0.97] transition-all flex items-center justify-center gap-2 uppercase tracking-[0.15em] text-[12px] hover:border-blue-500/20 shadow-sm"
                         >
-                            <Zap size={18} className="text-blue-500" /> Enter Simulation Mode
+                            <Zap size={18} className="text-blue-500" /> Try Demo Mode
                         </button>
                         
                         <div className="flex gap-4">
@@ -242,9 +242,9 @@ export default function LoginPage() {
 
                 {/* FOOTER */}
                 <p className="mt-12 text-center text-[15px] font-bold text-gray-400">
-                    New Architect?{' '}
+                    New here?{' '}
                     <Link href="/signup" className="text-blue-600 font-black border-b-2 border-blue-600/10 pb-1 hover:text-blue-700 transition-colors">
-                        Register Protocol
+                        Create Account
                     </Link>
                 </p>
             </div>

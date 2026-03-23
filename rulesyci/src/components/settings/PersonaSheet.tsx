@@ -22,7 +22,7 @@ export default function PersonaSheet({ isOpen, onClose }: PersonaSheetProps) {
     const styles = ['Day Trading', 'Swing Trading', 'Position Trading', 'Mixed'];
     const markets = ['Forex', 'Crypto', 'Stocks', 'Indices'];
     const weaknesses = ['FOMO', 'Revenge Trading', 'Oversizing', 'Early Exits', 'Hesitation'];
-    const goals = ['Consistency', 'Scaling Capital', 'Career Full-time', 'Recovery'];
+    const goals = ['Consistency', 'Account Growth', 'Career Full-time', 'Recovery'];
 
     const handleSave = () => {
         updateUserModel(localPersona);
@@ -57,7 +57,7 @@ export default function PersonaSheet({ isOpen, onClose }: PersonaSheetProps) {
                                 <div className="w-8 h-8 bg-[#1a1a2e] text-white rounded-lg flex items-center justify-center">
                                     <Brain size={18} />
                                 </div>
-                                <h2 className="text-[17px] font-black text-[#1a1a2e]">AI Trading Persona</h2>
+                                <h2 className="text-[17px] font-black text-[#1a1a2e]">My Trading Profile</h2>
                             </div>
                             <button onClick={onClose} className="w-8 h-8 flex items-center justify-center text-gray-300 bg-gray-50 rounded-full active:scale-90 transition-transform">
                                 <X size={18} strokeWidth={3} />
@@ -69,7 +69,7 @@ export default function PersonaSheet({ isOpen, onClose }: PersonaSheetProps) {
                             <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">
                                 <p className="text-[13px] font-bold text-blue-700 leading-relaxed flex items-start gap-2">
                                     <Sparkles size={16} className="shrink-0 mt-0.5" />
-                                    Your Persona defines how the AI agent analyzes your behavior and provides disciplined wisdom.
+                                    Your profile helps RuleSci provide better coaching based on your trading style.
                                 </p>
                             </div>
 
@@ -123,7 +123,7 @@ export default function PersonaSheet({ isOpen, onClose }: PersonaSheetProps) {
                             <div className="flex flex-col gap-3">
                                 <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
                                     <Target size={12} strokeWidth={3} />
-                                    Main Discipline Challenge
+                                    Biggest Struggle
                                 </label>
                                 <div className="flex flex-wrap gap-2">
                                     {weaknesses.map(w => (
@@ -146,7 +146,7 @@ export default function PersonaSheet({ isOpen, onClose }: PersonaSheetProps) {
                             <div className="flex flex-col gap-3 pb-8">
                                 <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
                                     <TrendingUp size={12} strokeWidth={3} />
-                                    Ultimate Trading Goal
+                                    Main Goal
                                 </label>
                                 <div className="flex flex-col gap-2">
                                     {goals.map(g => (
@@ -173,7 +173,7 @@ export default function PersonaSheet({ isOpen, onClose }: PersonaSheetProps) {
                                 onClick={handleSave}
                                 className="w-full h-14 bg-blue-600 text-white font-black rounded-xl shadow-xl shadow-blue-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                             >
-                                Update Persona & Intent
+                                Save Profile
                             </button>
                         </div>
                     </motion.div>

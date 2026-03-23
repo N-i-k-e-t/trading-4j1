@@ -57,7 +57,7 @@ export default function PricingPage() {
 
             <main className="max-w-[620px] mx-auto px-6 pt-12 text-center">
                 <h1 className="text-2xl md:text-[28px] font-bold text-[#1a1a2e] mb-2">
-                    Start Your Trading Discipline Journey!
+                    Master Your Trading Discipline.
                 </h1>
                 <p className="text-base text-[#6b7280] mb-12">
                     Track your rules. Build consistency. Trade with confidence.
@@ -91,7 +91,7 @@ export default function PricingPage() {
                                     <div className="h-full bg-[#ef4444] animate-[pulse_2s_infinite]" style={{ width: '40%' }} />
                                 </div>
                                 <p className="text-[11px] font-bold text-[#ef4444] mt-2 uppercase tracking-wide">
-                                    Limited offer: ends in {formatTime(timeLeft)}
+                                    Early Bird Offer ends in {formatTime(timeLeft)}
                                 </p>
                             </div>
                         </div>
@@ -133,11 +133,11 @@ export default function PricingPage() {
                 </div>
 
                 {/* Social Proof */}
-                <h2 className="text-2xl font-bold text-[#1a1a2e] mb-10">Traders love RuleSysci</h2>
+                <h2 className="text-2xl font-bold text-[#1a1a2e] mb-10">Traders love RuleSci</h2>
                 <div className="flex flex-col gap-4 mb-20">
                     {[
                         { name: "Marco S.", rating: 5, text: "The first app that actually made me stick to my stop loss. The interface is calming and the rules library is gold." },
-                        { name: "Sarah L.", rating: 5, text: "I've tried every journal out there. RuleSysci is different. It focuses on the behavior, not just the numbers." },
+                        { name: "Sarah L.", rating: 5, text: "I've tried every journal out there. RuleSci is different. It focuses on the behavior, not just the numbers." },
                         { name: "David K.", rating: 5, text: "The onboarding quiz really nailed my struggle with overtrading. Worth every penny." }
                     ].map((review, i) => (
                         <div key={i} className="bg-white rounded-2xl p-6 shadow-sm text-left">
