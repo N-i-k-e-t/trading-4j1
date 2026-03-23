@@ -395,19 +395,18 @@ export function RuleSciProvider({ children }: { children: ReactNode }) {
         let subscription: any = null;
         if (!isPlaceholderAuth) {
             const res = supabase.auth.onAuthStateChange((event, session) => {
-                if (session?.user && isMounted) {
-                    const email = session.user.email || '';
-                    const isPro = ALLOWED_PRO_EMAILS.includes(email.toLowerCase());
+                if (session?.user) {
                     dispatch({ 
                         type: 'SET_USER', 
                         payload: { 
-                            email, 
+                            email: session.user.email!, 
                             name: session.user.user_metadata?.full_name || 'Trader',
-                            isPro,
-                            isAdmin: isPro && email === 'niketpatil1624@gmail.com'
+                            isPro: ALLOWED_PRO_EMAILS.includes(session.user.email!),
+                            isAdmin: session.user.email === 'niketpatil1624@gmail.com'
                         } 
                     });
-                } else if (!isPlaceholderAuth && isMounted) {
+                }
+ else if (!isPlaceholderAuth && isMounted) {
                     dispatch({ type: 'SET_USER', payload: null });
                 }
                 if (isMounted) dispatch({ type: 'SET_CHECKING_AUTH', payload: false });

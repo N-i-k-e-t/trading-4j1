@@ -25,53 +25,33 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Missing raw note to parse' }, { status: 400 });
         }
 
-        // --- TRUE GPT-4o IMPLEMENTATION SCAFFOLD ---
+        // --- TRUE LIVE AI IMPLEMENTATION ---
+        const { askAi } = await import('@/lib/agents/liveAiEngine');
         
-        /*
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: [
-                {
-                    role: "system",
-                    content: `You are an expert trading assistant. Your job is to extract structured trading data from the user's raw notes.
-                    You must return a raw JSON object matching this schema exactly:
-                    {
-                        "asset": "string (e.g., NIFTY, TSLA, BTC)",
-                        "direction": "Long" or "Short",
-                        "entry": "number or string",
-                        "exit": "number or string",
-                        "pnl": "number (negative for loss, positive for win)",
-                        "emotion_tags": "very_bad" | "bad" | "neutral" | "good" | "great",
-                        "rules_followed": ["array of Rule IDs that evidence shows they specifically followed"],
-                        "rules_broken": ["array of Rule IDs that evidence shows they specifically broke"]
-                    }
-                    
-                    Here are the user's active rules to check against:
-                    ${JSON.stringify(activeRules, null, 2)}
-                    
-                    If the user note implies they broke a rule (e.g., they moved their stop loss, and Rule X is "Never move stop loss"), add Rule X to rules_broken.
-                    Output ONLY valid JSON. No markdown blocking.`
-                },
-                {
-                    role: "user",
-                    content: note
-                }
-            ],
-            temperature: 0.1,
-            response_format: { type: "json_object" }
-        });
+        const prompt = `
+            You are RuleSci AI. Extract structured trading data from this raw note:
+            Note: "${note}"
+            
+            Active Rules to check against:
+            ${JSON.stringify(activeRules, null, 2)}
+            
+            Format your response as a valid JSON object matching this schema:
+            {
+                "asset": "string (e.g. BTC, NIFTY)",
+                "direction": "Long" | "Short",
+                "entry": "string/number",
+                "exit": "string/number",
+                "pnl": "number (negative for loss, positive for win)",
+                "emotion_tags": "very_bad" | "bad" | "neutral" | "good" | "great",
+                "rules_followed": ["rule_id_1", "rule_id_2"],
+                "rules_broken": ["rule_id_3"]
+            }
+            
+            IMPORTANT: Return ONLY the raw JSON. If details are missing, make best-guess based on context.
+        `;
 
-        const extracted = JSON.parse(response.choices[0].message.content || '{}');
+        const extracted = await askAi(prompt, true);
         return NextResponse.json(extracted);
-        */
-
-        // --- FALLBACK MOCK RETURN FOR DEMO ---
-        // For right now, since the API key isn't provided, we will return a 501 
-        // to tell the client to revert to the local rule parser simulation.
-        return NextResponse.json(
-            { error: 'OpenAI API key not configured. Using client-side simulation fallback.' }, 
-            { status: 501 }
-        );
 
     } catch (e: any) {
         console.error("Parse Trade Error:", e);
