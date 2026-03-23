@@ -183,14 +183,14 @@ export default function TradeEntryModal({ isOpen, onClose }: TradeEntryModalProp
                                     onClick={() => setActiveTab('manual')}
                                     className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-lg text-sm font-bold transition-all ${activeTab === 'manual' ? 'bg-white text-[#1a1a2e] shadow-sm' : 'text-[#6b7280]'}`}
                                 >
-                                    Detailed Log
+                                    Step-by-Step
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('magic')}
                                     className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-lg text-sm font-bold transition-all ${activeTab === 'magic' ? 'bg-white text-[#1a1a2e] shadow-sm' : 'text-[#6b7280]'}`}
                                 >
                                     <Wand2 size={16} className={activeTab === 'magic' ? 'text-[#2563eb]' : ''} />
-                                    AI Magic Scan
+                                    Voice/Text Sync
                                 </button>
                             </div>
 
@@ -206,7 +206,7 @@ export default function TradeEntryModal({ isOpen, onClose }: TradeEntryModalProp
                                         <div className="bg-[#2563eb]/10 border border-[#2563eb]/20 rounded-xl p-4 text-[#1a1a2e] text-sm leading-relaxed">
                                             <p className="font-bold flex items-center gap-2 mb-1">
                                                 <Wand2 size={16} className="text-[#2563eb]" />
-                                                Rough Note Parser
+                                                Easy Log
                                             </p>
                                             <p className="text-[#6b7280]">
                                                 Just brain-dump your trade details. Our AI (GPT-4o simulated) will extract the pair, entry/exit, emotion, and auto-score your active rules.
@@ -299,7 +299,7 @@ export default function TradeEntryModal({ isOpen, onClose }: TradeEntryModalProp
 
                                         <div className="bg-[#1a1a2e]/5 rounded-2xl p-4 mb-5">
                                             <h3 className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                                <Target size={12} /> Execution Details
+                                                <Target size={12} /> Entry/Exit Rules
                                             </h3>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
@@ -380,7 +380,7 @@ export default function TradeEntryModal({ isOpen, onClose }: TradeEntryModalProp
                                         <div className="mb-6 flex flex-col gap-6">
                                             <div>
                                                 <label className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-wider ml-1 mb-3 block flex items-center gap-2">
-                                                    <Activity size={12} className="text-[#2563eb]" /> Mood Before Trade
+                                                    <Activity size={12} className="text-[#2563eb]" /> How I was feeling before
                                                 </label>
                                                 <div className="flex justify-between gap-1.5">
                                                     {moods.map((m) => (
@@ -400,7 +400,7 @@ export default function TradeEntryModal({ isOpen, onClose }: TradeEntryModalProp
 
                                             <div>
                                                 <label className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-wider ml-1 mb-3 block flex items-center gap-2">
-                                                    <ShieldCheck size={12} className="text-[#22c55e]" /> Mood After Trade
+                                                    <ShieldCheck size={12} className="text-[#22c55e]" /> How I'm feeling now
                                                 </label>
                                                 <div className="flex justify-between gap-1.5">
                                                     {moods.map((m) => (

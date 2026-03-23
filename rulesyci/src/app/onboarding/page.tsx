@@ -156,9 +156,9 @@ export default function OnboardingPage() {
                                 <div className="absolute bottom-10 left-10 right-10 text-left">
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Discipline Framework v1.1.0</span>
+                                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Trading Plan v1.1.0</span>
                                     </div>
-                                    <h3 className="text-white font-black text-2xl leading-tight">Master Your <br/> Discipline Hub.</h3>
+                                    <h3 className="text-white font-black text-2xl leading-tight">Master Your <br/> Trading Plan.</h3>
                                 </div>
                             </div>
                             
@@ -355,7 +355,7 @@ export default function OnboardingPage() {
                                 <div className="space-y-3">
                                     {[
                                         { label: 'Risk Rules', status: 'Active' },
-                                        { label: 'Hard Stop', status: 'Active' },
+                                        { label: 'Profit Rules', status: 'Active' },
                                         { label: 'Morning Check-In', status: 'Calibrating...' }
                                     ].map((l, i) => (
                                         <motion.div key={l.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.8 }} className="flex items-center justify-between w-[240px] px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100">

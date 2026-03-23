@@ -48,7 +48,7 @@ export default function CalendarDetailSheet({ isOpen, onClose, date, data }: Cal
                                 <h3 className="text-[32px] font-black tracking-[-0.04em] text-[#1a1a2e] leading-tight">
                                     {format(date, 'MMMM d')}
                                 </h3>
-                                <p className="text-[11px] font-black text-blue-500 uppercase tracking-[0.3em] mt-1">{format(date, 'EEEE')} Protocol</p>
+                                <p className="text-[11px] font-black text-blue-500 uppercase tracking-[0.3em] mt-1">{format(date, 'EEEE')} Session</p>
                             </div>
                             <button 
                                 onClick={onClose}
@@ -64,7 +64,7 @@ export default function CalendarDetailSheet({ isOpen, onClose, date, data }: Cal
                                 <div className="bg-[#1a1a2e] rounded-[35px] p-6 border border-white/5 flex flex-col gap-4 shadow-xl">
                                     <div className="flex items-center gap-2">
                                         <TrendingUp size={14} className="text-green-500" />
-                                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Net Revenue</span>
+                                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Profit/Loss</span>
                                     </div>
                                     <span className={`text-3xl font-black tracking-tighter ${log?.pnl && log.pnl > 0 ? 'text-green-400' : 'text-gray-200'}`}>
                                         {log?.pnl ? (log.pnl > 0 ? `+$${log.pnl}` : `-$${Math.abs(log.pnl)}`) : '$0.00'}
@@ -73,7 +73,7 @@ export default function CalendarDetailSheet({ isOpen, onClose, date, data }: Cal
                                 <div className="bg-blue-600 rounded-[35px] p-6 border border-white/10 flex flex-col gap-4 shadow-2xl shadow-blue-500/30">
                                     <div className="flex items-center gap-2">
                                         <ShieldCheck size={14} className="text-white/60" />
-                                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Compliance</span>
+                                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Discipline Grade</span>
                                     </div>
                                     <span className="text-3xl font-black text-white tracking-tighter">
                                         {log?.grade || 'N/A'}
@@ -85,7 +85,7 @@ export default function CalendarDetailSheet({ isOpen, onClose, date, data }: Cal
                             <section>
                                 <div className="flex items-center justify-between mb-6 px-1">
                                     <h4 className="text-[11px] font-black text-gray-300 uppercase tracking-[0.2em] flex items-center gap-2">
-                                        <Zap size={14} className="text-blue-500" /> System Constraints
+                                        <Zap size={14} className="text-blue-500" /> My Trading Rules
                                     </h4>
                                     <div className="h-[1px] flex-1 bg-gray-50 ml-4" />
                                 </div>
@@ -115,7 +115,7 @@ export default function CalendarDetailSheet({ isOpen, onClose, date, data }: Cal
                             <section>
                                 <div className="flex items-center justify-between mb-6 px-1">
                                     <h4 className="text-[11px] font-black text-gray-300 uppercase tracking-[0.2em] flex items-center gap-2">
-                                        <Brain size={14} className="text-orange-500" /> Neural Baseline
+                                        <Brain size={14} className="text-orange-500" /> How I'm Feeling
                                     </h4>
                                     <div className="h-[1px] flex-1 bg-gray-50 ml-4" />
                                 </div>
@@ -127,12 +127,12 @@ export default function CalendarDetailSheet({ isOpen, onClose, date, data }: Cal
                                         </div>
                                         <div>
                                             <p className="text-[18px] font-black text-white">Stable & Focused</p>
-                                            <p className="text-[12px] font-bold text-orange-400 uppercase tracking-widest mt-0.5">High Alpha State</p>
+                                            <p className="text-[12px] font-bold text-orange-400 uppercase tracking-widest mt-0.5">Feeling Good</p>
                                         </div>
                                     </div>
                                     <div className="p-5 bg-white/5 rounded-3xl border border-white/5 relative z-10">
                                         <p className="text-[14px] font-bold text-gray-400 italic leading-relaxed">
-                                            "Architecture stable. Decision latency at minimum. Mental capital preserved throughout session."
+                                            "Rules followed. Thinking clearly. Energy level preserved throughout session."
                                         </p>
                                     </div>
                                 </div>
@@ -143,7 +143,7 @@ export default function CalendarDetailSheet({ isOpen, onClose, date, data }: Cal
                                 <section>
                                     <div className="flex items-center justify-between mb-6 px-1">
                                         <h4 className="text-[11px] font-black text-gray-300 uppercase tracking-[0.2em] flex items-center gap-2">
-                                            <Activity size={14} className="text-red-500" /> Market Volatility
+                                            <Activity size={14} className="text-red-500" /> Market Events
                                         </h4>
                                         <div className="h-[1px] flex-1 bg-gray-50 ml-4" />
                                     </div>
@@ -174,7 +174,7 @@ export default function CalendarDetailSheet({ isOpen, onClose, date, data }: Cal
                                     <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-gray-100 animate-pulse">
                                         <Calendar size={48} strokeWidth={3} />
                                     </div>
-                                    <p className="text-[12px] font-black text-gray-300 uppercase tracking-[0.3em]">No Architecture Data</p>
+                                    <p className="text-[12px] font-black text-gray-300 uppercase tracking-[0.3em]">No Trade Data</p>
                                 </div>
                             )}
 

@@ -98,10 +98,10 @@ export default function DiaryScannerModal({ isOpen, onClose }: { isOpen: boolean
                                     <Camera size={28} strokeWidth={2.5} />
                                 </div>
                                 <div className="flex flex-col">
-                                    <h3 className="text-[32px] font-black text-[#1a1a2e] leading-none mb-1 tracking-tighter">Vision <br/> Engine.</h3>
+                                     <h3 className="text-[32px] font-black text-[#1a1a2e] leading-none mb-1 tracking-tighter">Scan <br/> Journal.</h3>
                                     <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                                        <p className="text-[12px] font-black text-gray-400 uppercase tracking-widest">Digitizing Neural Records</p>
+                                        <p className="text-[12px] font-black text-gray-400 uppercase tracking-widest">Scanning your notes</p>
                                     </div>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@ export default function DiaryScannerModal({ isOpen, onClose }: { isOpen: boolean
                                     <div className="w-24 h-24 bg-white text-[#1a1a2e] rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-xl">
                                         <Upload size={40} strokeWidth={2.5} />
                                     </div>
-                                    <h4 className="text-[22px] font-black text-[#1a1a2e] mb-3 tracking-tight">Record Sync Architecture</h4>
+                                    <h4 className="text-[22px] font-black text-[#1a1a2e] mb-3 tracking-tight">Scan to Digital</h4>
                                     <p className="text-gray-400 text-[15px] text-center max-w-[320px] font-bold leading-relaxed px-4">Snaps physical journals, charts, and handwritten logs into your secure digital library.</p>
                                 </div>
                             ) : (
@@ -139,7 +139,7 @@ export default function DiaryScannerModal({ isOpen, onClose }: { isOpen: boolean
                                                         <ShieldCheck size={32} className="text-white animate-pulse" />
                                                     </div>
                                                 </div>
-                                                <p className="mt-8 text-[12px] font-black text-white uppercase tracking-[0.4em] animate-pulse">Architecture Analysis...</p>
+                                                <p className="mt-8 text-[12px] font-black text-white uppercase tracking-[0.4em] animate-pulse">Analyzing notes...</p>
                                             </div>
                                         )}
                                     </div>
@@ -173,7 +173,7 @@ export default function DiaryScannerModal({ isOpen, onClose }: { isOpen: boolean
                                                             <div className="w-8 h-8 rounded-full bg-[#1a1a2e] text-white flex items-center justify-center">
                                                                 <PenTool size={14} />
                                                             </div>
-                                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Neural Transcription</p>
+                                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Handwriting conversion</p>
                                                         </div>
                                                         <p className="text-[16px] text-[#1a1a2e] font-bold leading-relaxed bg-gray-50/50 p-6 rounded-[24px] italic border border-gray-50 shadow-inner">"{scanResult.rawText}"</p>
                                                     </div>
@@ -197,7 +197,7 @@ export default function DiaryScannerModal({ isOpen, onClose }: { isOpen: boolean
                                     onClick={handleSave}
                                     className="h-20 px-12 bg-[#1a1a2e] text-white rounded-full text-[17px] font-black shadow-2xl hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-4"
                                 >
-                                    Commit Capture
+                                    Save Scan
                                     <ChevronRight size={24} strokeWidth={3} />
                                 </button>
                             </footer>

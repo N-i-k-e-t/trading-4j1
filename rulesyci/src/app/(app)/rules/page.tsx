@@ -116,7 +116,7 @@ export default function RulesPage() {
             {/* STICKY HEADER */}
             <header className="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-gray-100 flex flex-col px-5 pt-3">
                 <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-[20px] font-black text-[#1a1a2e]">My Rules</h1>
+                    <h1 className="text-[20px] font-black text-[#1a1a2e]">My Trading Plan</h1>
                     <button 
                         onClick={() => setIsSheetOpen(true)}
                         className="h-10 px-5 rounded-full bg-[#1a1a2e] text-white text-[13px] font-black flex items-center gap-1.5 active:scale-95 transition-all shadow-lg shadow-[#1a1a2e]/10"
@@ -190,8 +190,8 @@ export default function RulesPage() {
                                 <div className="py-12">
                                     <EmptyState 
                                         emoji="📔"
-                                        title="Rulebook Pending"
-                                        description="You haven't defined any trading rules yet. Systemization is the key to profit."
+                                        title="Trading Plan Pending"
+                                        description="You haven't defined any trading rules yet. A good plan is the key to profit."
                                         ctaText="Browse Library"
                                         onCtaClick={() => setActiveTab('library')}
                                     />

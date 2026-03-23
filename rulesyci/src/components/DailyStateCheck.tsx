@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRuleSci } from '@/lib/context';
-import { Shield, Battery, Moon, Smile, ArrowRight, Check } from 'lucide-react';
+import { Shield, Battery, Moon, Smile, ArrowRight, Check, Coffee } from 'lucide-react';
 
 export default function DailyStateCheck() {
     const { session, completePreSession, setEmotionalBaseline } = useRuleSci();
@@ -38,7 +38,7 @@ export default function DailyStateCheck() {
                     <Shield size={28} strokeWidth={2.5} />
                 </div>
                 <h1 className="text-[36px] font-black text-[#1a1a2e] leading-[0.9] tracking-tighter mb-4">Daily <br/> Readiness.</h1>
-                <p className="text-[14px] font-bold text-gray-400 uppercase tracking-widest pl-1">Baseline Neutralization</p>
+                <p className="text-[14px] font-bold text-gray-400 uppercase tracking-widest pl-1">Morning Check-In</p>
             </header>
 
             <div className="flex-1 flex flex-col gap-10">
@@ -104,7 +104,7 @@ export default function DailyStateCheck() {
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-3 mb-4">
                                     <Smile size={20} className="text-purple-500" />
-                                    <h3 className="text-lg font-black text-[#1a1a2e]">Emotional Baseline</h3>
+                                    <h3 className="text-lg font-black text-[#1a1a2e]">How I'm Feeling</h3>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     {['neutral', 'anxious', 'greedy', 'fearful', 'calm', 'distracted'].map(mood => (
@@ -129,14 +129,14 @@ export default function DailyStateCheck() {
                         onClick={() => setStep(step + 1)}
                         className="w-full h-20 bg-[#1a1a2e] text-white rounded-full font-black text-xl flex items-center justify-center gap-3 shadow-2xl active:scale-95 transition-all"
                     >
-                        Review Protocol <ArrowRight size={20} strokeWidth={3} />
+                        Next Step <ArrowRight size={20} strokeWidth={3} />
                     </button>
                 ) : (
                     <button 
                         onClick={handleComplete}
                         className="w-full h-20 bg-[#1a1a2e] text-white rounded-full font-black text-xl flex items-center justify-center gap-3 shadow-2xl active:scale-95 transition-all"
                     >
-                        Sync Architecture <Check size={24} strokeWidth={4} />
+                        Start My Session <Check size={24} strokeWidth={4} />
                     </button>
                 )}
                 <p className="text-[11px] font-bold text-gray-300 text-center mt-6 uppercase tracking-[0.2em]">RuleSci Discipline Shield Active</p>

@@ -118,11 +118,11 @@ export default function DashboardPage() {
                     <div className="w-full flex justify-between items-center mb-8 px-2">
                         <div className="flex flex-col">
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Account Level</span>
-                            <span className="text-[13px] font-black text-[#1a1a2e]">RULESCI COMPLIANCE</span>
+                            <span className="text-[13px] font-black text-[#1a1a2e]">MY TRADING PLAN</span>
                         </div>
                         <div className="flex items-center gap-1.5 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
                             <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                            <span className="text-[10px] font-black text-green-600 uppercase tracking-widest">Systems Active</span>
+                            <span className="text-[10px] font-black text-green-600 uppercase tracking-widest">Plan Active</span>
                         </div>
                     </div>
 
@@ -254,7 +254,7 @@ export default function DashboardPage() {
                 {/* TODAY'S RULES - HERO SECTION */}
                 <section className="w-full flex flex-col gap-6 mb-12">
                     <div className="flex items-center gap-3 px-2">
-                        <span className="text-[10px] font-black text-[#1a1a2e] uppercase tracking-widest">Today's Rules</span>
+                        <span className="text-[10px] font-black text-[#1a1a2e] uppercase tracking-widest">My Rules</span>
                         <div className="h-[1.5px] flex-1 bg-blue-100" />
                         <Link href="/rules" className="text-[10px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-1">
                             Edit <ChevronRight size={10} strokeWidth={4} />
@@ -314,7 +314,7 @@ export default function DashboardPage() {
                 {/* TRADE COUNTER & ACTION */}
                 <section className="w-full flex flex-col items-center gap-6 mb-14">
                     <div className="flex flex-col items-center gap-1">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Trade Counter</span>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Trades Today</span>
                         <div className="flex items-baseline gap-2">
                             <span className="text-5xl font-black text-[#1a1a2e] leading-none">{targetTrades.length}</span>
                             <span className="text-xl font-bold text-gray-300">/ {session.tradesAllowed}</span>
@@ -380,13 +380,13 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* AI TIP - SIMPLIFIED */}
+                {/* AI COACH - SIMPLIFIED */}
                 <div className="w-full bg-[#f8fafc] border border-gray-100 rounded-[28px] p-5 flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
-                        <Info size={16} strokeWidth={3} />
+                    <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 text-[10px] font-black uppercase">
+                        AI
                     </div>
                     <p className="text-[14px] font-bold text-gray-600 leading-tight">
-                        {streak >= 30 ? "Elite focus today. Your emotional baseline is stable." : "Maintain discipline for a 5-day streak to unlock rewards."}
+                        {streak >= 30 ? "Elite focus today. How you're feeling is stable." : "Follow your rules for 5 days to unlock a special bonus."}
                     </p>
                 </div>
             </main>

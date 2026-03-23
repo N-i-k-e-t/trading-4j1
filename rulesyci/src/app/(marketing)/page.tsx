@@ -216,7 +216,7 @@ export default function LandingPage() {
                 <section className="py-24 px-6 bg-white overflow-hidden">
                     <div className="max-w-6xl mx-auto">
                         <div className="text-center mb-20">
-                            <h2 className="text-[13px] font-black text-blue-600 uppercase tracking-[0.3em] mb-4">The Protocol</h2>
+                            <h2 className="text-[13px] font-black text-blue-600 uppercase tracking-[0.3em] mb-4">The Plan</h2>
                             <h3 className="text-[38px] md:text-[52px] font-black tracking-tighter leading-none mb-6">Build a Habit of Hard Discipline.</h3>
                             <p className="text-[18px] font-bold text-gray-400 uppercase tracking-widest max-w-[500px] mx-auto text-[14px]">Simple. Scalable. Scientific.</p>
                         </div>
@@ -285,9 +285,9 @@ export default function LandingPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left max-w-2xl mx-auto">
                             {[
                                 "Emotional classification for every trade",
-                                "Revenue leakage calculations",
+                                "Money lost to broken rules calculation",
                                 "Rule-based 'Hard Stop' alerts",
-                                "Historical compliance audits"
+                                "Historical discipline audits"
                             ].map((item, i) => (
                                 <div key={i} className="flex items-center gap-3">
                                     <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
@@ -722,7 +722,7 @@ export default function LandingPage() {
                             <span className="text-[22px] font-black tracking-tight text-white">RuleSci</span>
                         </div>
                         <p className="text-[14px] font-bold leading-relaxed mb-8 text-white/60">
-                            Building the world's most disciplined trading community. No fluff, just pure habit architecture for elite execution.
+                            Building the world's most disciplined trading community. No fluff, just pure trading habits for elite execution.
                         </p>
                         <div className="flex gap-4 text-white">
                             {[

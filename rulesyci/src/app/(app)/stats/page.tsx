@@ -125,7 +125,7 @@ export default function StatsPage() {
             {/* HEADER */}
             <header className="px-1 mb-2">
                 <h1 className="text-[38px] font-black text-[#1a1a2e] leading-none mb-2 tracking-tighter">My Stats.</h1>
-                <p className="text-[14px] font-bold text-gray-400 uppercase tracking-widest pl-1">Analyze my trading performance</p>
+                <p className="text-[14px] font-bold text-gray-400 uppercase tracking-widest pl-1">How I'm Doing</p>
             </header>
 
             {/* AI COACH — HERO INSIGHT */}
@@ -182,11 +182,11 @@ export default function StatsPage() {
             <section className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm overflow-hidden relative">
                 <header className="flex justify-between items-start mb-8">
                     <div>
-                        <h3 className="text-[22px] font-black text-[#1a1a2e] tracking-tight">Account Growth</h3>
-                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest pl-0.5">Level 1: Building Habits</p>
+                        <h3 className="text-[22px] font-black text-[#1a1a2e] tracking-tight">Your Progress</h3>
+                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest pl-0.5">Level 1</p>
                     </div>
                     <div className="bg-green-50 px-4 py-2 rounded-2xl border border-green-100">
-                        <span className="text-[12px] font-black text-green-600">₹1L CAP Active</span>
+                        <span className="text-[12px] font-black text-green-600">Trading Plan Active</span>
                     </div>
                 </header>
 
@@ -267,7 +267,7 @@ export default function StatsPage() {
             {/* Trading Pattern Insights */}
             <section className="grid grid-cols-2 gap-4">
                 <div className="card-premium">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Rules Kept</span>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Rules Followed</span>
                     <div className="flex items-baseline gap-1">
                         <span className="text-[24px] font-black text-green-600 tabular-nums">{followedWinRate}%</span>
                         <span className="text-[10px] font-black text-green-500 uppercase">Win</span>

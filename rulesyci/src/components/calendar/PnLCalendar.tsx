@@ -83,7 +83,7 @@ export default function PnLCalendar() {
                     <button onClick={() => setIsAdvancedPickerOpen(true)} className="flex flex-col items-start group">
                         <div className="flex items-center gap-2 mb-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                            <span className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Live Epoch</span>
+                            <span className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Selected Month</span>
                         </div>
                         <h2 className="text-[32px] font-black tracking-[-0.05em] text-[#1a1a2e] leading-none flex items-center gap-2">
                             {format(currentDate, 'MMMM')} <span className="text-gray-200 group-hover:text-blue-500 transition-colors">{format(currentDate, 'yyyy')}</span>
@@ -116,7 +116,7 @@ export default function PnLCalendar() {
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Jump to Session</span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Go to Date</span>
                                     <h3 className="text-2xl font-black text-[#1a1a2e]">Select Date</h3>
                                 </div>
                                 <button onClick={() => setIsAdvancedPickerOpen(false)} className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 font-black active:scale-90 transition-all">
@@ -127,7 +127,7 @@ export default function PnLCalendar() {
                             <div className="flex flex-col gap-6">
                                 {/* Year Selection */}
                                 <div className="flex flex-col gap-3">
-                                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest px-1">Epoch</span>
+                                    <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest px-1">Year</span>
                                     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                                         {[2024, 2025, 2026, 2027].map(y => (
                                             <button 
@@ -161,7 +161,7 @@ export default function PnLCalendar() {
                                     onClick={() => setIsAdvancedPickerOpen(false)}
                                     className="h-[64px] w-full bg-[#1a1a2e] text-white rounded-[28px] font-black text-[16px] shadow-2xl active:scale-95 transition-all mt-4"
                                 >
-                                    Confirm Session
+                                    View Date
                                 </button>
                             </div>
                         </motion.div>
@@ -224,8 +224,8 @@ export default function PnLCalendar() {
             <div className="bg-white rounded-[32px] p-6 border border-gray-50 shadow-[0_10px_30px_rgba(0,0,0,0.02)] flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-0.5">
-                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Protocol Efficiency</span>
-                        <p className="text-[13px] font-black text-[#1a1a2e]">Monthly Benchmark</p>
+                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Monthly Discipline %</span>
+                        <p className="text-[13px] font-black text-[#1a1a2e]">Discipline Score</p>
                     </div>
                     <div className="text-right">
                         <span className="text-2xl font-black text-blue-600 tracking-tighter">{monthlyEfficiency}%</span>
@@ -234,7 +234,7 @@ export default function PnLCalendar() {
                 <div className="h-3 w-full bg-gray-50 rounded-full overflow-hidden p-0.5 border border-gray-100">
                     <motion.div initial={{ width: 0 }} animate={{ width: `${monthlyEfficiency}%` }} className="h-full bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.3)]" />
                 </div>
-                <p className="text-[12px] font-bold text-gray-400 leading-relaxed">You've maintained a perfect architecture for <span className="text-[#1a1a2e] font-black">{monthlyEfficiency}%</span> of your trading days this month.</p>
+                <p className="text-[12px] font-bold text-gray-400 leading-relaxed">You've maintained a perfect discipline score for <span className="text-[#1a1a2e] font-black">{monthlyEfficiency}%</span> of your trading days this month.</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -253,7 +253,7 @@ export default function PnLCalendar() {
                     <div className="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center mb-4">
                         <Award size={20} className="text-blue-100" />
                     </div>
-                    <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">Architecture Max</span>
+                    <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">Best Streak</span>
                     <div className="flex items-baseline gap-1">
                         <span className="text-3xl font-black text-white leading-none">{maxStreak}</span>
                         <span className="text-[10px] font-black text-white/40">DAYS</span>

@@ -88,7 +88,7 @@ export default function MentalReset({ isOpen, onClose }: MentalResetProps) {
                                     <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
                                         <MessageSquare size={16} />
                                     </div>
-                                    Neural Reflection
+                                    Daily Lesson
                                 </h3>
                                 <textarea 
                                     autoFocus
@@ -120,7 +120,7 @@ export default function MentalReset({ isOpen, onClose }: MentalResetProps) {
                         onClick={handleFinalize}
                         className="w-full h-20 bg-[#1a1a2e] text-white rounded-full font-black text-xl flex items-center justify-center gap-3 shadow-2xl active:scale-95 transition-all"
                     >
-                        Close Baseline <Coffee size={24} strokeWidth={4} />
+                        Finish Session <Coffee size={24} strokeWidth={4} />
                     </button>
                 )}
             </footer>
