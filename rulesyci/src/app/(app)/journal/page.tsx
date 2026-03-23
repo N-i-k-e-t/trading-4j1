@@ -20,7 +20,7 @@ type ModeType = 'trades' | 'scans';
 type FilterType = 'all' | 'wins' | 'losses' | 'today' | 'week' | 'month';
 
 export default function JournalPage() {
-    const { trades, diaryEntries, setCaptureOpen } = useRuleSci();
+    const { trades, diaryEntries, setCaptureOpen, setCaptureMode } = useRuleSci();
     const router = useRouter();
     const [mode, setMode] = useState<ModeType>('trades');
     const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
@@ -68,7 +68,14 @@ export default function JournalPage() {
                         <p className="text-[14px] font-bold text-gray-400 uppercase tracking-widest pl-1">My Trading History</p>
                     </div>
                     <button 
-                        onClick={() => mode === 'trades' ? setCaptureOpen(true) : setIsScannerOpen(true)}
+                        onClick={() => {
+                            if (mode === 'trades') {
+                                setCaptureMode('checklist');
+                                setCaptureOpen(true);
+                            } else {
+                                setIsScannerOpen(true);
+                            }
+                        }}
                         className="w-16 h-16 bg-[#1a1a2e] text-white rounded-full flex items-center justify-center shadow-2xl active:scale-95 transition-all"
                     >
                         {mode === 'trades' ? <Activity size={28} strokeWidth={2.5} /> : <Camera size={28} strokeWidth={2.5} />}
@@ -161,7 +168,10 @@ export default function JournalPage() {
                                 <h3 className="text-[18px] font-black text-[#1a1a2e]">No trades yet today.</h3>
                                 <p className="text-[14px] font-bold text-gray-400">After your next trade, tap here to log it. It takes 30 seconds.</p>
                                 <button 
-                                    onClick={() => setCaptureOpen(true)}
+                                    onClick={() => {
+                                        setCaptureMode('checklist');
+                                        setCaptureOpen(true);
+                                    }}
                                     className="bg-[#1a1a2e] text-white px-8 h-12 rounded-full font-black text-[13px] uppercase tracking-widest mt-2"
                                 >
                                     Log My First Trade

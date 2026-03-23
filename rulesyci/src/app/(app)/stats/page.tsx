@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export default function StatsPage() {
-    const { trades, rules, dailyLogs, userModel, setCaptureOpen, analytics } = useRuleSci();
+    const { trades, rules, dailyLogs, userModel, setCaptureOpen, setCaptureMode, analytics } = useRuleSci();
     const [period, setPeriod] = useState('All');
 
     // Filter trades by period
@@ -252,7 +252,10 @@ export default function StatsPage() {
                         <h3 className="text-[18px] font-black text-[#1a1a2e]">Your progress will appear after your first week.</h3>
                         <p className="text-[14px] font-bold text-gray-400">Log trades daily and we'll show you patterns you can't see on your own.</p>
                         <button 
-                            onClick={() => setCaptureOpen(true)}
+                            onClick={() => {
+                                setCaptureMode('checklist');
+                                setCaptureOpen(true);
+                            }}
                             className="bg-[#1a1a2e] text-white px-8 h-12 rounded-full font-black text-[13px] uppercase tracking-widest mt-2"
                         >
                             Start Today →
@@ -315,7 +318,10 @@ export default function StatsPage() {
                         emoji="🧠"
                         title="AI Analysis Pending"
                         description={`Log at least ${3 - trades.length} more trades to unlock detailed pattern analysis.`}
-                        action={{ label: "Log Trade", onClick: () => setCaptureOpen(true) }}
+                        action={{ label: "Log Trade", onClick: () => {
+                            setCaptureMode('checklist');
+                            setCaptureOpen(true);
+                        } }}
                     />
                 )}
             </section>

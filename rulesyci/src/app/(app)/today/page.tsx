@@ -22,7 +22,7 @@ import MentalReset from '@/components/MentalReset';
 
 export default function DashboardPage() {
     const { 
-        rules, trades, dailyLogs, session, logDaily, setCaptureOpen, 
+        rules, trades, dailyLogs, session, logDaily, setCaptureOpen, setCaptureMode,
         analytics, lockRules, showToast 
     } = useRuleSci();
     const router = useRouter();
@@ -322,7 +322,10 @@ export default function DashboardPage() {
                     </div>
 
                     <button 
-                        onClick={() => setCaptureOpen(true)}
+                        onClick={() => {
+                            setCaptureMode('checklist');
+                            setCaptureOpen(true);
+                        }}
                         className="w-full h-18 bg-[#1a1a2e] text-white rounded-[32px] font-black text-[16px] flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(26,26,46,0.2)] active:scale-95 transition-all py-5"
                     >
                         <Plus size={20} strokeWidth={4} />
