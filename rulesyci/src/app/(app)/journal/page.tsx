@@ -59,9 +59,9 @@ export default function JournalPage() {
     ];
 
     return (
-        <div className="min-h-[100dvh] bg-white flex flex-col pb-[calc(env(safe-area-inset-bottom)+84px)] italic-none">
+        <div className="min-h-[100dvh] bg-white flex flex-col pb-[calc(env(safe-area-inset-bottom)+110px)] italic-none overflow-x-hidden">
             {/* HEADER */}
-            <header className="px-5 pt-12 mb-8">
+            <header className="px-5 pt-[calc(env(safe-area-inset-top)+20px)] mb-8">
                 <div className="flex items-center justify-between mb-10">
                     <div className="flex flex-col">
                         <h1 className="text-[38px] font-black text-[#1a1a2e] leading-none mb-1 tracking-tighter">Trade <br/> Journal.</h1>

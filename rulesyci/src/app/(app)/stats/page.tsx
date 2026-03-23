@@ -121,7 +121,7 @@ export default function StatsPage() {
     const streakPercent = bestStreak > 0 ? Math.min((streak / Math.max(bestStreak, 1)) * 100, 100) : (streak > 0 ? 100 : 0);
 
     return (
-        <div className="flex flex-col gap-6 px-5 pt-12 pb-[calc(env(safe-area-inset-bottom)+84px)] italic-none">
+        <div className="min-h-[100dvh] flex flex-col gap-6 px-5 pt-[calc(env(safe-area-inset-top)+20px)] pb-[calc(env(safe-area-inset-bottom)+110px)] italic-none overflow-x-hidden">
             {/* HEADER */}
             <header className="px-1 mb-2">
                 <h1 className="text-[38px] font-black text-[#1a1a2e] leading-none mb-2 tracking-tighter">My Stats.</h1>

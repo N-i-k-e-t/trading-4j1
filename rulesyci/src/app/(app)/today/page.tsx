@@ -112,8 +112,8 @@ export default function DashboardPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#fafafa] pb-48 selection:bg-blue-100 italic-none">
-            <main className="px-5 pt-20 flex flex-col items-center">
+        <div className="min-h-[100dvh] bg-[#fafafa] pb-[calc(env(safe-area-inset-bottom)+120px)] selection:bg-blue-100 italic-none overflow-x-hidden">
+            <main className="px-5 pt-[calc(env(safe-area-inset-top)+20px)] flex flex-col items-center">
                 <header className="w-full mb-10 flex flex-col items-center">
                     <div className="w-full flex justify-between items-center mb-8 px-2">
                         <div className="flex flex-col">
