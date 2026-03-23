@@ -70,6 +70,25 @@ export default function SignupPage() {
         }
     };
 
+    const handleSocialSignup = async (provider: 'google' | 'github') => {
+        if (!termsAccepted) {
+            showToast('Please accept the Terms & Conditions first', 'info');
+            return;
+        }
+
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider,
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                },
+            });
+            if (error) throw error;
+        } catch (err: any) {
+            showToast(err.message || 'Social signup failed', 'error');
+        }
+    };
+
     return (
         <div className="min-h-[100dvh] bg-white flex flex-col items-center justify-center px-6 selection:bg-blue-100 relative overflow-hidden"
             style={{ 
@@ -206,10 +225,16 @@ export default function SignupPage() {
 
                     {/* OAUTH */}
                     <div className="px-10 pb-10 flex gap-4">
-                        <button className="flex-1 h-[60px] bg-white border-2 border-gray-100 rounded-[22px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm group hover:border-blue-500/20">
+                        <button 
+                            onClick={() => handleSocialSignup('google')}
+                            className="flex-1 h-[60px] bg-white border-2 border-gray-100 rounded-[22px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm group hover:border-blue-500/20"
+                        >
                             <img src="https://www.google.com/favicon.ico" className="w-5 h-5 grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all" alt="G" />
                         </button>
-                        <button className="flex-1 h-[60px] bg-white border-2 border-gray-100 rounded-[22px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm group hover:border-blue-500/20">
+                        <button 
+                            onClick={() => handleSocialSignup('github')}
+                            className="flex-1 h-[60px] bg-white border-2 border-gray-100 rounded-[22px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm group hover:border-gray-800/20"
+                        >
                             <img src="https://github.com/favicon.ico" className="w-5 h-5 grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all" alt="A" />
                         </button>
                     </div>
