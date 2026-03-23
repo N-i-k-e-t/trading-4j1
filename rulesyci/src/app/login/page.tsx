@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useRuleSci } from '@/lib/context';
 import { createClient } from '@/utils/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, Target, ArrowLeft, Loader2, Zap } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Target, ArrowLeft, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
     const { login, showToast, setUser, user } = useRuleSci();
@@ -42,27 +42,9 @@ export default function LoginPage() {
         }
     }, [user, router]);
 
-    const handleGuestLogin = () => {
-        setIsLoading(true);
-        // Simulate a real architectural boot
-        setTimeout(() => {
-            const mockUser = {
-                email: 'demo@rulesci.app',
-                name: 'Elite Trader',
-                isPro: true,
-                isAdmin: true,
-                trialStartDate: new Date().toISOString()
-            };
-            setUser(mockUser);
-            showToast('Loading your dashboard...', 'success');
-            router.replace('/today');
-        }, 800);
-    };
-
     const handleSocialLogin = async (provider: 'google' | 'github') => {
         if (isPlaceholderAuth) {
-            showToast('Supabase not configured. Using Demo Mode.', 'info');
-            handleGuestLogin();
+            showToast('Authentication not configured', 'error');
             return;
         }
 
@@ -83,8 +65,7 @@ export default function LoginPage() {
         e.preventDefault();
         
         if (isPlaceholderAuth) {
-            showToast('Supabase not configured. Using Demo Mode.', 'info');
-            handleGuestLogin();
+            showToast('Authentication not configured', 'error');
             return;
         }
 
@@ -133,14 +114,6 @@ export default function LoginPage() {
                 <ArrowLeft size={16} strokeWidth={3} />
                 Back
             </Link>
-
-            {isPlaceholderAuth && (
-                <div className="absolute top-8 right-6">
-                    <div className="px-3 py-1 bg-blue-100 border border-blue-200 text-blue-700 text-[9px] font-black uppercase tracking-widest rounded-full">
-                        Offline Mode
-                    </div>
-                </div>
-            )}
 
             <div className="w-full max-w-[400px] flex flex-col pt-12 relative z-10">
                 {/* HEADER */}
@@ -236,33 +209,23 @@ export default function LoginPage() {
                     {/* DIVIDER */}
                     <div className="px-10 pb-6 flex items-center gap-4">
                         <div className="flex-1 h-[1px] bg-gray-100/50" />
-                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Deployment Path</span>
+                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Sign in with</span>
                         <div className="flex-1 h-[1px] bg-gray-100/50" />
                     </div>
 
-                    {/* ACTIONS */}
-                    <div className="px-10 pb-10 flex flex-col gap-4">
+                    <div className="px-10 pb-10 flex gap-4">
                         <button 
-                            onClick={handleGuestLogin}
-                            className="w-full h-[60px] bg-white border-2 border-gray-100 text-[#1a1a2e] font-black rounded-[22px] active:scale-[0.97] transition-all flex items-center justify-center gap-2 uppercase tracking-[0.15em] text-[12px] hover:border-blue-500/20 shadow-sm"
+                            onClick={() => handleSocialLogin('google')}
+                            className="flex-1 h-[60px] bg-white border-2 border-gray-100 rounded-[22px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm group hover:border-blue-500/20"
                         >
-                            <Zap size={18} className="text-blue-500" /> Try Demo Mode
+                            <img src="https://www.google.com/favicon.ico" className="w-5 h-5 grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all" alt="G" />
                         </button>
-                        
-                        <div className="flex gap-4">
-                            <button 
-                                onClick={() => handleSocialLogin('google')}
-                                className="flex-1 h-[60px] bg-white border-2 border-gray-100 rounded-[22px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm group hover:border-blue-500/20"
-                            >
-                                <img src="https://www.google.com/favicon.ico" className="w-5 h-5 grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all" alt="G" />
-                            </button>
-                            <button 
-                                onClick={() => handleSocialLogin('github')}
-                                className="flex-1 h-[60px] bg-white border-2 border-gray-100 rounded-[22px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm group hover:border-gray-800/20"
-                            >
-                                <img src="https://github.com/favicon.ico" className="w-5 h-5 grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all" alt="A" />
-                            </button>
-                        </div>
+                        <button 
+                            onClick={() => handleSocialLogin('github')}
+                            className="flex-1 h-[60px] bg-white border-2 border-gray-100 rounded-[22px] flex items-center justify-center gap-3 text-[14px] font-black text-[#1a1a2e] active:scale-[0.97] transition-all shadow-sm group hover:border-gray-800/20"
+                        >
+                            <img src="https://github.com/favicon.ico" className="w-5 h-5 grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all" alt="A" />
+                        </button>
                     </div>
                 </motion.div>
 
